@@ -1,0 +1,44 @@
+/* Problem Client — admin styles */
+
+.pc-metabox .pc-warn {
+	padding: 8px 10px;
+	background: #fff6f6;
+	border-radius: 3px;
+}
+.pc-metabox .pc-note {
+	margin: 6px 0;
+	font-style: italic;
+}
+.pc-metabox .pc-meta {
+	margin: 6px 0 10px;
+	color: #666;
+	font-size: 12px;
+}
+
+.pc-pill {
+	display: inline-block;
+	padding: 1px 8px;
+	border-radius: 10px;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+.pc-wrap .pc-form {
+	margin: 10px 0 20px;
+	padding: 4px 16px 12px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	max-width: 720px;
+}
+.pc-wrap .pc-filters {
+	margin: 10px 0;
+}
+.pc-wrap .pc-table {
+	margin-top: 8px;
+}
+.pc-wrap .button-link-delete {
+	color: #b32d2e;
+}
