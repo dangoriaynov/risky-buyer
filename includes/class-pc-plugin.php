@@ -21,6 +21,7 @@ class PC_Plugin {
 	}
 
 	public function init() {
+		add_action( 'init', array( $this, 'load_textdomain' ) );
 		add_action( 'admin_init', array( 'PC_Local_Table_Provider', 'maybe_install' ) );
 
 		PC_Ajax::instance()->hooks();
@@ -39,6 +40,10 @@ class PC_Plugin {
 	 * @param object|null $screen Current screen.
 	 * @return bool
 	 */
+	public function load_textdomain() {
+		load_plugin_textdomain( 'problem-client', false, dirname( plugin_basename( PC_FILE ) ) . '/languages' );
+	}
+
 	public static function is_relevant_screen( $screen ) {
 		if ( ! $screen ) {
 			return false;

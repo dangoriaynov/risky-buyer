@@ -4,9 +4,16 @@
  * Description: Маркира проблемни клиенти (по телефон/име) с причина и бележка; автоматично отбелязва техните поръчки в списъка. Архитектура със storage provider за бъдеща централизация между сайтове.
  * Version: 0.2.0
  * Author: dangoriaynov
+ * Author URI: https://github.com/dangoriaynov
+ * Plugin URI: https://github.com/dangoriaynov/problem-client
  * Requires PHP: 7.4
  * Requires at least: 6.0
+ * Tested up to: 6.9
+ * Requires Plugins: woocommerce
  * Text Domain: problem-client
+ * Domain Path: /languages
+ * License: GPLv2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
  * @package ProblemClient
  */
@@ -32,6 +39,16 @@ require_once PC_DIR . 'includes/admin/class-pc-admin-page.php';
 require_once PC_DIR . 'includes/class-pc-plugin.php';
 
 register_activation_hook( __FILE__, array( 'PC_Local_Table_Provider', 'install' ) );
+
+// Declare WooCommerce HPOS (custom order tables) compatibility.
+add_action(
+	'before_woocommerce_init',
+	function () {
+		if ( class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+		}
+	}
+);
 
 add_action(
 	'plugins_loaded',

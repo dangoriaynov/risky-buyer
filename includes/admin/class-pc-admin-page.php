@@ -28,14 +28,14 @@ class PC_Admin_Page {
 	}
 
 	public function menu() {
-		add_menu_page(
+		add_submenu_page(
+			'woocommerce',
 			'Проблемни клиенти',
 			'Проблемни клиенти',
 			'edit_shop_orders',
 			self::SLUG,
 			array( $this, 'render_page' ),
-			'dashicons-warning',
-			56
+			1
 		);
 	}
 
