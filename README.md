@@ -20,8 +20,12 @@ site **manually**; formal activation in WordPress comes later, once polished.
   colored bar) — works **across pagination** (computed server-side).
 - Order edit screen: a warning panel when the client is blacklisted, or a
   "mark client" form otherwise.
-- Admin page **"Проблемни клиенти"**: search/filter, add (team), edit/delete
-  (admins only).
+- Admin page **"Проблемни клиенти"** with tabs:
+  - **Проверка** — check a caller by phone and/or name → exact match + possible
+    (partial) matches for manual verification.
+  - **Списък** — search/filter; edit/delete (admins only).
+  - **Добавяне** — add one client, or **bulk** (one per line, batch reason/note;
+    existing entries skipped).
 
 ## Permissions
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Problem Client — споделен черен списък на клиенти
  * Description: Маркира проблемни клиенти (по телефон/име) с причина и бележка; автоматично отбелязва техните поръчки в списъка. Архитектура със storage provider за бъдеща централизация между сайтове.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: dangoriaynov
  * Requires PHP: 7.4
  * Requires at least: 6.0
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PC_VERSION', '0.1.0' );
+define( 'PC_VERSION', '0.2.0' );
 define( 'PC_DB_VERSION', '1' );
 define( 'PC_FILE', __FILE__ );
 define( 'PC_DIR', plugin_dir_path( __FILE__ ) );

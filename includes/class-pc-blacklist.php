@@ -267,4 +267,164 @@ class PC_Blacklist {
 		}
 		return $this->match( $phone, $name );
 	}
+
+	/**
+	 * Whether an active entry already exists for this phone or name.
+	 *
+	 * @param string $phone_norm Normalized phone.
+	 * @param string $name_norm  Normalized name.
+	 * @return bool
+	 */
+	public function exists( $phone_norm, $name_norm ) {
+		$idx = $this->index();
+		if ( '' !== $phone_norm && isset( $idx['phones'][ $phone_norm ] ) ) {
+			return true;
+		}
+		if ( '' !== $name_norm && isset( $idx['names'][ $name_norm ] ) ) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Partial ("possible") matches for manual verification — substring on the
+	 * last digits of the phone and on name tokens. Filtered in PHP over the
+	 * (small, curated) active list.
+	 *
+	 * @param string $phone        Raw phone typed.
+	 * @param string $name         Raw name typed.
+	 * @param string $exclude_uuid Exact-match uuid to exclude.
+	 * @return array<int,array>
+	 */
+	public function possible_matches( $phone, $name, $exclude_uuid = '' ) {
+		$digits = preg_replace( '/\D+/', '', (string) $phone );
+		$frag   = strlen( $digits ) >= 6 ? substr( $digits, -6 ) : '';
+		$nname  = self::normalize_name( $name );
+
+		$words = array();
+		if ( '' !== $nname ) {
+			foreach ( explode( ' ', $nname ) as $w ) {
+				if ( mb_strlen( $w ) >= 3 ) {
+					$words[] = $w;
+				}
+			}
+		}
+		if ( '' === $frag && empty( $words ) ) {
+			return array();
+		}
+
+		$out = array();
+		foreach ( $this->provider->all( array( 'status' => 'active' ) ) as $e ) {
+			if ( $exclude_uuid && isset( $e['uuid'] ) && $e['uuid'] === $exclude_uuid ) {
+				continue;
+			}
+			$hit = false;
+			if ( '' !== $frag && ! empty( $e['phone_norm'] ) && false !== strpos( $e['phone_norm'], $frag ) ) {
+				$hit = true;
+			}
+			if ( ! $hit && ! empty( $e['name_norm'] ) ) {
+				foreach ( $words as $w ) {
+					if ( false !== strpos( $e['name_norm'], $w ) ) {
+						$hit = true;
+						break;
+					}
+				}
+			}
+			if ( $hit ) {
+				$out[] = $e;
+			}
+		}
+		return $out;
+	}
+
+	/**
+	 * Bulk add: one client per line; fields split by , ; tab or |.
+	 * A token with >=6 digits is treated as the phone, the rest as the name.
+	 * Skips lines already in the list (by phone or name) and invalid lines.
+	 *
+	 * @param string $text   Raw textarea content.
+	 * @param string $reason Reason applied to the whole batch.
+	 * @param string $note   Note applied to the whole batch.
+	 * @return array{added:int,skipped:int,invalid:int}|WP_Error
+	 */
+	public function bulk_add( $text, $reason, $note ) {
+		if ( ! $this->can_add() ) {
+			return new WP_Error( 'pc_forbidden', 'Нямате права да добавяте.' );
+		}
+		$reason = self::valid_reason( $reason );
+		$note   = wp_strip_all_tags( (string) $note );
+
+		// Seed a local "seen" set once, then keep it up to date in-batch.
+		$idx         = $this->index();
+		$seen_phones = $idx['phones'];
+		$seen_names  = $idx['names'];
+
+		$added   = 0;
+		$skipped = 0;
+		$invalid = 0;
+
+		$lines = preg_split( '/\r\n|\r|\n/', (string) $text );
+		foreach ( $lines as $line ) {
+			$line = trim( $line );
+			if ( '' === $line ) {
+				continue;
+			}
+
+			$parts = preg_split( '/[,;\t|]+/', $line );
+			$phone = '';
+			$name  = array();
+			foreach ( $parts as $p ) {
+				$p = trim( $p );
+				if ( '' === $p ) {
+					continue;
+				}
+				$d = preg_replace( '/\D+/', '', $p );
+				if ( '' === $phone && strlen( $d ) >= 6 ) {
+					$phone = $p;
+				} else {
+					$name[] = $p;
+				}
+			}
+			$name_str   = trim( implode( ' ', $name ) );
+			$phone_norm = self::normalize_phone( $phone );
+			$name_norm  = self::normalize_name( $name_str );
+
+			if ( '' === $phone_norm && '' === $name_norm ) {
+				++$invalid;
+				continue;
+			}
+			if ( ( '' !== $phone_norm && isset( $seen_phones[ $phone_norm ] ) ) ||
+				( '' !== $name_norm && isset( $seen_names[ $name_norm ] ) ) ) {
+				++$skipped;
+				continue;
+			}
+
+			$res = $this->add_entry(
+				array(
+					'name'   => $name_str,
+					'phone'  => $phone,
+					'reason' => $reason,
+					'note'   => $note,
+				)
+			);
+			if ( is_wp_error( $res ) ) {
+				++$invalid;
+			} else {
+				++$added;
+				if ( '' !== $phone_norm ) {
+					$seen_phones[ $phone_norm ] = true;
+				}
+				if ( '' !== $name_norm ) {
+					$seen_names[ $name_norm ] = true;
+				}
+			}
+		}
+
+		$this->idx = null;
+		return array(
+			'added'   => $added,
+			'skipped' => $skipped,
+			'invalid' => $invalid,
+		);
+	}
 }

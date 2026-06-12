@@ -42,3 +42,39 @@
 .pc-wrap .button-link-delete {
 	color: #b32d2e;
 }
+
+.pc-check-form {
+	margin: 12px 0 4px;
+}
+.pc-result {
+	margin: 16px 0;
+	padding: 10px 16px;
+	border-radius: 6px;
+}
+.pc-result h2 {
+	margin: 4px 0;
+}
+.pc-result-yes {
+	background: #fdecea;
+	border: 1px solid #d63638;
+}
+.pc-result-no {
+	background: #edf7ed;
+	border: 1px solid #2e9e4f;
+}
+.pc-card {
+	background: transparent;
+	border-collapse: collapse;
+	margin-top: 6px;
+}
+.pc-card th {
+	text-align: left;
+	padding: 3px 14px 3px 0;
+	white-space: nowrap;
+	color: #555;
+	vertical-align: top;
+	font-weight: 600;
+}
+.pc-card td {
+	padding: 3px 0;
+}
