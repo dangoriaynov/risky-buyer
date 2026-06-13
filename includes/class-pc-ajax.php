@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Ajax {
+class Probclient_Ajax {
 
 	protected static $instance = null;
 
@@ -21,17 +21,17 @@ class PC_Ajax {
 	}
 
 	public function hooks() {
-		add_action( 'wp_ajax_pc_mark', array( $this, 'mark' ) );
-		add_action( 'wp_ajax_pc_unmark', array( $this, 'unmark' ) );
+		add_action( 'wp_ajax_probclient_mark', array( $this, 'mark' ) );
+		add_action( 'wp_ajax_probclient_unmark', array( $this, 'unmark' ) );
 	}
 
 	/**
 	 * Mark a client (from an order) as problematic.
 	 */
 	public function mark() {
-		check_ajax_referer( 'pc_ajax', 'nonce' );
+		check_ajax_referer( 'probclient_ajax', 'nonce' );
 
-		$bl = PC_Blacklist::instance();
+		$bl = Probclient_Blacklist::instance();
 		if ( ! $bl->can_add() ) {
 			wp_send_json_error( array( 'message' => 'Нямате права.' ), 403 );
 		}
@@ -77,8 +77,8 @@ class PC_Ajax {
 		wp_send_json_success(
 			array(
 				'uuid'   => $result['uuid'],
-				'label'  => PC_Blacklist::reason_label( $result['reason_code'] ),
-				'color'  => PC_Blacklist::reason_color( $result['reason_code'] ),
+				'label'  => Probclient_Blacklist::reason_label( $result['reason_code'] ),
+				'color'  => Probclient_Blacklist::reason_color( $result['reason_code'] ),
 				'note'   => $result['note'],
 				'name'   => $result['name_raw'],
 				'phone'  => $result['phone_raw'],
@@ -91,9 +91,9 @@ class PC_Ajax {
 	 * Remove a blacklist entry (admins only).
 	 */
 	public function unmark() {
-		check_ajax_referer( 'pc_ajax', 'nonce' );
+		check_ajax_referer( 'probclient_ajax', 'nonce' );
 
-		$bl = PC_Blacklist::instance();
+		$bl = Probclient_Blacklist::instance();
 		$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
 		if ( '' === $uuid ) {
 			wp_send_json_error( array( 'message' => 'Липсва идентификатор.' ), 400 );

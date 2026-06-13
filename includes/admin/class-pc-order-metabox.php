@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Order_Metabox {
+class Probclient_Order_Metabox {
 
 	protected static $instance = null;
 
@@ -34,7 +34,7 @@ class PC_Order_Metabox {
 			}
 		}
 		add_meta_box(
-			'pc_problem_client',
+			'probclient_metabox',
 			'⚠ Проблемен клиент',
 			array( $this, 'render_box' ),
 			$screen,
@@ -57,14 +57,14 @@ class PC_Order_Metabox {
 			return;
 		}
 
-		$bl    = PC_Blacklist::instance();
+		$bl    = Probclient_Blacklist::instance();
 		$entry = $bl->match_order( $order );
 
 		echo '<div class="pc-metabox" data-order-id="' . esc_attr( $order->get_id() ) . '">';
 
 		if ( $entry ) {
-			$color = PC_Blacklist::reason_color( $entry['reason_code'] );
-			$label = PC_Blacklist::reason_label( $entry['reason_code'] );
+			$color = Probclient_Blacklist::reason_color( $entry['reason_code'] );
+			$label = Probclient_Blacklist::reason_label( $entry['reason_code'] );
 			echo '<div class="pc-warn" style="border-left:4px solid ' . esc_attr( $color ) . ';">';
 			echo '<strong style="color:' . esc_attr( $color ) . ';">' . esc_html( $label ) . '</strong>';
 			if ( ! empty( $entry['note'] ) ) {
@@ -91,7 +91,7 @@ class PC_Order_Metabox {
 		} elseif ( $bl->can_add() ) {
 			echo '<p>Маркирай този клиент като проблемен (по име и телефон от поръчката).</p>';
 			echo '<p><label>Причина<br><select class="pc-reason widefat">';
-			foreach ( PC_Blacklist::reasons() as $code => $r ) {
+			foreach ( Probclient_Blacklist::reasons() as $code => $r ) {
 				echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $r['label'] ) . '</option>';
 			}
 			echo '</select></label></p>';

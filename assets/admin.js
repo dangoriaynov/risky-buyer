@@ -1,12 +1,12 @@
-/* global PC_DATA, jQuery */
+/* global ProbclientData, jQuery */
 ( function ( $ ) {
 	'use strict';
 
 	function post( action, data ) {
 		data = data || {};
 		data.action = action;
-		data.nonce = PC_DATA.nonce;
-		return $.post( PC_DATA.ajax_url, data );
+		data.nonce = ProbclientData.nonce;
+		return $.post( ProbclientData.ajax_url, data );
 	}
 
 	$( document ).on( 'click', '.pc-mark-btn', function ( e ) {
@@ -17,40 +17,40 @@
 		var note = $box.find( '.pc-note-input' ).val() || '';
 		var $btn = $( this ).prop( 'disabled', true );
 
-		post( 'pc_mark', { order_id: orderId, reason: reason, note: note } )
+		post( 'probclient_mark', { order_id: orderId, reason: reason, note: note } )
 			.done( function ( res ) {
 				if ( res && res.success ) {
 					window.location.reload();
 				} else {
-					window.alert( ( res && res.data && res.data.message ) || PC_DATA.i18n.error );
+					window.alert( ( res && res.data && res.data.message ) || ProbclientData.i18n.error );
 					$btn.prop( 'disabled', false );
 				}
 			} )
 			.fail( function () {
-				window.alert( PC_DATA.i18n.error );
+				window.alert( ProbclientData.i18n.error );
 				$btn.prop( 'disabled', false );
 			} );
 	} );
 
 	$( document ).on( 'click', '.pc-unmark-btn', function ( e ) {
 		e.preventDefault();
-		if ( ! window.confirm( PC_DATA.i18n.confirm_remove ) ) {
+		if ( ! window.confirm( ProbclientData.i18n.confirm_remove ) ) {
 			return;
 		}
 		var uuid = $( this ).data( 'uuid' );
 		var $btn = $( this ).prop( 'disabled', true );
 
-		post( 'pc_unmark', { uuid: uuid } )
+		post( 'probclient_unmark', { uuid: uuid } )
 			.done( function ( res ) {
 				if ( res && res.success ) {
 					window.location.reload();
 				} else {
-					window.alert( ( res && res.data && res.data.message ) || PC_DATA.i18n.error );
+					window.alert( ( res && res.data && res.data.message ) || ProbclientData.i18n.error );
 					$btn.prop( 'disabled', false );
 				}
 			} )
 			.fail( function () {
-				window.alert( PC_DATA.i18n.error );
+				window.alert( ProbclientData.i18n.error );
 				$btn.prop( 'disabled', false );
 			} );
 	} );

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Plugin {
+class Probclient_Plugin {
 
 	protected static $instance = null;
 
@@ -22,15 +22,15 @@ class PC_Plugin {
 
 	public function init() {
 		add_action( 'init', array( $this, 'load_textdomain' ) );
-		add_action( 'admin_init', array( 'PC_Local_Table_Provider', 'maybe_install' ) );
+		add_action( 'admin_init', array( 'Probclient_Local_Table_Provider', 'maybe_install' ) );
 
-		PC_Ajax::instance()->hooks();
+		Probclient_Ajax::instance()->hooks();
 
 		if ( is_admin() ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );
-			PC_Admin_Page::instance()->hooks();
-			PC_Order_Metabox::instance()->hooks();
-			PC_Orders_List::instance()->hooks();
+			Probclient_Admin_Page::instance()->hooks();
+			Probclient_Order_Metabox::instance()->hooks();
+			Probclient_Orders_List::instance()->hooks();
 		}
 	}
 
@@ -41,7 +41,7 @@ class PC_Plugin {
 	 * @return bool
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( 'problem-client', false, dirname( plugin_basename( PC_FILE ) ) . '/languages' );
+		load_plugin_textdomain( 'problem-client', false, dirname( plugin_basename( PROBCLIENT_FILE ) ) . '/languages' );
 	}
 
 	public static function is_relevant_screen( $screen ) {
@@ -61,17 +61,17 @@ class PC_Plugin {
 			return;
 		}
 
-		wp_enqueue_style( 'pc-admin', PC_URL . 'assets/admin.css', array(), PC_VERSION );
-		wp_enqueue_script( 'pc-admin', PC_URL . 'assets/admin.js', array( 'jquery' ), PC_VERSION, true );
+		wp_enqueue_style( 'probclient-admin', PROBCLIENT_URL . 'assets/admin.css', array(), PROBCLIENT_VERSION );
+		wp_enqueue_script( 'probclient-admin', PROBCLIENT_URL . 'assets/admin.js', array( 'jquery' ), PROBCLIENT_VERSION, true );
 
-		$bl = PC_Blacklist::instance();
+		$bl = Probclient_Blacklist::instance();
 		wp_localize_script(
-			'pc-admin',
-			'PC_DATA',
+			'probclient-admin',
+			'ProbclientData',
 			array(
 				'ajax_url'   => admin_url( 'admin-ajax.php' ),
-				'nonce'      => wp_create_nonce( 'pc_ajax' ),
-				'reasons'    => PC_Blacklist::reasons(),
+				'nonce'      => wp_create_nonce( 'probclient_ajax' ),
+				'reasons'    => Probclient_Blacklist::reasons(),
 				'can_add'    => $bl->can_add(),
 				'can_manage' => $bl->can_manage(),
 				'i18n'       => array(

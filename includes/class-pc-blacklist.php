@@ -12,15 +12,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Blacklist {
+class Probclient_Blacklist {
 
-	/** @var PC_Storage_Provider */
+	/** @var Probclient_Storage_Provider */
 	protected $provider;
 
 	/** @var array|null Cached active index. */
 	protected $idx = null;
 
-	/** @var PC_Blacklist|null */
+	/** @var Probclient_Blacklist|null */
 	protected static $instance = null;
 
 	public static function instance() {
@@ -31,13 +31,13 @@ class PC_Blacklist {
 	}
 
 	public function __construct() {
-		$provider = new PC_Local_Table_Provider();
+		$provider = new Probclient_Local_Table_Provider();
 		/**
 		 * Swap the storage backend (e.g. a future central/remote provider).
 		 *
-		 * @param PC_Storage_Provider $provider Default local provider.
+		 * @param Probclient_Storage_Provider $provider Default local provider.
 		 */
-		$this->provider = apply_filters( 'pc_storage_provider', $provider );
+		$this->provider = apply_filters( 'probclient_storage_provider', $provider );
 	}
 
 	public function provider() {
@@ -121,7 +121,7 @@ class PC_Blacklist {
 
 	public function add_entry( $data ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'pc_forbidden', 'Нямате права да добавяте.' );
+			return new WP_Error( 'probclient_forbidden', 'Нямате права да добавяте.' );
 		}
 
 		$phone_raw  = isset( $data['phone'] ) ? trim( (string) $data['phone'] ) : '';
@@ -130,7 +130,7 @@ class PC_Blacklist {
 		$name_norm  = self::normalize_name( $name_raw );
 
 		if ( '' === $phone_norm && '' === $name_norm ) {
-			return new WP_Error( 'pc_empty', 'Трябва валиден телефон или име.' );
+			return new WP_Error( 'probclient_empty', 'Трябва валиден телефон или име.' );
 		}
 
 		$user  = wp_get_current_user();
@@ -157,7 +157,7 @@ class PC_Blacklist {
 
 	public function update_entry( $uuid, $changes ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'pc_forbidden', 'Само администратор може да редактира.' );
+			return new WP_Error( 'probclient_forbidden', 'Само администратор може да редактира.' );
 		}
 
 		$allowed = array();
@@ -188,7 +188,7 @@ class PC_Blacklist {
 
 	public function delete_entry( $uuid ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'pc_forbidden', 'Само администратор може да трие.' );
+			return new WP_Error( 'probclient_forbidden', 'Само администратор може да трие.' );
 		}
 		$this->idx = null;
 		return $this->provider->delete( $uuid );
@@ -349,7 +349,7 @@ class PC_Blacklist {
 	 */
 	public function bulk_add( $text, $reason, $note ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'pc_forbidden', 'Нямате права да добавяте.' );
+			return new WP_Error( 'probclient_forbidden', 'Нямате права да добавяте.' );
 		}
 		$reason = self::valid_reason( $reason );
 		$note   = wp_strip_all_tags( (string) $note );

@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Admin_Page {
+class Probclient_Admin_Page {
 
 	const SLUG = 'problem-client';
 
@@ -24,6 +24,7 @@ class PC_Admin_Page {
 
 	public function hooks() {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
+		add_action( 'admin_menu', array( $this, 'reorder_menu' ), 100 );
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
 	}
 
@@ -34,9 +35,46 @@ class PC_Admin_Page {
 			'Проблемни клиенти',
 			'edit_shop_orders',
 			self::SLUG,
-			array( $this, 'render_page' ),
-			1
+			array( $this, 'render_page' )
 		);
+	}
+
+	/**
+	 * Place our item just before WooCommerce → Settings (slug "wc-settings").
+	 */
+	public function reorder_menu() {
+		global $submenu;
+		if ( empty( $submenu['woocommerce'] ) ) {
+			return;
+		}
+
+		$items = $submenu['woocommerce'];
+		$ours  = null;
+		foreach ( $items as $i => $it ) {
+			if ( isset( $it[2] ) && self::SLUG === $it[2] ) {
+				$ours = $it;
+				unset( $items[ $i ] );
+				break;
+			}
+		}
+		if ( null === $ours ) {
+			return;
+		}
+
+		$rebuilt  = array();
+		$inserted = false;
+		foreach ( $items as $it ) {
+			if ( ! $inserted && isset( $it[2] ) && 'wc-settings' === $it[2] ) {
+				$rebuilt[] = $ours;
+				$inserted  = true;
+			}
+			$rebuilt[] = $it;
+		}
+		if ( ! $inserted ) {
+			$rebuilt[] = $ours;
+		}
+
+		$submenu['woocommerce'] = array_values( $rebuilt );
 	}
 
 	protected function base_url( $tab = '' ) {
@@ -51,13 +89,13 @@ class PC_Admin_Page {
 	 * Handle add/update/delete/bulk POSTs, then redirect with a notice.
 	 */
 	public function handle_actions() {
-		if ( ! isset( $_POST['pc_action'] ) ) {
+		if ( ! isset( $_POST['probclient_action'] ) ) {
 			return;
 		}
-		check_admin_referer( 'pc_admin' );
+		check_admin_referer( 'probclient_admin' );
 
-		$bl     = PC_Blacklist::instance();
-		$action = sanitize_key( wp_unslash( $_POST['pc_action'] ) );
+		$bl     = Probclient_Blacklist::instance();
+		$action = sanitize_key( wp_unslash( $_POST['probclient_action'] ) );
 		$notice = '';
 		$type   = 'success';
 		$tab    = 'list';
@@ -106,8 +144,8 @@ class PC_Admin_Page {
 
 		$url = add_query_arg(
 			array(
-				'pc_notice' => rawurlencode( $notice ),
-				'pc_type'   => $type,
+				'probclient_notice' => rawurlencode( $notice ),
+				'probclient_type'   => $type,
 			),
 			$this->base_url( $tab )
 		);
@@ -128,7 +166,7 @@ class PC_Admin_Page {
 		if ( ! current_user_can( 'edit_shop_orders' ) ) {
 			return;
 		}
-		$bl = PC_Blacklist::instance();
+		$bl = Probclient_Blacklist::instance();
 
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'check'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! in_array( $tab, array( 'check', 'list', 'add' ), true ) ) {
@@ -143,9 +181,9 @@ class PC_Admin_Page {
 		echo '<h1>Проблемни клиенти</h1>';
 
 		// Notice.
-		if ( isset( $_GET['pc_notice'] ) && '' !== $_GET['pc_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$msg   = sanitize_text_field( wp_unslash( $_GET['pc_notice'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$ntype = ( isset( $_GET['pc_type'] ) && 'error' === $_GET['pc_type'] ) ? 'error' : 'success'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['probclient_notice'] ) && '' !== $_GET['probclient_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$msg   = sanitize_text_field( wp_unslash( $_GET['probclient_notice'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$ntype = ( isset( $_GET['probclient_type'] ) && 'error' === $_GET['probclient_type'] ) ? 'error' : 'success'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-' . esc_attr( $ntype ) . ' is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
 		}
 
@@ -194,7 +232,7 @@ class PC_Admin_Page {
 			return;
 		}
 
-		$exact = $bl->match( PC_Blacklist::normalize_phone( $cphone ), PC_Blacklist::normalize_name( $cname ) );
+		$exact = $bl->match( Probclient_Blacklist::normalize_phone( $cphone ), Probclient_Blacklist::normalize_name( $cname ) );
 
 		if ( $exact ) {
 			echo '<div class="pc-result pc-result-yes">';
@@ -214,8 +252,8 @@ class PC_Admin_Page {
 	}
 
 	protected function render_entry_card( $e ) {
-		$color = PC_Blacklist::reason_color( $e['reason_code'] );
-		$label = PC_Blacklist::reason_label( $e['reason_code'] );
+		$color = Probclient_Blacklist::reason_color( $e['reason_code'] );
+		$label = Probclient_Blacklist::reason_label( $e['reason_code'] );
 		$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
 		echo '<table class="pc-card">';
 		echo '<tr><th>Име</th><td>' . esc_html( $e['name_raw'] ) . '</td></tr>';
@@ -247,12 +285,12 @@ class PC_Admin_Page {
 	}
 
 	protected function render_form( $edit_entry, $can_manage ) {
-		$reasons = PC_Blacklist::reasons();
+		$reasons = Probclient_Blacklist::reasons();
 		$is_edit = ( $edit_entry && $can_manage );
 		echo '<h2>' . ( $is_edit ? 'Редакция на запис' : 'Добавяне на един клиент' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
-		wp_nonce_field( 'pc_admin' );
-		echo '<input type="hidden" name="pc_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
+		wp_nonce_field( 'probclient_admin' );
+		echo '<input type="hidden" name="probclient_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
 		if ( $is_edit ) {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
 		}
@@ -275,12 +313,12 @@ class PC_Admin_Page {
 	}
 
 	protected function render_bulk_form() {
-		$reasons = PC_Blacklist::reasons();
+		$reasons = Probclient_Blacklist::reasons();
 		echo '<hr><h2>Пакетно добавяне</h2>';
 		echo '<p class="description">Един клиент на ред. Полета, разделени със запетая / табулация / точка и запетая. Стойност с 6+ цифри се приема за телефон, останалото — за име. Причината и бележката се прилагат за целия списък. Вече съществуващи (по телефон или име) се пропускат.</p>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
-		wp_nonce_field( 'pc_admin' );
-		echo '<input type="hidden" name="pc_action" value="bulk_add">';
+		wp_nonce_field( 'probclient_admin' );
+		echo '<input type="hidden" name="probclient_action" value="bulk_add">';
 		echo '<p><textarea name="bulk" rows="8" class="large-text code" placeholder="0888123456, Иван Иванов&#10;0877000111&#10;Мария Петрова"></textarea></p>';
 		echo '<table class="form-table"><tbody>';
 		echo '<tr><th><label>Причина</label></th><td><select name="reason">';
@@ -299,7 +337,7 @@ class PC_Admin_Page {
 	/* --------------------------------------------------------------------- */
 
 	protected function render_list_tab( $bl ) {
-		$reasons = PC_Blacklist::reasons();
+		$reasons = Probclient_Blacklist::reasons();
 		$search  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$freason = isset( $_GET['reason'] ) ? sanitize_text_field( wp_unslash( $_GET['reason'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
@@ -345,8 +383,8 @@ class PC_Admin_Page {
 			echo '<tr><td colspan="' . (int) $cols . '">Няма записи.</td></tr>';
 		} else {
 			foreach ( $entries as $e ) {
-				$color = PC_Blacklist::reason_color( $e['reason_code'] );
-				$label = PC_Blacklist::reason_label( $e['reason_code'] );
+				$color = Probclient_Blacklist::reason_color( $e['reason_code'] );
+				$label = Probclient_Blacklist::reason_label( $e['reason_code'] );
 				$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
 				echo '<tr>';
 				echo '<td>' . esc_html( $e['name_raw'] ) . '</td>';
@@ -368,8 +406,8 @@ class PC_Admin_Page {
 					);
 					echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">Редактирай</a> ';
 					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'Да премахна ли този запис?\');">';
-					wp_nonce_field( 'pc_admin' );
-					echo '<input type="hidden" name="pc_action" value="delete">';
+					wp_nonce_field( 'probclient_admin' );
+					echo '<input type="hidden" name="probclient_action" value="delete">';
 					echo '<input type="hidden" name="uuid" value="' . esc_attr( $e['uuid'] ) . '">';
 					echo '<button type="submit" class="button button-small button-link-delete">Изтрий</button>';
 					echo '</form>';

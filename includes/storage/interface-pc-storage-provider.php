@@ -4,8 +4,8 @@
  *
  * The whole plugin talks to the blacklist through this interface only, so the
  * backing store can be swapped without touching the rest of the code:
- *   - PC_Local_Table_Provider  — current (a custom DB table on this site).
- *   - (future) PC_Remote_Api_Provider — a shared central service where many
+ *   - Probclient_Local_Table_Provider  — current (a custom DB table on this site).
+ *   - (future) Probclient_Remote_Api_Provider — a shared central service where many
  *     sites contribute to and read the same list. See docs/PLAN.md for the
  *     planned REST contract, auth and conflict-resolution (central = source of
  *     truth; local cache + pull; add = push; edit/delete gated by ownership).
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-interface PC_Storage_Provider {
+interface Probclient_Storage_Provider {
 
 	/**
 	 * Return entries. $filters: status ('active'|'removed'|'all'), reason, search.

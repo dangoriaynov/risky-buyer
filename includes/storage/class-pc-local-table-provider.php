@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Local_Table_Provider implements PC_Storage_Provider {
+class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 
 	/**
 	 * Fully-qualified table name.
@@ -18,7 +18,7 @@ class PC_Local_Table_Provider implements PC_Storage_Provider {
 	 */
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'pc_blacklist';
+		return $wpdb->prefix . 'probclient_blacklist';
 	}
 
 	/**
@@ -30,6 +30,14 @@ class PC_Local_Table_Provider implements PC_Storage_Provider {
 		$charset_collate = $wpdb->get_charset_collate();
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+
+		// One-time cleanup of the pre-rename table/option (held only disposable test data).
+		$old_table = $wpdb->prefix . 'pc_blacklist';
+		if ( $old_table !== $table ) {
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$wpdb->query( "DROP TABLE IF EXISTS {$old_table}" );
+		}
+		delete_option( 'pc_db_version' );
 
 		$sql = "CREATE TABLE {$table} (
 			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -55,14 +63,14 @@ class PC_Local_Table_Provider implements PC_Storage_Provider {
 		) {$charset_collate};";
 
 		dbDelta( $sql );
-		update_option( 'pc_db_version', PC_DB_VERSION );
+		update_option( 'probclient_db_version', PROBCLIENT_DB_VERSION );
 	}
 
 	/**
 	 * Create the table on demand if missing/outdated (robust to manual uploads).
 	 */
 	public static function maybe_install() {
-		if ( get_option( 'pc_db_version' ) !== PC_DB_VERSION ) {
+		if ( get_option( 'probclient_db_version' ) !== PROBCLIENT_DB_VERSION ) {
 			self::install();
 		}
 	}
@@ -171,7 +179,7 @@ class PC_Local_Table_Provider implements PC_Storage_Provider {
 		$ok = $wpdb->insert( self::table(), $data );
 		// phpcs:enable
 		if ( ! $ok ) {
-			return new WP_Error( 'pc_db', 'Грешка при запис в базата.' );
+			return new WP_Error( 'probclient_db', 'Грешка при запис в базата.' );
 		}
 		$entry['id'] = (int) $wpdb->insert_id;
 		return $entry;

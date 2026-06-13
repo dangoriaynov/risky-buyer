@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PC_Orders_List {
+class Probclient_Orders_List {
 
 	protected static $instance = null;
 
@@ -46,7 +46,7 @@ class PC_Orders_List {
 	}
 
 	public function render() {
-		$map = PC_Order_Matcher::build_marked_map();
+		$map = Probclient_Order_Matcher::build_marked_map();
 		if ( empty( $map ) ) {
 			return;
 		}

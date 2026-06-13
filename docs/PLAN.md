@@ -24,19 +24,19 @@ WordPress/WooCommerce плъгин за маркиране на **проблем
 UI (orders list, order metabox, admin page, AJAX)
         │
         ▼
-PC_Blacklist  ← сервиз: нормализация, права, CRUD, matching
+Probclient_Blacklist  ← сервиз: нормализация, права, CRUD, matching
         │  използва само интерфейса
         ▼
-PC_Storage_Provider (interface)
-   ├── PC_Local_Table_Provider   ← сега (таблица wp_pc_blacklist)
-   └── PC_Remote_Api_Provider     ← бъдеще (централен сервиз)  [само контракт]
+Probclient_Storage_Provider (interface)
+   ├── Probclient_Local_Table_Provider   ← сега (таблица wp_probclient_blacklist)
+   └── Probclient_Remote_Api_Provider     ← бъдеще (централен сервиз)  [само контракт]
 ```
 
-- Подмяна на хранилището: филтър `pc_storage_provider`.
+- Подмяна на хранилището: филтър `probclient_storage_provider`.
 - Правата се проверяват в **сервиза** (над провайдера), за да е единна логиката и в
   бъдещия федериран режим.
 
-## 3. Модел на данните — `wp_pc_blacklist`
+## 3. Модел на данните — `wp_probclient_blacklist`
 
 | Поле | Тип | Бележка |
 |------|-----|---------|
@@ -80,7 +80,7 @@ PC_Storage_Provider (interface)
 
 ## 7. Бъдеща централизация (само контракт, не се строи сега)
 
-`PC_Remote_Api_Provider` срещу централен сервиз:
+`Probclient_Remote_Api_Provider` срещу централен сервиз:
 
 - **REST**: `GET /entries` (pull), `POST /entries` (add/push), `PATCH /entries/{uuid}`,
   `DELETE /entries/{uuid}`.
@@ -99,7 +99,7 @@ PC_Storage_Provider (interface)
 - [ ] Регистрация в каталога/полиране на UI.
 - [ ] Експорт/импорт CSV.
 - [ ] (опция) предупреждение/блокиране на поръчка на фронта при checkout.
-- [ ] `PC_Remote_Api_Provider` + централен сервиз.
+- [ ] `Probclient_Remote_Api_Provider` + централен сервиз.
 
 ## 9. Деплой (текущ процес)
 

@@ -66,5 +66,5 @@ legacy orders screen.
 
 ## Future
 
-A `PC_Remote_Api_Provider` will talk to a central service so multiple sites share
+A `Probclient_Remote_Api_Provider` will talk to a central service so multiple sites share
 one list (add by anyone, edit/delete by resource admins). See `docs/PLAN.md`.
