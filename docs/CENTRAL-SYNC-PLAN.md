@@ -96,7 +96,8 @@ Probclient_Blacklist (сервиз)
 3. **Интеграция** — dobavki.club с write-ключ; останалите само четат.
 4. **WP.org финал** — readme external-services, Plugin Check, assets, zip.
 
-## 8. Отворени въпроси
-- **Име на домейна** (нов): да се избере и регистрира. Идеи: `codshield.*`, `badclients.*`,
-  `neizkupeno.*`, `clientguard.*`, `chernsписък→chernlist.*`. До регистрация — dev на вътрешен IP.
+## 8. Решения / отворени въпроси
+- **Домейн:** `riskybuyer.com` (избран; RDAP-потвърден свободен — да се регистрира).
+  API база: `https://api.riskybuyer.com/v1` или `https://riskybuyer.com/v1`. До регистрация —
+  dev срещу вътрешен IP/стъб.
 - SQLite vs Postgres за старта (предложение: SQLite, лесна миграция после).
