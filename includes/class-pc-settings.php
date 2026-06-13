@@ -20,7 +20,7 @@ class Probclient_Settings {
 	public static function defaults() {
 		return array(
 			'sync_enabled' => 0,
-			'server_url'   => 'https://api.riskybuyer.com/v1',
+			'server_url'   => 'https://riskybuyer.com/v1',
 			'api_key'      => '',
 		);
 	}

@@ -1,0 +1,10 @@
+# Files/dirs excluded from the WordPress.org plugin build (zip).
+/.git
+/.github
+/.gitignore
+/.distignore
+/.wordpress-org
+/server
+/docs
+/tests
+/README.md
