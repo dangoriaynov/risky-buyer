@@ -23,24 +23,82 @@ class Probclient_Order_Metabox {
 
 	public function hooks() {
 		add_action( 'add_meta_boxes', array( $this, 'add_box' ) );
+		add_action( 'admin_notices', array( $this, 'order_notice' ) );
 	}
 
 	public function add_box() {
-		$screen = 'shop_order';
+		$screens = array( 'shop_order' );
 		if ( function_exists( 'wc_get_page_screen_id' ) ) {
 			$maybe = wc_get_page_screen_id( 'shop-order' );
 			if ( $maybe ) {
-				$screen = $maybe;
+				$screens[] = $maybe;
 			}
 		}
-		add_meta_box(
-			'probclient_metabox',
-			'⚠ ' . __( 'Problem client', 'problem-client' ),
-			array( $this, 'render_box' ),
-			$screen,
-			'side',
-			'high'
-		);
+		foreach ( array_unique( $screens ) as $screen ) {
+			add_meta_box(
+				'probclient_metabox',
+				'⚠ ' . __( 'Problem client', 'problem-client' ),
+				array( $this, 'render_box' ),
+				$screen,
+				'side',
+				'high'
+			);
+		}
+	}
+
+	/**
+	 * Resolve the order id from the current order-edit request (HPOS or legacy).
+	 *
+	 * @return int
+	 */
+	protected function current_order_id() {
+		if ( isset( $_GET['id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return absint( wp_unslash( $_GET['id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+		if ( isset( $_GET['post'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return absint( wp_unslash( $_GET['post'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
+		return 0;
+	}
+
+	/**
+	 * Prominent banner at the top of the order-edit screen for a blacklisted client.
+	 */
+	public function order_notice() {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen ) {
+			return;
+		}
+		$action  = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$is_edit = ( 'woocommerce_page_wc-orders' === $screen->id && 'edit' === $action ) || 'shop_order' === $screen->id;
+		if ( ! $is_edit || ! function_exists( 'wc_get_order' ) ) {
+			return;
+		}
+		$order_id = $this->current_order_id();
+		if ( ! $order_id ) {
+			return;
+		}
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return;
+		}
+		$entry = Probclient_Blacklist::instance()->match_order( $order );
+		if ( ! $entry ) {
+			return;
+		}
+
+		$color = Probclient_Blacklist::reason_color( $entry['reason_code'] );
+		$label = Probclient_Blacklist::reason_label( $entry['reason_code'] );
+		echo '<div class="notice" style="border-left:5px solid ' . esc_attr( $color ) . ';background:#fff6f6;">';
+		echo '<p style="font-size:14px;margin:.6em 0;"><strong style="color:' . esc_attr( $color ) . ';">⛔ ' . esc_html__( 'Problem client', 'problem-client' ) . ' — ' . esc_html( $label ) . '</strong>';
+		if ( ! empty( $entry['note'] ) ) {
+			echo ' · ' . esc_html( $entry['note'] );
+		}
+		$by = ! empty( $entry['created_by_name'] ) ? $entry['created_by_name'] : ( ! empty( $entry['source_site'] ) ? $entry['source_site'] : '' );
+		if ( $by ) {
+			echo ' <span style="color:#666;">(' . esc_html__( 'Added by', 'problem-client' ) . ' ' . esc_html( $by ) . ')</span>';
+		}
+		echo '</p></div>';
 	}
 
 	/**

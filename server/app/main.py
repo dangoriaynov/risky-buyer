@@ -139,6 +139,23 @@ def healthz():
     return {"ok": True}
 
 
+@app.get("/v1/whoami")
+def whoami(authorization: Optional[str] = Header(default=None)):
+    """Validate an API key: returns its site_domain and scope, or 401/403."""
+    if not authorization or not authorization.lower().startswith("bearer "):
+        raise HTTPException(status_code=401, detail="Missing API key")
+    key = authorization.split(" ", 1)[1].strip()
+    key_hash = hashlib.sha256(key.encode("utf-8")).hexdigest()
+    conn = db()
+    row = conn.execute(
+        "SELECT site_domain, scope FROM api_keys WHERE key_hash = ?", (key_hash,)
+    ).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=403, detail="Invalid API key")
+    return {"site_domain": row["site_domain"], "scope": row["scope"]}
+
+
 @app.get("/v1/entries")
 def list_entries(since: Optional[str] = None):
     conn = db()

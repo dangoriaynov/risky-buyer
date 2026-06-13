@@ -40,10 +40,29 @@ class Probclient_Remote_Sync {
 		$scheduled = wp_next_scheduled( self::CRON );
 		if ( Probclient_Settings::is_sync_enabled() ) {
 			if ( ! $scheduled ) {
-				wp_schedule_event( time() + 60, 'hourly', self::CRON );
+				wp_schedule_event( self::next_run_ts(), 'daily', self::CRON );
 			}
 		} elseif ( $scheduled ) {
 			wp_unschedule_event( $scheduled, self::CRON );
+		}
+	}
+
+	/**
+	 * Next 03:00 in the site timezone (as a UTC timestamp).
+	 *
+	 * @return int
+	 */
+	protected static function next_run_ts() {
+		try {
+			$tz   = wp_timezone();
+			$now  = new DateTime( 'now', $tz );
+			$next = new DateTime( 'today 03:00', $tz );
+			if ( $next <= $now ) {
+				$next->modify( '+1 day' );
+			}
+			return $next->getTimestamp();
+		} catch ( Exception $e ) {
+			return time() + DAY_IN_SECONDS;
 		}
 	}
 

@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.4.0
+Stable tag: 0.4.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -92,6 +92,11 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.4.1 =
+* Prominent banner on the order screen when the customer is on the problem list.
+* List tab: separate phone/name search (LIKE) with an AND/OR toggle (AND by default).
+* Daily sync moved to ~03:00 site time.
 
 = 0.4.0 =
 * Optional synchronization with the central shared blacklist (riskybuyer.com), opt-in and off by default.

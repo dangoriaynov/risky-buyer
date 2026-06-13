@@ -262,3 +262,12 @@ msgstr "Синхронизацията е изключена."
 
 msgid "An API key is required to write to the server."
 msgstr "Нужен е API ключ за запис към сървъра."
+
+msgid "Combine criteria"
+msgstr "Комбиниране на критериите"
+
+msgid "All (AND)"
+msgstr "Всички (AND)"
+
+msgid "Any (OR)"
+msgstr "Поне едно (OR)"

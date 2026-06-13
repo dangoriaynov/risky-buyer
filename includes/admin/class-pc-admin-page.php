@@ -393,15 +393,22 @@ class Probclient_Admin_Page {
 
 	protected function render_list_tab( $bl ) {
 		$reasons = Probclient_Blacklist::reasons();
-		$search  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$fname   = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$fphone  = isset( $_GET['fphone'] ) ? sanitize_text_field( wp_unslash( $_GET['fphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$freason = isset( $_GET['reason'] ) ? sanitize_text_field( wp_unslash( $_GET['reason'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$op      = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		// Filters.
+		// Filters: phone / name (LIKE) combined by AND (default) or OR, plus reason.
 		echo '<form method="get" class="pc-filters">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
 		echo '<input type="hidden" name="tab" value="list">';
-		echo '<input type="search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Search (name, phone, note)', 'problem-client' ) . '">';
-		echo ' <select name="reason"><option value="">' . esc_html__( 'All reasons', 'problem-client' ) . '</option>';
+		echo '<input type="search" name="fphone" value="' . esc_attr( $fphone ) . '" placeholder="' . esc_attr__( 'Phone', 'problem-client' ) . '"> ';
+		echo '<input type="search" name="fname" value="' . esc_attr( $fname ) . '" placeholder="' . esc_attr__( 'Name', 'problem-client' ) . '"> ';
+		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'problem-client' ) . '">';
+		echo '<option value="AND"' . selected( $op, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'problem-client' ) . '</option>';
+		echo '<option value="OR"' . selected( $op, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'problem-client' ) . '</option>';
+		echo '</select> ';
+		echo '<select name="reason"><option value="">' . esc_html__( 'All reasons', 'problem-client' ) . '</option>';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( $freason, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
@@ -412,8 +419,10 @@ class Probclient_Admin_Page {
 		$entries = $bl->all(
 			array(
 				'status' => 'active',
-				'search' => $search,
+				'name'   => $fname,
+				'phone'  => $fphone,
 				'reason' => $freason,
+				'op'     => $op,
 			)
 		);
 		$this->render_entries_table( $entries, $bl->can_manage() );

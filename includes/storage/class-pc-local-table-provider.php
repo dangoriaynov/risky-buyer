@@ -125,12 +125,36 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 			$where[] = 'reason_code = %s';
 			$args[]  = $filters['reason'];
 		}
+
+		// Text criteria (LIKE), combined by op: AND (default) or OR.
+		$textcond = array();
+		$textargs = array();
+		if ( ! empty( $filters['name'] ) ) {
+			$like       = '%' . $wpdb->esc_like( $filters['name'] ) . '%';
+			$textcond[] = 'name_raw LIKE %s';
+			$textargs[] = $like;
+		}
+		if ( ! empty( $filters['phone'] ) ) {
+			$like       = '%' . $wpdb->esc_like( $filters['phone'] ) . '%';
+			$digits     = preg_replace( '/\D+/', '', $filters['phone'] );
+			$likenum    = '%' . $wpdb->esc_like( $digits ) . '%';
+			$textcond[] = '( phone_raw LIKE %s OR phone_norm LIKE %s )';
+			$textargs[] = $like;
+			$textargs[] = $likenum;
+		}
 		if ( ! empty( $filters['search'] ) ) {
-			$like    = '%' . $wpdb->esc_like( $filters['search'] ) . '%';
-			$where[] = '( name_raw LIKE %s OR phone_raw LIKE %s OR note LIKE %s )';
-			$args[]  = $like;
-			$args[]  = $like;
-			$args[]  = $like;
+			$like       = '%' . $wpdb->esc_like( $filters['search'] ) . '%';
+			$textcond[] = '( name_raw LIKE %s OR phone_raw LIKE %s OR note LIKE %s )';
+			$textargs[] = $like;
+			$textargs[] = $like;
+			$textargs[] = $like;
+		}
+		if ( $textcond ) {
+			$op      = ( isset( $filters['op'] ) && 'OR' === strtoupper( $filters['op'] ) ) ? ' OR ' : ' AND ';
+			$where[] = '( ' . implode( $op, $textcond ) . ' )';
+			foreach ( $textargs as $a ) {
+				$args[] = $a;
+			}
 		}
 
 		$sql = "SELECT * FROM {$table}";
