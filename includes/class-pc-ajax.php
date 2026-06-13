@@ -33,7 +33,7 @@ class Probclient_Ajax {
 
 		$bl = Probclient_Blacklist::instance();
 		if ( ! $bl->can_add() ) {
-			wp_send_json_error( array( 'message' => 'Нямате права.' ), 403 );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission.', 'problem-client' ) ), 403 );
 		}
 
 		$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
@@ -82,7 +82,7 @@ class Probclient_Ajax {
 				'note'   => $result['note'],
 				'name'   => $result['name_raw'],
 				'phone'  => $result['phone_raw'],
-				'message' => 'Клиентът е маркиран.',
+				'message' => __( 'Client marked.', 'problem-client' ),
 			)
 		);
 	}
@@ -96,7 +96,7 @@ class Probclient_Ajax {
 		$bl = Probclient_Blacklist::instance();
 		$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
 		if ( '' === $uuid ) {
-			wp_send_json_error( array( 'message' => 'Липсва идентификатор.' ), 400 );
+			wp_send_json_error( array( 'message' => __( 'Missing identifier.', 'problem-client' ) ), 400 );
 		}
 
 		$result = $bl->delete_entry( $uuid );
@@ -104,6 +104,6 @@ class Probclient_Ajax {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ), 403 );
 		}
 
-		wp_send_json_success( array( 'message' => 'Маркировката е премахната.' ) );
+		wp_send_json_success( array( 'message' => __( 'Marker removed.', 'problem-client' ) ) );
 	}
 }

@@ -60,6 +60,7 @@ class Probclient_Orders_List {
 		<script id="pc-orders-list-js">
 		( function () {
 			var MAP = <?php echo wp_json_encode( $map ); ?>;
+			var PC_LABEL = <?php echo wp_json_encode( __( 'Problem client', 'problem-client' ) ); ?>;
 
 			function rgba( hex, a ) {
 				var h = hex.replace( '#', '' );
@@ -85,7 +86,7 @@ class Probclient_Orders_List {
 						var b = document.createElement( 'span' );
 						b.className = 'pc-badge';
 						b.style.background = info.color;
-						b.textContent = '⚠ Проблемен клиент · ' + info.label;
+						b.textContent = '⚠ ' + PC_LABEL + ' · ' + info.label;
 						if ( info.note ) { b.title = info.note; }
 						cell.appendChild( document.createElement( 'br' ) );
 						cell.appendChild( b );

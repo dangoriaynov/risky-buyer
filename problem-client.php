@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Problem Client — споделен черен списък на клиенти
- * Description: Маркира проблемни клиенти (по телефон/име) с причина и бележка; автоматично отбелязва техните поръчки в списъка. Архитектура със storage provider за бъдеща централизация между сайтове.
- * Version: 0.2.0
+ * Plugin Name: Problem Client
+ * Description: Flag problematic WooCommerce customers by phone or name (with a reason and note) and automatically mark their orders in the admin. Storage-provider architecture, ready for a future shared/central list across sites.
+ * Version: 0.3.0
  * Author: dangoriaynov
  * Author URI: https://github.com/dangoriaynov
  * Plugin URI: https://github.com/dangoriaynov/problem-client
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PROBCLIENT_VERSION', '0.2.0' );
+define( 'PROBCLIENT_VERSION', '0.3.0' );
 define( 'PROBCLIENT_DB_VERSION', '1' );
 define( 'PROBCLIENT_FILE', __FILE__ );
 define( 'PROBCLIENT_DIR', plugin_dir_path( __FILE__ ) );

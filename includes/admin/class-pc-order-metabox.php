@@ -35,7 +35,7 @@ class Probclient_Order_Metabox {
 		}
 		add_meta_box(
 			'probclient_metabox',
-			'⚠ Проблемен клиент',
+			'⚠ ' . __( 'Problem client', 'problem-client' ),
 			array( $this, 'render_box' ),
 			$screen,
 			'side',
@@ -73,7 +73,7 @@ class Probclient_Order_Metabox {
 			$by   = ! empty( $entry['created_by_name'] ) ? $entry['created_by_name'] : '—';
 			$src  = ! empty( $entry['source_site'] ) ? $entry['source_site'] : '';
 			$date = ! empty( $entry['created_at'] ) ? mysql2date( 'd.m.Y', $entry['created_at'] ) : '';
-			echo '<p class="pc-meta">Добавил: ' . esc_html( $by );
+			echo '<p class="pc-meta">' . esc_html__( 'Added by:', 'problem-client' ) . ' ' . esc_html( $by );
 			if ( $date ) {
 				echo ' · ' . esc_html( $date );
 			}
@@ -83,22 +83,22 @@ class Probclient_Order_Metabox {
 			echo '</p>';
 
 			if ( $bl->can_manage() ) {
-				echo '<button type="button" class="button pc-unmark-btn" data-uuid="' . esc_attr( $entry['uuid'] ) . '">Премахни от списъка</button>';
+				echo '<button type="button" class="button pc-unmark-btn" data-uuid="' . esc_attr( $entry['uuid'] ) . '">' . esc_html__( 'Remove from list', 'problem-client' ) . '</button>';
 			} else {
-				echo '<p class="pc-meta"><em>Само администратор може да премахне.</em></p>';
+				echo '<p class="pc-meta"><em>' . esc_html__( 'Only an administrator can remove.', 'problem-client' ) . '</em></p>';
 			}
 			echo '</div>';
 		} elseif ( $bl->can_add() ) {
-			echo '<p>Маркирай този клиент като проблемен (по име и телефон от поръчката).</p>';
-			echo '<p><label>Причина<br><select class="pc-reason widefat">';
+			echo '<p>' . esc_html__( 'Mark this client as problematic (by name and phone from the order).', 'problem-client' ) . '</p>';
+			echo '<p><label>' . esc_html__( 'Reason', 'problem-client' ) . '<br><select class="pc-reason widefat">';
 			foreach ( Probclient_Blacklist::reasons() as $code => $r ) {
 				echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $r['label'] ) . '</option>';
 			}
 			echo '</select></label></p>';
-			echo '<p><label>Бележка (по избор)<br><textarea class="pc-note-input widefat" rows="2"></textarea></label></p>';
-			echo '<button type="button" class="button button-primary pc-mark-btn">Маркирай клиента</button>';
+			echo '<p><label>' . esc_html__( 'Note (optional)', 'problem-client' ) . '<br><textarea class="pc-note-input widefat" rows="2"></textarea></label></p>';
+			echo '<button type="button" class="button button-primary pc-mark-btn">' . esc_html__( 'Mark client', 'problem-client' ) . '</button>';
 		} else {
-			echo '<p><em>Нямате права да маркирате клиенти.</em></p>';
+			echo '<p><em>' . esc_html__( 'You do not have permission to mark clients.', 'problem-client' ) . '</em></p>';
 		}
 
 		echo '</div>';

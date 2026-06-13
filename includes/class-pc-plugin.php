@@ -75,8 +75,8 @@ class Probclient_Plugin {
 				'can_add'    => $bl->can_add(),
 				'can_manage' => $bl->can_manage(),
 				'i18n'       => array(
-					'confirm_remove' => 'Да премахна ли този клиент от списъка?',
-					'error'          => 'Възникна грешка.',
+					'confirm_remove' => __( 'Remove this client from the list?', 'problem-client' ),
+					'error'          => __( 'An error occurred.', 'problem-client' ),
 				),
 			)
 		);

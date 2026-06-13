@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.2.0
+Stable tag: 0.3.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,13 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
 
 == Changelog ==
 
+= 0.3.0 =
+* Internationalized: English source strings with full translation support; ships a Bulgarian (bg_BG) translation.
+* Unique plugin prefix across classes, options, table, AJAX actions and hooks.
+* Check tab now does partial (LIKE) matching on phone or name, newest first.
+* Admin page moved under the WooCommerce menu (just before Settings).
+* Declared HPOS compatibility; added uninstall cleanup and GPL license.
+
 = 0.2.0 =
 * Admin page reorganised into tabs: Check / List / Add.
 * Check tab: exact match plus possible (partial) matches.
@@ -87,6 +94,9 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
   phone or name, orders-list flagging, order metabox, management page.
 
 == Upgrade Notice ==
+
+= 0.3.0 =
+Translatable strings (with Bulgarian translation), partial check search, and a unique plugin prefix.
 
 = 0.2.0 =
 Adds a customer check tab and bulk add; moves the page under WooCommerce.

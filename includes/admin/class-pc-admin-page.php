@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin management page with tabs: Проверка (check), Списък (list), Добавяне (add).
+ * Admin management page with tabs: Check / List / Add.
  *
  * @package ProblemClient
  */
@@ -31,8 +31,8 @@ class Probclient_Admin_Page {
 	public function menu() {
 		add_submenu_page(
 			'woocommerce',
-			'Проблемни клиенти',
-			'Проблемни клиенти',
+			__( 'Problem clients', 'problem-client' ),
+			__( 'Problem clients', 'problem-client' ),
 			'edit_shop_orders',
 			self::SLUG,
 			array( $this, 'render_page' )
@@ -107,7 +107,7 @@ class Probclient_Admin_Page {
 				$type   = 'error';
 				$tab    = 'add';
 			} else {
-				$notice = 'Клиентът е добавен в списъка.';
+				$notice = __( 'Client added to the list.', 'problem-client' );
 			}
 		} elseif ( 'bulk_add' === $action ) {
 			$text   = isset( $_POST['bulk'] ) ? sanitize_textarea_field( wp_unslash( $_POST['bulk'] ) ) : '';
@@ -119,7 +119,8 @@ class Probclient_Admin_Page {
 				$type   = 'error';
 				$tab    = 'add';
 			} else {
-				$notice = sprintf( 'Добавени: %d · пропуснати (вече в списъка): %d · невалидни: %d', $res['added'], $res['skipped'], $res['invalid'] );
+				/* translators: 1: added count, 2: skipped count, 3: invalid count */
+				$notice = sprintf( __( 'Added: %1$d · skipped (already in list): %2$d · invalid: %3$d', 'problem-client' ), $res['added'], $res['skipped'], $res['invalid'] );
 				$tab    = 'add';
 			}
 		} elseif ( 'update' === $action ) {
@@ -129,7 +130,7 @@ class Probclient_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = 'Записът е обновен.';
+				$notice = __( 'Entry updated.', 'problem-client' );
 			}
 		} elseif ( 'delete' === $action ) {
 			$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
@@ -138,7 +139,7 @@ class Probclient_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = 'Записът е премахнат.';
+				$notice = __( 'Entry removed.', 'problem-client' );
 			}
 		}
 
@@ -178,7 +179,7 @@ class Probclient_Admin_Page {
 		}
 
 		echo '<div class="wrap pc-wrap">';
-		echo '<h1>Проблемни клиенти</h1>';
+		echo '<h1>' . esc_html__( 'Problem clients', 'problem-client' ) . '</h1>';
 
 		// Notice.
 		if ( isset( $_GET['probclient_notice'] ) && '' !== $_GET['probclient_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -189,9 +190,9 @@ class Probclient_Admin_Page {
 
 		// Tabs.
 		$tabs = array(
-			'check' => 'Проверка',
-			'list'  => 'Списък',
-			'add'   => 'Добавяне',
+			'check' => __( 'Check', 'problem-client' ),
+			'list'  => __( 'List', 'problem-client' ),
+			'add'   => __( 'Add', 'problem-client' ),
 		);
 		echo '<h2 class="nav-tab-wrapper">';
 		foreach ( $tabs as $key => $label ) {
@@ -212,20 +213,20 @@ class Probclient_Admin_Page {
 	}
 
 	/* --------------------------------------------------------------------- */
-	/* Tab: Проверка                                                         */
+	/* Tab: Check                                                            */
 	/* --------------------------------------------------------------------- */
 
 	protected function render_check_tab( $bl ) {
 		$cphone = isset( $_GET['cphone'] ) ? sanitize_text_field( wp_unslash( $_GET['cphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$cname  = isset( $_GET['cname'] ) ? sanitize_text_field( wp_unslash( $_GET['cname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		echo '<p class="description">Въведете телефон и/или име (напр. когато клиент се обади), за да проверите дали е в списъка.</p>';
+		echo '<p class="description">' . esc_html__( 'Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first.', 'problem-client' ) . '</p>';
 		echo '<form method="get" class="pc-check-form">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
 		echo '<input type="hidden" name="tab" value="check">';
-		echo '<input type="text" name="cphone" value="' . esc_attr( $cphone ) . '" placeholder="Телефон"> ';
-		echo '<input type="text" name="cname" value="' . esc_attr( $cname ) . '" placeholder="Име"> ';
-		submit_button( 'Провери', 'primary', '', false );
+		echo '<input type="text" name="cphone" value="' . esc_attr( $cphone ) . '" placeholder="' . esc_attr__( 'Phone', 'problem-client' ) . '"> ';
+		echo '<input type="text" name="cname" value="' . esc_attr( $cname ) . '" placeholder="' . esc_attr__( 'Name', 'problem-client' ) . '"> ';
+		submit_button( __( 'Look up', 'problem-client' ), 'primary', '', false );
 		echo '</form>';
 
 		if ( '' === $cphone && '' === $cname ) {
@@ -236,17 +237,17 @@ class Probclient_Admin_Page {
 
 		if ( $exact ) {
 			echo '<div class="pc-result pc-result-yes">';
-			echo '<h2>⛔ ДА — този клиент е в списъка</h2>';
+			echo '<h2>⛔ ' . esc_html__( 'YES — this client is in the list', 'problem-client' ) . '</h2>';
 			$this->render_entry_card( $exact );
 			echo '</div>';
 		} else {
-			echo '<div class="pc-result pc-result-no"><h2>✓ Няма точно съвпадение</h2>';
-			echo '<p>Клиентът не е намерен по точен телефон/име. Проверете и възможните съвпадения по-долу.</p></div>';
+			echo '<div class="pc-result pc-result-no"><h2>✓ ' . esc_html__( 'No exact match', 'problem-client' ) . '</h2>';
+			echo '<p>' . esc_html__( 'Not found by exact phone/name. Check the possible matches below.', 'problem-client' ) . '</p></div>';
 		}
 
 		$possible = $bl->possible_matches( $cphone, $cname, $exact ? $exact['uuid'] : '' );
 		if ( ! empty( $possible ) ) {
-			echo '<h3>Възможни съвпадения (за ръчна проверка)</h3>';
+			echo '<h3>' . esc_html__( 'Possible matches (for manual verification)', 'problem-client' ) . '</h3>';
 			$this->render_entries_table( $possible, false );
 		}
 	}
@@ -256,19 +257,19 @@ class Probclient_Admin_Page {
 		$label = Probclient_Blacklist::reason_label( $e['reason_code'] );
 		$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
 		echo '<table class="pc-card">';
-		echo '<tr><th>Име</th><td>' . esc_html( $e['name_raw'] ) . '</td></tr>';
-		echo '<tr><th>Телефон</th><td>' . esc_html( $e['phone_raw'] ) . '</td></tr>';
-		echo '<tr><th>Причина</th><td><span class="pc-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Name', 'problem-client' ) . '</th><td>' . esc_html( $e['name_raw'] ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Phone', 'problem-client' ) . '</th><td>' . esc_html( $e['phone_raw'] ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Reason', 'problem-client' ) . '</th><td><span class="pc-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td></tr>';
 		if ( ! empty( $e['note'] ) ) {
-			echo '<tr><th>Бележка</th><td>' . esc_html( $e['note'] ) . '</td></tr>';
+			echo '<tr><th>' . esc_html__( 'Note', 'problem-client' ) . '</th><td>' . esc_html( $e['note'] ) . '</td></tr>';
 		}
-		echo '<tr><th>Източник</th><td>' . esc_html( $e['source_site'] ) . '</td></tr>';
-		echo '<tr><th>Добавил</th><td>' . esc_html( $e['created_by_name'] ) . ( $date ? ' · ' . esc_html( $date ) : '' ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Source', 'problem-client' ) . '</th><td>' . esc_html( $e['source_site'] ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Added by', 'problem-client' ) . '</th><td>' . esc_html( $e['created_by_name'] ) . ( $date ? ' · ' . esc_html( $date ) : '' ) . '</td></tr>';
 		echo '</table>';
 	}
 
 	/* --------------------------------------------------------------------- */
-	/* Tab: Добавяне                                                         */
+	/* Tab: Add                                                              */
 	/* --------------------------------------------------------------------- */
 
 	protected function render_add_tab( $bl ) {
@@ -287,7 +288,7 @@ class Probclient_Admin_Page {
 	protected function render_form( $edit_entry, $can_manage ) {
 		$reasons = Probclient_Blacklist::reasons();
 		$is_edit = ( $edit_entry && $can_manage );
-		echo '<h2>' . ( $is_edit ? 'Редакция на запис' : 'Добавяне на един клиент' ) . '</h2>';
+		echo '<h2>' . ( $is_edit ? esc_html__( 'Edit entry', 'problem-client' ) : esc_html__( 'Add one client', 'problem-client' ) ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
 		wp_nonce_field( 'probclient_admin' );
 		echo '<input type="hidden" name="probclient_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
@@ -295,45 +296,45 @@ class Probclient_Admin_Page {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
 		}
 		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label>Име</label></th><td><input type="text" name="name" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></td></tr>';
-		echo '<tr><th><label>Телефон</label></th><td><input type="text" name="phone" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></td></tr>';
-		echo '<tr><th><label>Причина</label></th><td><select name="reason">';
+		echo '<tr><th><label>' . esc_html__( 'Name', 'problem-client' ) . '</label></th><td><input type="text" name="name" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Phone', 'problem-client' ) . '</label></th><td><input type="text" name="phone" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Reason', 'problem-client' ) . '</label></th><td><select name="reason">';
 		$cur = $is_edit ? $edit_entry['reason_code'] : 'other';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( $cur, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
 		echo '</select></td></tr>';
-		echo '<tr><th><label>Бележка</label></th><td><textarea name="note" rows="2" class="large-text">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Note', 'problem-client' ) . '</label></th><td><textarea name="note" rows="2" class="large-text">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></td></tr>';
 		echo '</tbody></table>';
-		submit_button( $is_edit ? 'Запази промените' : 'Добави' );
+		submit_button( $is_edit ? __( 'Save changes', 'problem-client' ) : __( 'Add client', 'problem-client' ) );
 		if ( $is_edit ) {
-			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">Отказ</a>';
+			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">' . esc_html__( 'Cancel', 'problem-client' ) . '</a>';
 		}
 		echo '</form>';
 	}
 
 	protected function render_bulk_form() {
 		$reasons = Probclient_Blacklist::reasons();
-		echo '<hr><h2>Пакетно добавяне</h2>';
-		echo '<p class="description">Един клиент на ред. Полета, разделени със запетая / табулация / точка и запетая. Стойност с 6+ цифри се приема за телефон, останалото — за име. Причината и бележката се прилагат за целия списък. Вече съществуващи (по телефон или име) се пропускат.</p>';
+		echo '<hr><h2>' . esc_html__( 'Bulk add', 'problem-client' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped.', 'problem-client' ) . '</p>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
 		wp_nonce_field( 'probclient_admin' );
 		echo '<input type="hidden" name="probclient_action" value="bulk_add">';
-		echo '<p><textarea name="bulk" rows="8" class="large-text code" placeholder="0888123456, Иван Иванов&#10;0877000111&#10;Мария Петрова"></textarea></p>';
+		echo '<p><textarea name="bulk" rows="8" class="large-text code" placeholder="0888123456, Ivan Ivanov&#10;0877000111&#10;Maria Petrova"></textarea></p>';
 		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label>Причина</label></th><td><select name="reason">';
+		echo '<tr><th><label>' . esc_html__( 'Reason', 'problem-client' ) . '</label></th><td><select name="reason">';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( 'other', $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
 		echo '</select></td></tr>';
-		echo '<tr><th><label>Бележка</label></th><td><textarea name="note" rows="2" class="large-text"></textarea></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Note', 'problem-client' ) . '</label></th><td><textarea name="note" rows="2" class="large-text"></textarea></td></tr>';
 		echo '</tbody></table>';
-		submit_button( 'Добави пакетно' );
+		submit_button( __( 'Add in bulk', 'problem-client' ) );
 		echo '</form>';
 	}
 
 	/* --------------------------------------------------------------------- */
-	/* Tab: Списък                                                           */
+	/* Tab: List                                                             */
 	/* --------------------------------------------------------------------- */
 
 	protected function render_list_tab( $bl ) {
@@ -345,13 +346,13 @@ class Probclient_Admin_Page {
 		echo '<form method="get" class="pc-filters">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
 		echo '<input type="hidden" name="tab" value="list">';
-		echo '<input type="search" name="s" value="' . esc_attr( $search ) . '" placeholder="Търсене (име, телефон, бележка)">';
-		echo ' <select name="reason"><option value="">Всички причини</option>';
+		echo '<input type="search" name="s" value="' . esc_attr( $search ) . '" placeholder="' . esc_attr__( 'Search (name, phone, note)', 'problem-client' ) . '">';
+		echo ' <select name="reason"><option value="">' . esc_html__( 'All reasons', 'problem-client' ) . '</option>';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( $freason, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
 		echo '</select> ';
-		submit_button( 'Филтрирай', 'secondary', '', false );
+		submit_button( __( 'Filter', 'problem-client' ), 'secondary', '', false );
 		echo '</form>';
 
 		$entries = $bl->all(
@@ -372,15 +373,21 @@ class Probclient_Admin_Page {
 	 */
 	protected function render_entries_table( $entries, $with_actions ) {
 		echo '<table class="wp-list-table widefat fixed striped pc-table"><thead><tr>';
-		echo '<th>Име</th><th>Телефон</th><th>Причина</th><th>Бележка</th><th>Източник</th><th>Добавил</th><th>Дата</th>';
+		echo '<th>' . esc_html__( 'Name', 'problem-client' ) . '</th>';
+		echo '<th>' . esc_html__( 'Phone', 'problem-client' ) . '</th>';
+		echo '<th>' . esc_html__( 'Reason', 'problem-client' ) . '</th>';
+		echo '<th>' . esc_html__( 'Note', 'problem-client' ) . '</th>';
+		echo '<th>' . esc_html__( 'Source', 'problem-client' ) . '</th>';
+		echo '<th>' . esc_html__( 'Added by', 'problem-client' ) . '</th>';
+		echo '<th>' . esc_html__( 'Date', 'problem-client' ) . '</th>';
 		if ( $with_actions ) {
-			echo '<th>Действия</th>';
+			echo '<th>' . esc_html__( 'Actions', 'problem-client' ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';
 
 		$cols = $with_actions ? 8 : 7;
 		if ( empty( $entries ) ) {
-			echo '<tr><td colspan="' . (int) $cols . '">Няма записи.</td></tr>';
+			echo '<tr><td colspan="' . (int) $cols . '">' . esc_html__( 'No entries.', 'problem-client' ) . '</td></tr>';
 		} else {
 			foreach ( $entries as $e ) {
 				$color = Probclient_Blacklist::reason_color( $e['reason_code'] );
@@ -404,12 +411,12 @@ class Probclient_Admin_Page {
 						),
 						admin_url( 'admin.php' )
 					);
-					echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">Редактирай</a> ';
-					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'Да премахна ли този запис?\');">';
+					echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'problem-client' ) . '</a> ';
+					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( __( 'Remove this entry?', 'problem-client' ) ) . '\');">';
 					wp_nonce_field( 'probclient_admin' );
 					echo '<input type="hidden" name="probclient_action" value="delete">';
 					echo '<input type="hidden" name="uuid" value="' . esc_attr( $e['uuid'] ) . '">';
-					echo '<button type="submit" class="button button-small button-link-delete">Изтрий</button>';
+					echo '<button type="submit" class="button button-small button-link-delete">' . esc_html__( 'Delete', 'problem-client' ) . '</button>';
 					echo '</form>';
 					echo '</td>';
 				}

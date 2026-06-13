@@ -1,0 +1,301 @@
+# Copyright (C) 2026 dangoriaynov
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Problem Client 0.2.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/problem-client\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-06-13T09:45:53+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: problem-client\n"
+
+#. Plugin Name of the plugin
+#: problem-client.php
+msgid "Problem Client"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: problem-client.php
+msgid "https://github.com/dangoriaynov/problem-client"
+msgstr ""
+
+#. Description of the plugin
+#: problem-client.php
+msgid "Flag problematic WooCommerce customers by phone or name (with a reason and note) and automatically mark their orders in the admin. Storage-provider architecture, ready for a future shared/central list across sites."
+msgstr ""
+
+#. Author of the plugin
+#: problem-client.php
+msgid "dangoriaynov"
+msgstr ""
+
+#. Author URI of the plugin
+#: problem-client.php
+msgid "https://github.com/dangoriaynov"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:34
+#: includes/admin/class-pc-admin-page.php:35
+#: includes/admin/class-pc-admin-page.php:182
+msgid "Problem clients"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:110
+msgid "Client added to the list."
+msgstr ""
+
+#. translators: 1: added count, 2: skipped count, 3: invalid count
+#: includes/admin/class-pc-admin-page.php:123
+#, php-format
+msgid "Added: %1$d · skipped (already in list): %2$d · invalid: %3$d"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:133
+msgid "Entry updated."
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:142
+msgid "Entry removed."
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:193
+msgid "Check"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:194
+msgid "List"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:195
+msgid "Add"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:223
+msgid "Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first."
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:227
+#: includes/admin/class-pc-admin-page.php:261
+#: includes/admin/class-pc-admin-page.php:300
+#: includes/admin/class-pc-admin-page.php:377
+msgid "Phone"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:228
+#: includes/admin/class-pc-admin-page.php:260
+#: includes/admin/class-pc-admin-page.php:299
+#: includes/admin/class-pc-admin-page.php:376
+msgid "Name"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:229
+msgid "Look up"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:240
+msgid "YES — this client is in the list"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:244
+msgid "No exact match"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:245
+msgid "Not found by exact phone/name. Check the possible matches below."
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:250
+msgid "Possible matches (for manual verification)"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:262
+#: includes/admin/class-pc-admin-page.php:301
+#: includes/admin/class-pc-admin-page.php:325
+#: includes/admin/class-pc-admin-page.php:378
+#: includes/admin/class-pc-order-metabox.php:93
+msgid "Reason"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:264
+#: includes/admin/class-pc-admin-page.php:307
+#: includes/admin/class-pc-admin-page.php:330
+#: includes/admin/class-pc-admin-page.php:379
+msgid "Note"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:266
+#: includes/admin/class-pc-admin-page.php:380
+msgid "Source"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:267
+#: includes/admin/class-pc-admin-page.php:381
+msgid "Added by"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:291
+msgid "Edit entry"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:291
+msgid "Add one client"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:309
+msgid "Save changes"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:309
+msgid "Add client"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:311
+msgid "Cancel"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:318
+msgid "Bulk add"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:319
+msgid "One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped."
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:332
+msgid "Add in bulk"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:349
+msgid "Search (name, phone, note)"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:350
+msgid "All reasons"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:355
+msgid "Filter"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:382
+msgid "Date"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:384
+msgid "Actions"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:390
+msgid "No entries."
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:414
+msgid "Edit"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:415
+msgid "Remove this entry?"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:419
+msgid "Delete"
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:38
+#: includes/admin/class-pc-orders-list.php:63
+msgid "Problem client"
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:76
+msgid "Added by:"
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:86
+msgid "Remove from list"
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:88
+msgid "Only an administrator can remove."
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:92
+msgid "Mark this client as problematic (by name and phone from the order)."
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:98
+msgid "Note (optional)"
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:99
+msgid "Mark client"
+msgstr ""
+
+#: includes/admin/class-pc-order-metabox.php:101
+msgid "You do not have permission to mark clients."
+msgstr ""
+
+#: includes/class-pc-ajax.php:36
+msgid "You do not have permission."
+msgstr ""
+
+#: includes/class-pc-ajax.php:85
+msgid "Client marked."
+msgstr ""
+
+#: includes/class-pc-ajax.php:99
+msgid "Missing identifier."
+msgstr ""
+
+#: includes/class-pc-ajax.php:107
+msgid "Marker removed."
+msgstr ""
+
+#: includes/class-pc-blacklist.php:54
+msgid "Uncollected shipment"
+msgstr ""
+
+#: includes/class-pc-blacklist.php:58
+msgid "Fake order"
+msgstr ""
+
+#: includes/class-pc-blacklist.php:62
+msgid "Problematic / abusive"
+msgstr ""
+
+#: includes/class-pc-blacklist.php:66
+msgid "Other"
+msgstr ""
+
+#: includes/class-pc-blacklist.php:124
+#: includes/class-pc-blacklist.php:365
+msgid "You do not have permission to add."
+msgstr ""
+
+#: includes/class-pc-blacklist.php:133
+msgid "A valid phone or name is required."
+msgstr ""
+
+#: includes/class-pc-blacklist.php:160
+msgid "Only an administrator can edit."
+msgstr ""
+
+#: includes/class-pc-blacklist.php:191
+msgid "Only an administrator can delete."
+msgstr ""
+
+#: includes/class-pc-plugin.php:78
+msgid "Remove this client from the list?"
+msgstr ""
+
+#: includes/class-pc-plugin.php:79
+msgid "An error occurred."
+msgstr ""
+
+#: includes/storage/class-pc-local-table-provider.php:182
+msgid "Database write error."
+msgstr ""

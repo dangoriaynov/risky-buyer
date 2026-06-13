@@ -7,6 +7,14 @@
  */
 
 define( 'ABSPATH', __DIR__ );
+
+// Minimal WordPress i18n shim so the class can be loaded standalone.
+if ( ! function_exists( '__' ) ) {
+	function __( $text, $domain = 'default' ) {
+		return $text;
+	}
+}
+
 require __DIR__ . '/../includes/class-pc-blacklist.php';
 
 $failed = 0;

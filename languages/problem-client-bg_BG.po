@@ -1,0 +1,189 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Problem Client 0.2.0\n"
+"Report-Msgid-Bugs-To: https://github.com/dangoriaynov/problem-client\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: bg_BG\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Uncollected shipment"
+msgstr "Неизкупена пратка"
+
+msgid "Fake order"
+msgstr "Фалшива поръчка"
+
+msgid "Problematic / abusive"
+msgstr "Проблемен / обиди"
+
+msgid "Other"
+msgstr "Друго"
+
+msgid "You do not have permission to add."
+msgstr "Нямате права да добавяте."
+
+msgid "A valid phone or name is required."
+msgstr "Трябва валиден телефон или име."
+
+msgid "Only an administrator can edit."
+msgstr "Само администратор може да редактира."
+
+msgid "Only an administrator can delete."
+msgstr "Само администратор може да трие."
+
+msgid "You do not have permission."
+msgstr "Нямате права."
+
+msgid "Client marked."
+msgstr "Клиентът е маркиран."
+
+msgid "Missing identifier."
+msgstr "Липсва идентификатор."
+
+msgid "Marker removed."
+msgstr "Маркировката е премахната."
+
+msgid "Remove this client from the list?"
+msgstr "Да премахна ли този клиент от списъка?"
+
+msgid "An error occurred."
+msgstr "Възникна грешка."
+
+msgid "Database write error."
+msgstr "Грешка при запис в базата."
+
+msgid "Problem client"
+msgstr "Проблемен клиент"
+
+msgid "Added by:"
+msgstr "Добавил:"
+
+msgid "Remove from list"
+msgstr "Премахни от списъка"
+
+msgid "Only an administrator can remove."
+msgstr "Само администратор може да премахне."
+
+msgid "Mark this client as problematic (by name and phone from the order)."
+msgstr "Маркирай този клиент като проблемен (по име и телефон от поръчката)."
+
+msgid "Reason"
+msgstr "Причина"
+
+msgid "Note (optional)"
+msgstr "Бележка (по избор)"
+
+msgid "Mark client"
+msgstr "Маркирай клиента"
+
+msgid "You do not have permission to mark clients."
+msgstr "Нямате права да маркирате клиенти."
+
+msgid "Problem clients"
+msgstr "Проблемни клиенти"
+
+msgid "Client added to the list."
+msgstr "Клиентът е добавен в списъка."
+
+msgid "Added: %1$d · skipped (already in list): %2$d · invalid: %3$d"
+msgstr "Добавени: %1$d · пропуснати (вече в списъка): %2$d · невалидни: %3$d"
+
+msgid "Entry updated."
+msgstr "Записът е обновен."
+
+msgid "Entry removed."
+msgstr "Записът е премахнат."
+
+msgid "Check"
+msgstr "Проверка"
+
+msgid "List"
+msgstr "Списък"
+
+msgid "Add"
+msgstr "Добавяне"
+
+msgid "Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first."
+msgstr "Въведете телефон и/или име (напр. когато клиент се обади), за да проверите дали е в списъка. Частичните съвпадения също се показват, най-новите отгоре."
+
+msgid "Phone"
+msgstr "Телефон"
+
+msgid "Name"
+msgstr "Име"
+
+msgid "Look up"
+msgstr "Провери"
+
+msgid "YES — this client is in the list"
+msgstr "ДА — този клиент е в списъка"
+
+msgid "No exact match"
+msgstr "Няма точно съвпадение"
+
+msgid "Not found by exact phone/name. Check the possible matches below."
+msgstr "Не е намерен по точен телефон/име. Проверете възможните съвпадения по-долу."
+
+msgid "Possible matches (for manual verification)"
+msgstr "Възможни съвпадения (за ръчна проверка)"
+
+msgid "Note"
+msgstr "Бележка"
+
+msgid "Source"
+msgstr "Източник"
+
+msgid "Added by"
+msgstr "Добавил"
+
+msgid "Edit entry"
+msgstr "Редакция на запис"
+
+msgid "Add one client"
+msgstr "Добавяне на един клиент"
+
+msgid "Save changes"
+msgstr "Запази промените"
+
+msgid "Add client"
+msgstr "Добави"
+
+msgid "Cancel"
+msgstr "Отказ"
+
+msgid "Bulk add"
+msgstr "Пакетно добавяне"
+
+msgid "One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped."
+msgstr "Един клиент на ред. Полета, разделени със запетая / табулация / точка и запетая. Стойност с 6+ цифри се приема за телефон, останалото — за име. Причината и бележката се прилагат за целия списък. Вече съществуващи (по телефон или име) се пропускат."
+
+msgid "Add in bulk"
+msgstr "Добави пакетно"
+
+msgid "Search (name, phone, note)"
+msgstr "Търсене (име, телефон, бележка)"
+
+msgid "All reasons"
+msgstr "Всички причини"
+
+msgid "Filter"
+msgstr "Филтрирай"
+
+msgid "Date"
+msgstr "Дата"
+
+msgid "Actions"
+msgstr "Действия"
+
+msgid "No entries."
+msgstr "Няма записи."
+
+msgid "Edit"
+msgstr "Редактирай"
+
+msgid "Remove this entry?"
+msgstr "Да премахна ли този запис?"
+
+msgid "Delete"
+msgstr "Изтрий"

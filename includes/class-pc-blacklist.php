@@ -51,19 +51,19 @@ class Probclient_Blacklist {
 	public static function reasons() {
 		return array(
 			'uncollected' => array(
-				'label' => 'Неизкупена пратка',
+				'label' => __( 'Uncollected shipment', 'problem-client' ),
 				'color' => '#e08a00',
 			),
 			'fake'        => array(
-				'label' => 'Фалшива поръчка',
+				'label' => __( 'Fake order', 'problem-client' ),
 				'color' => '#d63638',
 			),
 			'abusive'     => array(
-				'label' => 'Проблемен / обиди',
+				'label' => __( 'Problematic / abusive', 'problem-client' ),
 				'color' => '#9b1c1c',
 			),
 			'other'       => array(
-				'label' => 'Друго',
+				'label' => __( 'Other', 'problem-client' ),
 				'color' => '#6b7280',
 			),
 		);
@@ -121,7 +121,7 @@ class Probclient_Blacklist {
 
 	public function add_entry( $data ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'probclient_forbidden', 'Нямате права да добавяте.' );
+			return new WP_Error( 'probclient_forbidden', __( 'You do not have permission to add.', 'problem-client' ) );
 		}
 
 		$phone_raw  = isset( $data['phone'] ) ? trim( (string) $data['phone'] ) : '';
@@ -130,7 +130,7 @@ class Probclient_Blacklist {
 		$name_norm  = self::normalize_name( $name_raw );
 
 		if ( '' === $phone_norm && '' === $name_norm ) {
-			return new WP_Error( 'probclient_empty', 'Трябва валиден телефон или име.' );
+			return new WP_Error( 'probclient_empty', __( 'A valid phone or name is required.', 'problem-client' ) );
 		}
 
 		$user  = wp_get_current_user();
@@ -157,7 +157,7 @@ class Probclient_Blacklist {
 
 	public function update_entry( $uuid, $changes ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'probclient_forbidden', 'Само администратор може да редактира.' );
+			return new WP_Error( 'probclient_forbidden', __( 'Only an administrator can edit.', 'problem-client' ) );
 		}
 
 		$allowed = array();
@@ -188,7 +188,7 @@ class Probclient_Blacklist {
 
 	public function delete_entry( $uuid ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'probclient_forbidden', 'Само администратор може да трие.' );
+			return new WP_Error( 'probclient_forbidden', __( 'Only an administrator can delete.', 'problem-client' ) );
 		}
 		$this->idx = null;
 		return $this->provider->delete( $uuid );
@@ -297,39 +297,52 @@ class Probclient_Blacklist {
 	 * @return array<int,array>
 	 */
 	public function possible_matches( $phone, $name, $exclude_uuid = '' ) {
+		// Phone needle: the typed digits (>= 3) matched as a substring of the stored phone.
 		$digits = preg_replace( '/\D+/', '', (string) $phone );
-		$frag   = strlen( $digits ) >= 6 ? substr( $digits, -6 ) : '';
-		$nname  = self::normalize_name( $name );
+		$pneedle = strlen( $digits ) >= 3 ? $digits : '';
+
+		// Name needle: normalized typed text (without the >= 3 min-length gate), plus tokens.
+		$nname = mb_strtolower( (string) $name, 'UTF-8' );
+		$nname = preg_replace( '/[^\p{L}\p{N}]+/u', ' ', $nname );
+		$nname = trim( preg_replace( '/\s+/u', ' ', $nname ) );
 
 		$words = array();
 		if ( '' !== $nname ) {
 			foreach ( explode( ' ', $nname ) as $w ) {
-				if ( mb_strlen( $w ) >= 3 ) {
+				if ( mb_strlen( $w ) >= 2 ) {
 					$words[] = $w;
 				}
 			}
 		}
-		if ( '' === $frag && empty( $words ) ) {
+
+		if ( '' === $pneedle && '' === $nname ) {
 			return array();
 		}
 
+		// all() is ordered by created_at DESC, so results stay newest-first.
 		$out = array();
 		foreach ( $this->provider->all( array( 'status' => 'active' ) ) as $e ) {
 			if ( $exclude_uuid && isset( $e['uuid'] ) && $e['uuid'] === $exclude_uuid ) {
 				continue;
 			}
+
 			$hit = false;
-			if ( '' !== $frag && ! empty( $e['phone_norm'] ) && false !== strpos( $e['phone_norm'], $frag ) ) {
+			if ( '' !== $pneedle && ! empty( $e['phone_norm'] ) && false !== strpos( $e['phone_norm'], $pneedle ) ) {
 				$hit = true;
 			}
-			if ( ! $hit && ! empty( $e['name_norm'] ) ) {
-				foreach ( $words as $w ) {
-					if ( false !== strpos( $e['name_norm'], $w ) ) {
-						$hit = true;
-						break;
+			if ( ! $hit && '' !== $nname && ! empty( $e['name_norm'] ) ) {
+				if ( false !== strpos( $e['name_norm'], $nname ) ) {
+					$hit = true;
+				} else {
+					foreach ( $words as $w ) {
+						if ( false !== strpos( $e['name_norm'], $w ) ) {
+							$hit = true;
+							break;
+						}
 					}
 				}
 			}
+
 			if ( $hit ) {
 				$out[] = $e;
 			}
@@ -349,7 +362,7 @@ class Probclient_Blacklist {
 	 */
 	public function bulk_add( $text, $reason, $note ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'probclient_forbidden', 'Нямате права да добавяте.' );
+			return new WP_Error( 'probclient_forbidden', __( 'You do not have permission to add.', 'problem-client' ) );
 		}
 		$reason = self::valid_reason( $reason );
 		$note   = wp_strip_all_tags( (string) $note );

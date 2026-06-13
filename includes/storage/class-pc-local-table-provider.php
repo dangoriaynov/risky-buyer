@@ -179,7 +179,7 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 		$ok = $wpdb->insert( self::table(), $data );
 		// phpcs:enable
 		if ( ! $ok ) {
-			return new WP_Error( 'probclient_db', 'Грешка при запис в базата.' );
+			return new WP_Error( 'probclient_db', __( 'Database write error.', 'problem-client' ) );
 		}
 		$entry['id'] = (int) $wpdb->insert_id;
 		return $entry;
