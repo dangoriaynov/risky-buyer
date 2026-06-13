@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.3.0
+Stable tag: 0.4.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -73,7 +73,30 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
 3. Order edit screen warning panel.
 4. Bulk add.
 
+== External services ==
+
+This plugin can optionally synchronize with a central, shared blacklist service
+at **riskybuyer.com** so that your checks are extended with phone numbers
+reported by other sites. **This is opt-in and disabled by default** — no data is
+sent or received until you enable it under WooCommerce → Problem clients →
+Settings.
+
+When sync is enabled:
+
+* The plugin periodically requests the shared list (GET) to extend your local
+  checks. Reading the list is open.
+* If you have a write API key, the plugin sends your own entries to the service
+  to be shared: phone, name, reason, note, and your site's domain.
+
+The service is provided by the plugin author. Terms of Use:
+https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
+
 == Changelog ==
+
+= 0.4.0 =
+* Optional synchronization with the central shared blacklist (riskybuyer.com), opt-in and off by default.
+* Settings tab: enable sync, server URL, API key, Sync now, Push my list.
+* Checks are extended with cached server phone numbers; local entries always stay local.
 
 = 0.3.0 =
 * Internationalized: English source strings with full translation support; ships a Bulgarian (bg_BG) translation.
@@ -94,6 +117,9 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
   phone or name, orders-list flagging, order metabox, management page.
 
 == Upgrade Notice ==
+
+= 0.4.0 =
+Adds optional sync with a shared central blacklist (opt-in, off by default).
 
 = 0.3.0 =
 Translatable strings (with Bulgarian translation), partial check search, and a unique plugin prefix.

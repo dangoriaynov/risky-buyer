@@ -141,6 +141,55 @@ class Probclient_Admin_Page {
 			} else {
 				$notice = __( 'Entry removed.', 'problem-client' );
 			}
+		} elseif ( 'save_settings' === $action ) {
+			$tab = 'settings';
+			if ( ! $bl->can_manage() ) {
+				$notice = __( 'Only an administrator can change settings.', 'problem-client' );
+				$type   = 'error';
+			} else {
+				Probclient_Settings::update(
+					array(
+						'sync_enabled' => isset( $_POST['sync_enabled'] ) ? 1 : 0,
+						'server_url'   => isset( $_POST['server_url'] ) ? wp_unslash( $_POST['server_url'] ) : '',
+						'api_key'      => isset( $_POST['api_key'] ) ? wp_unslash( $_POST['api_key'] ) : '',
+					)
+				);
+				Probclient_Remote_Sync::instance()->maybe_schedule();
+				$notice = __( 'Settings saved.', 'problem-client' );
+			}
+		} elseif ( 'sync_now' === $action ) {
+			$tab = 'settings';
+			if ( ! $bl->can_manage() ) {
+				$notice = __( 'Only an administrator can change settings.', 'problem-client' );
+				$type   = 'error';
+			} else {
+				$ok = Probclient_Remote_Sync::instance()->pull();
+				$st = Probclient_Settings::state();
+				if ( $ok ) {
+					/* translators: %d: number of cached entries */
+					$notice = sprintf( __( 'Sync done: %d entries cached.', 'problem-client' ), (int) $st['cached'] );
+				} else {
+					$type = 'error';
+					/* translators: %s: error message */
+					$notice = sprintf( __( 'Sync error: %s', 'problem-client' ), $st['last_error'] );
+				}
+			}
+		} elseif ( 'push_all' === $action ) {
+			$tab = 'settings';
+			if ( ! $bl->can_manage() ) {
+				$notice = __( 'Only an administrator can change settings.', 'problem-client' );
+				$type   = 'error';
+			} else {
+				$r = Probclient_Remote_Sync::instance()->push_all();
+				if ( is_wp_error( $r ) ) {
+					$type = 'error';
+					/* translators: %s: error message */
+					$notice = sprintf( __( 'Push error: %s', 'problem-client' ), $r->get_error_message() );
+				} else {
+					/* translators: %d: number of entries pushed */
+					$notice = sprintf( __( 'Pushed %d entries to the server.', 'problem-client' ), (int) $r );
+				}
+			}
 		}
 
 		$url = add_query_arg(
@@ -170,7 +219,7 @@ class Probclient_Admin_Page {
 		$bl = Probclient_Blacklist::instance();
 
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'check'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		if ( ! in_array( $tab, array( 'check', 'list', 'add' ), true ) ) {
+		if ( ! in_array( $tab, array( 'check', 'list', 'add', 'settings' ), true ) ) {
 			$tab = 'check';
 		}
 		// Editing an entry happens in the "add" tab with a prefilled form.
@@ -194,6 +243,9 @@ class Probclient_Admin_Page {
 			'list'  => __( 'List', 'problem-client' ),
 			'add'   => __( 'Add', 'problem-client' ),
 		);
+		if ( $bl->can_manage() ) {
+			$tabs['settings'] = __( 'Settings', 'problem-client' );
+		}
 		echo '<h2 class="nav-tab-wrapper">';
 		foreach ( $tabs as $key => $label ) {
 			$cls = 'nav-tab' . ( $tab === $key ? ' nav-tab-active' : '' );
@@ -205,6 +257,8 @@ class Probclient_Admin_Page {
 			$this->render_check_tab( $bl );
 		} elseif ( 'add' === $tab ) {
 			$this->render_add_tab( $bl );
+		} elseif ( 'settings' === $tab ) {
+			$this->render_settings_tab( $bl );
 		} else {
 			$this->render_list_tab( $bl );
 		}
@@ -363,6 +417,53 @@ class Probclient_Admin_Page {
 			)
 		);
 		$this->render_entries_table( $entries, $bl->can_manage() );
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* Tab: Settings                                                         */
+	/* --------------------------------------------------------------------- */
+
+	protected function render_settings_tab( $bl ) {
+		if ( ! $bl->can_manage() ) {
+			echo '<p><em>' . esc_html__( 'Only an administrator can change settings.', 'problem-client' ) . '</em></p>';
+			return;
+		}
+		$s     = Probclient_Settings::get();
+		$state = Probclient_Settings::state();
+
+		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'problem-client' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'problem-client' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain.', 'problem-client' ) . '</p>';
+
+		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
+		wp_nonce_field( 'probclient_admin' );
+		echo '<input type="hidden" name="probclient_action" value="save_settings">';
+		echo '<table class="form-table"><tbody>';
+		echo '<tr><th>' . esc_html__( 'Synchronization', 'problem-client' ) . '</th><td><label><input type="checkbox" name="sync_enabled" value="1"' . checked( ! empty( $s['sync_enabled'] ), true, false ) . '> ' . esc_html__( 'Enable sync with the central server', 'problem-client' ) . '</label></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Server URL', 'problem-client' ) . '</label></th><td><input type="url" name="server_url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '"></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'API key', 'problem-client' ) . '</label></th><td><input type="text" name="api_key" class="regular-text" value="' . esc_attr( $s['api_key'] ) . '"><p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'problem-client' ) . '</p></td></tr>';
+		echo '</tbody></table>';
+		submit_button( __( 'Save settings', 'problem-client' ) );
+		echo '</form>';
+
+		$last = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'problem-client' );
+		echo '<hr><h2>' . esc_html__( 'Status', 'problem-client' ) . '</h2>';
+		echo '<p>' . esc_html__( 'Last sync:', 'problem-client' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Cached entries:', 'problem-client' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
+		if ( ! empty( $state['last_error'] ) ) {
+			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'problem-client' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
+		}
+
+		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline">';
+		wp_nonce_field( 'probclient_admin' );
+		echo '<input type="hidden" name="probclient_action" value="sync_now">';
+		submit_button( __( 'Sync now', 'problem-client' ), 'secondary', '', false );
+		echo '</form> ';
+
+		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline">';
+		wp_nonce_field( 'probclient_admin' );
+		echo '<input type="hidden" name="probclient_action" value="push_all">';
+		submit_button( __( 'Push my list to the server', 'problem-client' ), 'secondary', '', false );
+		echo '</form>';
 	}
 
 	/**

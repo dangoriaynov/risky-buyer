@@ -25,6 +25,7 @@ class Probclient_Plugin {
 		add_action( 'admin_init', array( 'Probclient_Local_Table_Provider', 'maybe_install' ) );
 
 		Probclient_Ajax::instance()->hooks();
+		Probclient_Remote_Sync::instance()->hooks();
 
 		if ( is_admin() ) {
 			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_assets' ) );

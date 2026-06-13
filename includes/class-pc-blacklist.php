@@ -207,6 +207,47 @@ class Probclient_Blacklist {
 	/* --------------------------------------------------------------------- */
 
 	/**
+	 * Active entries used for matching: local always, plus the cached remote
+	 * entries when sync is enabled. Deduplicated by uuid, newest first.
+	 *
+	 * @return array<int,array>
+	 */
+	public function active_for_match() {
+		$local = $this->provider->all( array( 'status' => 'active' ) );
+
+		if ( ! class_exists( 'Probclient_Settings' ) || ! Probclient_Settings::is_sync_enabled() ) {
+			return $local;
+		}
+		$remote = Probclient_Remote_Sync::instance()->cached_active();
+		if ( empty( $remote ) ) {
+			return $local;
+		}
+
+		$seen = array();
+		$out  = array();
+		foreach ( array_merge( $local, $remote ) as $e ) {
+			$uuid = isset( $e['uuid'] ) ? $e['uuid'] : '';
+			if ( '' !== $uuid ) {
+				if ( isset( $seen[ $uuid ] ) ) {
+					continue;
+				}
+				$seen[ $uuid ] = true;
+			}
+			$out[] = $e;
+		}
+
+		usort(
+			$out,
+			function ( $a, $b ) {
+				$da = ! empty( $a['created_at'] ) ? $a['created_at'] : ( ! empty( $a['updated_at'] ) ? $a['updated_at'] : '1970-01-01' );
+				$db = ! empty( $b['created_at'] ) ? $b['created_at'] : ( ! empty( $b['updated_at'] ) ? $b['updated_at'] : '1970-01-01' );
+				return strtotime( $db ) <=> strtotime( $da );
+			}
+		);
+		return $out;
+	}
+
+	/**
 	 * Build an in-memory index of active entries for fast bulk matching.
 	 *
 	 * @return array{phones:array,names:array}
@@ -217,7 +258,7 @@ class Probclient_Blacklist {
 		}
 		$phones = array();
 		$names  = array();
-		foreach ( $this->provider->all( array( 'status' => 'active' ) ) as $e ) {
+		foreach ( $this->active_for_match() as $e ) {
 			if ( ! empty( $e['phone_norm'] ) ) {
 				$phones[ $e['phone_norm'] ] = $e;
 			}
@@ -321,7 +362,7 @@ class Probclient_Blacklist {
 
 		// all() is ordered by created_at DESC, so results stay newest-first.
 		$out = array();
-		foreach ( $this->provider->all( array( 'status' => 'active' ) ) as $e ) {
+		foreach ( $this->active_for_match() as $e ) {
 			if ( $exclude_uuid && isset( $e['uuid'] ) && $e['uuid'] === $exclude_uuid ) {
 				continue;
 			}

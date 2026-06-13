@@ -187,3 +187,78 @@ msgstr "Да премахна ли този запис?"
 
 msgid "Delete"
 msgstr "Изтрий"
+
+msgid "Settings"
+msgstr "Настройки"
+
+msgid "Synchronization"
+msgstr "Синхронизация"
+
+msgid "Synchronization with the central server"
+msgstr "Синхронизация с централния сървър"
+
+msgid "Enable sync with the central server"
+msgstr "Включи синхронизация с централния сървър"
+
+msgid "When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only."
+msgstr "Когато е включено, проверките се разширяват с телефони от споделения сървър (създадени от други сайтове). Вашите записи винаги остават на вашия сайт. Изключете, за да ползвате само локалния списък."
+
+msgid "Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain."
+msgstr "Данни, изпращани към сървъра (само ако имате ключ за запис): телефон, име, причина, бележка и домейна на сайта ви."
+
+msgid "Server URL"
+msgstr "URL на сървъра"
+
+msgid "API key"
+msgstr "API ключ"
+
+msgid "Only needed to write your entries to the server. Reading the shared list is open."
+msgstr "Нужен е само за запис на вашите записи към сървъра. Четенето на споделения списък е отворено."
+
+msgid "Save settings"
+msgstr "Запази настройките"
+
+msgid "Status"
+msgstr "Състояние"
+
+msgid "Last sync:"
+msgstr "Последна синхронизация:"
+
+msgid "Cached entries:"
+msgstr "Записи в кеша:"
+
+msgid "Last error:"
+msgstr "Последна грешка:"
+
+msgid "never"
+msgstr "никога"
+
+msgid "Sync now"
+msgstr "Синхронизирай сега"
+
+msgid "Push my list to the server"
+msgstr "Изпрати моя списък към сървъра"
+
+msgid "Settings saved."
+msgstr "Настройките са запазени."
+
+msgid "Only an administrator can change settings."
+msgstr "Само администратор може да променя настройките."
+
+msgid "Sync done: %d entries cached."
+msgstr "Синхронизацията завърши: %d записа в кеша."
+
+msgid "Sync error: %s"
+msgstr "Грешка при синхронизация: %s"
+
+msgid "Pushed %d entries to the server."
+msgstr "Изпратени %d записа към сървъра."
+
+msgid "Push error: %s"
+msgstr "Грешка при изпращане: %s"
+
+msgid "Sync is disabled."
+msgstr "Синхронизацията е изключена."
+
+msgid "An API key is required to write to the server."
+msgstr "Нужен е API ключ за запис към сървъра."

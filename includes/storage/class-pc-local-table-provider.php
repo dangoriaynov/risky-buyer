@@ -22,6 +22,16 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 	}
 
 	/**
+	 * Cache table for entries pulled from the central server.
+	 *
+	 * @return string
+	 */
+	public static function cache_table() {
+		global $wpdb;
+		return $wpdb->prefix . 'probclient_remote_cache';
+	}
+
+	/**
 	 * Create/upgrade the table (activation hook).
 	 */
 	public static function install() {
@@ -63,6 +73,28 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 		) {$charset_collate};";
 
 		dbDelta( $sql );
+
+		$cache = self::cache_table();
+		$sql_cache = "CREATE TABLE {$cache} (
+			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+			uuid CHAR(36) NOT NULL,
+			phone_norm VARCHAR(32) NOT NULL DEFAULT '',
+			phone_raw VARCHAR(64) NOT NULL DEFAULT '',
+			name_norm VARCHAR(191) NOT NULL DEFAULT '',
+			name_raw VARCHAR(191) NOT NULL DEFAULT '',
+			reason_code VARCHAR(32) NOT NULL DEFAULT 'other',
+			note TEXT NULL,
+			source_site VARCHAR(191) NOT NULL DEFAULT '',
+			status VARCHAR(16) NOT NULL DEFAULT 'active',
+			updated_at DATETIME NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY uuid (uuid),
+			KEY phone_norm (phone_norm),
+			KEY name_norm (name_norm),
+			KEY status (status)
+		) {$charset_collate};";
+		dbDelta( $sql_cache );
+
 		update_option( 'probclient_db_version', PROBCLIENT_DB_VERSION );
 	}
 

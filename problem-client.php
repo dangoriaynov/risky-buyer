@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Problem Client
  * Description: Flag problematic WooCommerce customers by phone or name (with a reason and note) and automatically mark their orders in the admin. Storage-provider architecture, ready for a future shared/central list across sites.
- * Version: 0.3.0
+ * Version: 0.4.0
  * Author: dangoriaynov
  * Author URI: https://github.com/dangoriaynov
  * Plugin URI: https://github.com/dangoriaynov/problem-client
@@ -22,14 +22,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PROBCLIENT_VERSION', '0.3.0' );
-define( 'PROBCLIENT_DB_VERSION', '1' );
+define( 'PROBCLIENT_VERSION', '0.4.0' );
+define( 'PROBCLIENT_DB_VERSION', '2' );
 define( 'PROBCLIENT_FILE', __FILE__ );
 define( 'PROBCLIENT_DIR', plugin_dir_path( __FILE__ ) );
 define( 'PROBCLIENT_URL', plugin_dir_url( __FILE__ ) );
 
 require_once PROBCLIENT_DIR . 'includes/storage/interface-pc-storage-provider.php';
 require_once PROBCLIENT_DIR . 'includes/storage/class-pc-local-table-provider.php';
+require_once PROBCLIENT_DIR . 'includes/class-pc-settings.php';
+require_once PROBCLIENT_DIR . 'includes/class-pc-remote-sync.php';
 require_once PROBCLIENT_DIR . 'includes/class-pc-blacklist.php';
 require_once PROBCLIENT_DIR . 'includes/class-pc-matcher.php';
 require_once PROBCLIENT_DIR . 'includes/class-pc-ajax.php';
@@ -39,6 +41,7 @@ require_once PROBCLIENT_DIR . 'includes/admin/class-pc-admin-page.php';
 require_once PROBCLIENT_DIR . 'includes/class-pc-plugin.php';
 
 register_activation_hook( __FILE__, array( 'Probclient_Local_Table_Provider', 'install' ) );
+register_deactivation_hook( __FILE__, array( 'Probclient_Remote_Sync', 'clear_schedule' ) );
 
 // Declare WooCommerce HPOS (custom order tables) compatibility.
 add_action(
