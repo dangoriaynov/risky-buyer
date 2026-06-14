@@ -61,6 +61,14 @@ def init_db() -> None:
             scope TEXT DEFAULT 'read',
             created_at TEXT
         );
+        CREATE TABLE IF NOT EXISTS appeals (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT DEFAULT '',
+            phone TEXT DEFAULT '',
+            message TEXT DEFAULT '',
+            status TEXT DEFAULT 'new',
+            created_at TEXT
+        );
         """
     )
     conn.commit()
@@ -128,6 +136,13 @@ class EntryIn(BaseModel):
 
 class EntriesIn(BaseModel):
     entries: List[EntryIn]
+
+
+class AppealIn(BaseModel):
+    name: Optional[str] = ""
+    phone: Optional[str] = ""
+    message: Optional[str] = ""
+    website: Optional[str] = ""  # honeypot — must stay empty
 
 
 # --------------------------------------------------------------------------- #
@@ -218,6 +233,26 @@ def upsert_entries(payload: EntriesIn, authorization: Optional[str] = Header(def
     conn.commit()
     conn.close()
     return {"ok": True, "upserted": upserted}
+
+
+@app.post("/v1/appeal")
+def submit_appeal(payload: AppealIn):
+    """Removal / wrongly-listed request. Honeypot-protected, open (no key)."""
+    if ( payload.website or "" ).strip():
+        return {"ok": True}  # bot filled the honeypot — silently drop
+    name    = ( payload.name or "" ).strip()[:191]
+    phone   = ( payload.phone or "" ).strip()[:64]
+    message = ( payload.message or "" ).strip()[:2000]
+    if "" == name and "" == phone and "" == message:
+        raise HTTPException(status_code=400, detail="Empty appeal")
+    conn = db()
+    conn.execute(
+        "INSERT INTO appeals (name, phone, message, status, created_at) VALUES (?, ?, ?, 'new', ?)",
+        (name, phone, message, now_iso()),
+    )
+    conn.commit()
+    conn.close()
+    return {"ok": True}
 
 
 @app.delete("/v1/entries/{uuid}")

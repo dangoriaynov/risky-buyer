@@ -1,46 +1,80 @@
 <!doctype html>
-<html lang="en">
+<html lang="bg">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Privacy Policy — RiskyBuyer</title>
-<style>body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:#0f172a;color:#e5e7eb;line-height:1.6}.wrap{max-width:760px;margin:0 auto;padding:40px 20px 80px}h1{font-size:28px}h2{font-size:18px;margin-top:28px}a{color:#7cc4ff}code{background:#0b1220;padding:2px 6px;border-radius:4px}</style>
+<title>Privacy — RiskyBuyer</title>
+<style>
+  :root{--bg:#0b1020;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.10);--red:#e0413f;--text:#eaf0fb;--muted:#9aa6bd;--accent:#7cc4ff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.7 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+  a{color:var(--accent);text-decoration:none}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px}
+  header{position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(10px);background:rgba(11,16,32,.62);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;height:62px;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}.brand svg{width:28px;height:28px}.sp{flex:1}
+  .langs{display:flex;gap:3px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .langs button{all:unset;cursor:pointer;font:700 12px/1 inherit;color:var(--muted);padding:6px 11px;border-radius:999px;transition:.2s}
+  .langs button.active{background:var(--red);color:#fff}.langs button:hover{color:#fff}
+  .doc{padding:34px 0 70px}
+  h1{font-size:30px;margin:6px 0 18px}h2{font-size:18px;margin:26px 0 6px}
+  p{color:#d6deec;margin:0 0 8px}.back{color:var(--muted);font-size:14px}
+  .upd{color:var(--muted);font-size:13px;margin-top:24px}
+  footer{border-top:1px solid var(--line);padding:22px 0;color:var(--muted);font-size:14px}
+  .frow{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+</style>
 </head>
 <body>
-<div class="wrap">
-<h1>Privacy Policy</h1>
+<header><div class="wrap bar">
+  <a class="brand" href="/"><svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" rx="56" fill="#e0413f"/><path d="M128 44 L198 70 V126 C198 174 164 206 128 220 C92 206 58 174 58 126 V70 Z" fill="#fff"/><rect x="119" y="86" width="18" height="64" rx="9" fill="#9b1c1c"/><circle cx="128" cy="174" r="11" fill="#9b1c1c"/></svg>RiskyBuyer</a>
+  <span class="sp"></span>
+  <span class="langs" id="langs"><button data-lang="bg">BG</button><button data-lang="ua">UA</button><button data-lang="en">EN</button></span>
+</div></header>
 
-<h2>What data is stored</h2>
-<p>For each entry the Service stores: a phone number and/or name (as a contact
-identifier), a reason code (uncollected / fake / abusive / other), an optional
-short note, the domain of the submitting store, a status, and a timestamp. No
-payment data, addresses, or other sensitive personal data are stored.</p>
-
-<h2>How data is collected</h2>
-<p>Data is submitted by stores running the Problem Client plugin that have
-<strong>explicitly enabled</strong> synchronization and hold a write API key.
-Synchronization is opt-in and off by default. Reading the shared list is open
-to plugin users to check incoming orders.</p>
-
-<h2>Purpose and legal basis</h2>
-<p>Data is processed for the legitimate interest of preventing order fraud and
-losses for small online stores. Stores submitting data are responsible for
-having a lawful basis under their local law.</p>
-
-<h2>Retention</h2>
-<p>Entries are kept while relevant. Removed entries are flagged and propagated
-to subscribers so they stop matching.</p>
-
-<h2>Your rights / removal requests</h2>
-<p>To request access, correction, or removal of an entry about you, contact the
-operator at <code>privacy@riskybuyer.com</code> with the phone/name in question.
-Verified requests are actioned promptly.</p>
-
-<h2>Sharing</h2>
-<p>The shared list is available to authorized plugin installations for the sole
-purpose described above. It is not sold.</p>
-
-<p><a href="/">← Home</a> · <a href="/terms">Terms of Use</a></p>
+<div class="wrap doc">
+  <p><a class="back" href="/">← <span id="home"></span></a></p>
+  <h1 id="title"></h1>
+  <div id="content"></div>
+  <p class="upd" id="updated"></p>
 </div>
+
+<footer><div class="wrap frow"><span>© RiskyBuyer</span><span class="sp"></span><a href="/">Home</a><a href="/terms" id="lterms"></a></div></footer>
+
+<script>
+const T={
+ bg:{home:"Начало",title:"Политика за поверителност",updated:"Последна актуализация: юни 2026",lterms:"Условия",sections:[
+  ["Какво съхраняваме","За всеки запис: телефонен номер и/или име (като контактен идентификатор), причина (неизкупена / фалшива / обиди / друго), незадължителна кратка бележка, домейна на съобщаващия магазин, статус и дата. Не съхраняваме платежни данни, адреси или други чувствителни лични данни."],
+  ["Как се събира","Данните се подават от магазини с плъгина Problem Client, които изрично са включили синхронизацията и имат ключ за запис. Синхронизацията е по избор и изключена по подразбиране. Четенето на списъка е отворено за потребителите на плъгина, за проверка на входящи поръчки."],
+  ["Цел и основание","Обработката обслужва легитимния интерес от предотвратяване на измами и загуби за малки онлайн магазини. Съобщаващите магазини отговарят за законното основание според местното им право."],
+  ["Съхранение","Записите се пазят, докато са актуални. Премахнатите записи се маркират и се разпространяват към абонатите, за да спрат да съвпадат."],
+  ["Вашите права и премахване","За достъп, корекция или премахване на запис за вас използвайте формата на началната страница („Смятате, че сте в списъка по грешка?“). Не публикуваме e-mail за контакт, за да предотвратим спам; формата достига директно до оператора. Проверените заявки се обработват своевременно."],
+  ["Споделяне","Списъкът е достъпен само за оторизирани инсталации на плъгина за горепосочената цел. Не се продава."]
+ ]},
+ ua:{home:"Головна",title:"Політика приватності",updated:"Останнє оновлення: червень 2026",lterms:"Умови",sections:[
+  ["Що ми зберігаємо","Для кожного запису: номер телефону та/або ім'я (як контактний ідентифікатор), причину (невикуплена / фейкова / образи / інше), необов'язкову коротку нотатку, домен магазину-джерела, статус і час. Ми не зберігаємо платіжні дані, адреси чи інші чутливі персональні дані."],
+  ["Як збираються дані","Дані подають магазини з плагіном Problem Client, які явно увімкнули синхронізацію та мають ключ запису. Синхронізація — за бажанням і вимкнена за замовчуванням. Читання списку відкрите для користувачів плагіна, щоб перевіряти вхідні замовлення."],
+  ["Мета та підстава","Обробка слугує законному інтересу запобігання шахрайству та збиткам для малих онлайн-магазинів. Магазини-джерела відповідають за законну підставу згідно з місцевим правом."],
+  ["Зберігання","Записи зберігаються, доки актуальні. Видалені записи позначаються й поширюються підписникам, щоб припинити збіги."],
+  ["Ваші права та видалення","Щоб отримати доступ, виправити або видалити запис про вас, скористайтеся формою на головній сторінці («Вважаєте, що вас внесли помилково?»). Ми не публікуємо контактний e-mail, щоб запобігти спаму; форма надходить безпосередньо оператору. Підтверджені запити опрацьовуються оперативно."],
+  ["Поширення","Список доступний лише авторизованим інсталяціям плагіна для зазначеної мети. Він не продається."]
+ ]},
+ en:{home:"Home",title:"Privacy Policy",updated:"Last updated: June 2026",lterms:"Terms",sections:[
+  ["What we store","For each entry: a phone number and/or name (as a contact identifier), a reason (uncollected / fake / abusive / other), an optional short note, the domain of the reporting store, a status and a timestamp. We do not store payment data, addresses or other sensitive personal data."],
+  ["How it is collected","Data is submitted by stores running the Problem Client plugin that have explicitly enabled synchronization and hold a write key. Synchronization is opt-in and off by default. Reading the list is open to plugin users to check incoming orders."],
+  ["Purpose & legal basis","Processing serves the legitimate interest of preventing order fraud and losses for small online stores. Reporting stores are responsible for having a lawful basis under their local law."],
+  ["Retention","Entries are kept while relevant. Removed entries are flagged and propagated to subscribers so they stop matching."],
+  ["Your rights & removal","To request access, correction or removal of an entry about you, use the form on the home page (“Listed by mistake?”). We don’t publish a contact e-mail to prevent spam; the form reaches the operator directly. Verified requests are actioned promptly."],
+  ["Sharing","The list is available only to authorized plugin installations for the purpose above. It is not sold."]
+ ]}
+};
+function render(l){if(!T[l])l="bg";const d=T[l];document.documentElement.lang=l==="ua"?"uk":l;
+ document.getElementById("home").textContent=d.home;document.getElementById("title").textContent=d.title;
+ document.getElementById("updated").textContent=d.updated;document.getElementById("lterms").textContent=d.lterms;
+ document.getElementById("content").innerHTML=d.sections.map(s=>"<h2>"+s[0]+"</h2><p>"+s[1]+"</p>").join("");
+ document.querySelectorAll("#langs button").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
+ try{localStorage.setItem("rb_lang",l)}catch(e){}}
+document.getElementById("langs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)render(b.dataset.lang)});
+let s="bg";try{s=localStorage.getItem("rb_lang")||"bg"}catch(e){}render(s);
+</script>
 </body>
 </html>

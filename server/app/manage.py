@@ -38,7 +38,18 @@ def list_keys() -> None:
     conn.close()
 
 
+def list_appeals() -> None:
+    init_db()
+    conn = db()
+    for r in conn.execute( "SELECT id, created_at, status, name, phone, message FROM appeals ORDER BY created_at DESC LIMIT 200" ):
+        print( "#%d [%s] %s | %s | %s | %s" % ( r["id"], r["status"], r["created_at"], r["name"], r["phone"], ( r["message"] or "" )[:120] ) )
+    conn.close()
+
+
 if __name__ == "__main__":
+    if len(sys.argv) >= 2 and sys.argv[1] == "appeals":
+        list_appeals()
+        sys.exit(0)
     if len(sys.argv) >= 3 and sys.argv[1] == "create-key":
         create_key(sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else "read")
     elif len(sys.argv) >= 2 and sys.argv[1] == "list-keys":

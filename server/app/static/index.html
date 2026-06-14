@@ -5,155 +5,134 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RiskyBuyer</title>
 <style>
-  :root{
-    --bg:#0b1020; --bg2:#0f172a; --card:rgba(255,255,255,.04); --line:rgba(255,255,255,.09);
-    --red:#e0413f; --red2:#9b1c1c; --text:#e8edf6; --muted:#9aa6bd; --accent:#7cc4ff;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.65;-webkit-font-smoothing:antialiased}
+  :root{--bg:#0b1020;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.10);--red:#e0413f;--text:#eaf0fb;--muted:#9aa6bd;--accent:#7cc4ff}
+  *{box-sizing:border-box}html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
   a{color:var(--accent);text-decoration:none}
-  .wrap{max-width:960px;margin:0 auto;padding:0 22px}
-
-  /* header */
-  header{position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(10px);background:rgba(11,16,32,.6);border-bottom:1px solid var(--line)}
-  .bar{display:flex;align-items:center;gap:14px;height:64px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
-  .brand svg{width:30px;height:30px}
-  .spacer{flex:1}
-  .langs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
-  .langs button{all:unset;cursor:pointer;font-size:12px;font-weight:700;color:var(--muted);padding:5px 11px;border-radius:999px;transition:.2s}
-  .langs button.active{background:var(--red);color:#fff}
-  .langs button:hover{color:#fff}
-
-  /* hero */
-  .hero{position:relative;overflow:hidden;padding:96px 0 80px;text-align:center}
-  .hero::before{content:"";position:absolute;inset:-40% -10% auto -10%;height:520px;
-    background:radial-gradient(60% 60% at 50% 0,rgba(224,65,63,.35),transparent 70%),
-               radial-gradient(50% 50% at 20% 30%,rgba(124,196,255,.18),transparent 70%);
-    animation:float 12s ease-in-out infinite;z-index:0}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(26px)}}
-  .hero .wrap{position:relative;z-index:1}
-  .shield{width:88px;height:88px;margin:0 auto 22px;filter:drop-shadow(0 12px 30px rgba(224,65,63,.45));animation:pop .7s cubic-bezier(.2,.8,.2,1) both}
-  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-  h1{font-size:clamp(30px,5vw,52px);line-height:1.12;margin:0 0 16px;font-weight:850;letter-spacing:-.02em}
-  .lead{font-size:clamp(16px,2.2vw,21px);color:var(--muted);max-width:680px;margin:0 auto 28px}
-  .cta{display:inline-flex;gap:12px;flex-wrap:wrap;justify-content:center}
-  .btn{display:inline-block;padding:13px 22px;border-radius:12px;font-weight:700;transition:.2s;border:1px solid transparent}
-  .btn.primary{background:var(--red);color:#fff}
-  .btn.primary:hover{background:#ef5350;transform:translateY(-2px)}
-  .btn.ghost{border-color:var(--line);color:var(--text)}
-  .btn.ghost:hover{border-color:var(--accent);transform:translateY(-2px)}
-
-  /* sections */
-  section.block{padding:34px 0}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
-    opacity:0;transform:translateY(26px);transition:opacity .6s ease,transform .6s ease}
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px}
+  header{position:sticky;top:0;z-index:20;backdrop-filter:saturate(140%) blur(10px);background:rgba(11,16,32,.62);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;height:62px;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
+  .brand svg{width:28px;height:28px}.sp{flex:1}
+  .langs{display:flex;gap:3px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .langs button{all:unset;cursor:pointer;font:700 12px/1 inherit;color:var(--muted);padding:6px 11px;border-radius:999px;transition:.2s}
+  .langs button.active{background:var(--red);color:#fff}.langs button:hover{color:#fff}
+  .hero{position:relative;overflow:hidden;padding:104px 0 72px;text-align:center}
+  .hero::before{content:"";position:absolute;inset:-45% -10% auto -10%;height:480px;background:radial-gradient(60% 60% at 50% 0,rgba(224,65,63,.32),transparent 70%),radial-gradient(45% 45% at 22% 28%,rgba(124,196,255,.16),transparent 70%);animation:fl 12s ease-in-out infinite}
+  @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(24px)}}
+  .hero .wrap{position:relative}
+  .shield{width:80px;height:80px;margin:0 auto 20px;filter:drop-shadow(0 12px 28px rgba(224,65,63,.45));animation:pop .7s cubic-bezier(.2,.8,.2,1) both}
+  @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+  h1{font-size:clamp(30px,5.2vw,50px);line-height:1.1;margin:0 0 14px;font-weight:850;letter-spacing:-.02em}
+  .lead{font-size:clamp(16px,2.1vw,20px);color:var(--muted);max-width:640px;margin:0 auto 26px}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .btn{padding:12px 22px;border-radius:12px;font-weight:700;border:1px solid transparent;transition:.2s;cursor:pointer}
+  .btn.primary{background:var(--red);color:#fff}.btn.primary:hover{background:#ef5350;transform:translateY(-2px)}
+  .btn.ghost{border-color:var(--line);color:var(--text)}.btn.ghost:hover{border-color:var(--accent);transform:translateY(-2px)}
+  section{padding:30px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;opacity:0;transform:translateY(24px);transition:.55s}
   .card.in{opacity:1;transform:none}
-  .card h2{margin:0 0 8px;font-size:20px}
-  .card p{margin:0;color:var(--muted)}
-  .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgba(224,65,63,.14);margin-bottom:12px;font-size:22px}
-  code{background:#0a0f1e;border:1px solid var(--line);padding:2px 7px;border-radius:6px;color:#cfe1ff}
-
-  footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 0;color:var(--muted);font-size:14px}
-  footer .bar2{display:flex;flex-wrap:wrap;gap:14px;align-items:center}
+  .card h2{margin:0 0 6px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:15px}
+  .ic{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:rgba(224,65,63,.14);margin-bottom:10px;font-size:20px}
+  code{background:#0a0f1e;border:1px solid var(--line);padding:2px 7px;border-radius:6px;color:#cfe1ff;font-size:14px}
+  h2.sec{font-size:22px;margin:0 0 6px}
+  .appeal{max-width:560px}
+  .appeal input,.appeal textarea{width:100%;margin:7px 0;padding:11px 13px;border-radius:10px;border:1px solid var(--line);background:#0a0f1e;color:var(--text);font:inherit}
+  .appeal textarea{min-height:90px;resize:vertical}
+  .hp{position:absolute!important;left:-9999px!important;width:1px;height:1px;overflow:hidden}
+  #ap-status{display:block;margin-top:8px;font-size:14px}
+  footer{border-top:1px solid var(--line);margin-top:34px;padding:24px 0;color:var(--muted);font-size:14px}
+  .frow{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
 </style>
 </head>
 <body>
-<header>
-  <div class="wrap bar">
-    <div class="brand">
-      <svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" rx="56" fill="#e0413f"/><path d="M128 44 L198 70 V126 C198 174 164 206 128 220 C92 206 58 174 58 126 V70 Z" fill="#fff"/><rect x="119" y="86" width="18" height="64" rx="9" fill="#9b1c1c"/><circle cx="128" cy="174" r="11" fill="#9b1c1c"/></svg>
-      RiskyBuyer
-    </div>
-    <div class="spacer"></div>
-    <div class="langs" id="langs">
-      <button data-lang="bg">BG</button>
-      <button data-lang="ua">UA</button>
-      <button data-lang="en">EN</button>
-    </div>
-  </div>
-</header>
+<header><div class="wrap bar">
+  <span class="brand"><svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" rx="56" fill="#e0413f"/><path d="M128 44 L198 70 V126 C198 174 164 206 128 220 C92 206 58 174 58 126 V70 Z" fill="#fff"/><rect x="119" y="86" width="18" height="64" rx="9" fill="#9b1c1c"/><circle cx="128" cy="174" r="11" fill="#9b1c1c"/></svg>RiskyBuyer</span>
+  <span class="sp"></span>
+  <span class="langs" id="langs"><button data-lang="bg">BG</button><button data-lang="ua">UA</button><button data-lang="en">EN</button></span>
+</div></header>
 
-<div class="hero">
-  <div class="wrap">
-    <svg class="shield" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" rx="56" fill="#e0413f"/><path d="M128 44 L198 70 V126 C198 174 164 206 128 220 C92 206 58 174 58 126 V70 Z" fill="#fff"/><rect x="119" y="86" width="18" height="64" rx="9" fill="#9b1c1c"/><circle cx="128" cy="174" r="11" fill="#9b1c1c"/></svg>
-    <h1 data-i18n="hero_title"></h1>
-    <p class="lead" data-i18n="hero_lead"></p>
-    <div class="cta">
-      <a class="btn primary" href="https://github.com/dangoriaynov/problem-client" data-i18n="cta_plugin"></a>
-      <a class="btn ghost" href="#how" data-i18n="cta_how"></a>
-    </div>
-  </div>
-</div>
+<div class="hero"><div class="wrap">
+  <svg class="shield" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><rect width="256" height="256" rx="56" fill="#e0413f"/><path d="M128 44 L198 70 V126 C198 174 164 206 128 220 C92 206 58 174 58 126 V70 Z" fill="#fff"/><rect x="119" y="86" width="18" height="64" rx="9" fill="#9b1c1c"/><circle cx="128" cy="174" r="11" fill="#9b1c1c"/></svg>
+  <h1 data-i18n="h1"></h1>
+  <p class="lead" data-i18n="lead"></p>
+  <div class="cta"><a class="btn primary" href="#how" data-i18n="cta1"></a><a class="btn ghost" href="https://github.com/dangoriaynov/risky-buyer" data-i18n="cta2"></a></div>
+</div></div>
 
-<section class="block"><div class="wrap grid">
-  <div class="card"><div class="ic">📋</div><h2 data-i18n="s1_t"></h2><p data-i18n="s1_b"></p></div>
-  <div class="card" id="how"><div class="ic">🔌</div><h2 data-i18n="s2_t"></h2><p data-i18n="s2_b"></p></div>
-  <div class="card"><div class="ic">🔒</div><h2 data-i18n="s3_t"></h2><p data-i18n="s3_b"></p></div>
+<section id="how"><div class="wrap grid">
+  <div class="card"><div class="ic">🧭</div><h2 data-i18n="c1t"></h2><p data-i18n="c1b"></p></div>
+  <div class="card"><div class="ic">🔌</div><h2 data-i18n="c2t"></h2><p data-i18n="c2b"></p></div>
+  <div class="card"><div class="ic">⚖️</div><h2 data-i18n="c3t"></h2><p data-i18n="c3b"></p></div>
 </div></section>
 
-<section class="block"><div class="wrap">
-  <div class="card" style="text-align:center"><div class="ic" style="margin:0 auto 12px">⚙️</div>
-    <h2 data-i18n="api_t"></h2>
-    <p data-i18n="api_b"></p>
-    <p style="margin-top:10px"><code>GET https://riskybuyer.com/v1/entries</code></p>
-  </div>
+<section><div class="wrap"><div class="card" style="text-align:center"><div class="ic" style="margin:0 auto 10px">⚙️</div><h2 data-i18n="apit"></h2><p data-i18n="apib"></p><p style="margin-top:8px"><code>GET https://riskybuyer.com/v1/entries</code></p></div></div></section>
+
+<section id="appeal"><div class="wrap">
+  <h2 class="sec" data-i18n="ap_title"></h2>
+  <p class="lead" style="margin:0 0 14px;text-align:left" data-i18n="ap_intro"></p>
+  <form class="appeal" id="ap-form">
+    <input type="text" id="ap-name" data-ph="ap_name">
+    <input type="text" id="ap-phone" data-ph="ap_phone">
+    <textarea id="ap-msg" data-ph="ap_msg"></textarea>
+    <input type="text" id="ap-website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button type="submit" class="btn primary" data-i18n="ap_send"></button>
+    <span id="ap-status"></span>
+  </form>
 </div></section>
 
-<footer><div class="wrap bar2">
-  <span>© RiskyBuyer</span><span class="spacer" style="flex:1"></span>
-  <a href="/terms" data-i18n="f_terms"></a><a href="/privacy" data-i18n="f_privacy"></a>
-</div></footer>
+<footer><div class="wrap frow"><span>© RiskyBuyer</span><span class="sp"></span><a href="/terms" data-i18n="terms"></a><a href="/privacy" data-i18n="privacy"></a></div></footer>
 
 <script>
-const I18N = {
-  bg:{
-    hero_title:"Спрете проблемните клиенти, преди да изпратите",
-    hero_lead:"Споделен черен списък на рискови купувачи — фалшиви поръчки, неизкупени пратки, обиди — за WooCommerce магазини.",
-    cta_plugin:"Вземи плъгина", cta_how:"Как работи",
-    s1_t:"Какво е", s1_b:"RiskyBuyer е общностен списък на проблемни клиенти по телефон или име. Проверете входяща поръчка срещу споделения списък и отбележете рисковите купувачи преди изпращане.",
-    s2_t:"Как се използва", s2_b:"Чрез безплатния плъгин Problem Client за WooCommerce. Отворете WooCommerce → Проблемни клиенти → Настройки и включете синхронизацията.",
-    s3_t:"Поверителност и коректност", s3_b:"Списъкът съдържа само контактни идентификатори и кратка причина. Синхронизацията е по избор. Изтриване — по заявка.",
-    api_t:"Отворен API", api_b:"Четенето на споделения списък е отворено. Записът изисква оторизиран API ключ.",
-    f_terms:"Условия", f_privacy:"Поверителност"
-  },
-  ua:{
-    hero_title:"Зупиніть проблемних клієнтів до відправлення",
-    hero_lead:"Спільний чорний список ризикових покупців — фейкові замовлення, невикуплені посилки, образи — для WooCommerce-магазинів.",
-    cta_plugin:"Отримати плагін", cta_how:"Як це працює",
-    s1_t:"Що це", s1_b:"RiskyBuyer — спільнотний список проблемних клієнтів за телефоном або іменем. Перевіряйте вхідне замовлення проти спільного списку й позначайте ризикових покупців до відправлення.",
-    s2_t:"Як користуватися", s2_b:"Через безкоштовний плагін Problem Client для WooCommerce. Відкрийте WooCommerce → Проблемні клієнти → Налаштування та увімкніть синхронізацію.",
-    s3_t:"Приватність і чесність", s3_b:"Список містить лише контактні ідентифікатори та коротку причину. Синхронізація — за бажанням. Видалення — за запитом.",
-    api_t:"Відкритий API", api_b:"Читання спільного списку відкрите. Запис потребує авторизованого API-ключа.",
-    f_terms:"Умови", f_privacy:"Приватність"
-  },
-  en:{
-    hero_title:"Stop problem customers before you ship",
-    hero_lead:"A shared blacklist of risky buyers — fake orders, uncollected COD parcels, abusive behaviour — for WooCommerce stores.",
-    cta_plugin:"Get the plugin", cta_how:"How it works",
-    s1_t:"What it is", s1_b:"RiskyBuyer is a community list of problematic customers, keyed by phone or name. Check an incoming order against the shared list and flag risky buyers before shipping.",
-    s2_t:"How to use it", s2_b:"Through the free Problem Client plugin for WooCommerce. Open WooCommerce → Problem clients → Settings and enable synchronization.",
-    s3_t:"Privacy & fairness", s3_b:"The list holds only contact identifiers and a short reason. Synchronization is opt-in. Removal on request.",
-    api_t:"Open API", api_b:"Reading the shared list is open. Writing requires an authorized API key.",
-    f_terms:"Terms", f_privacy:"Privacy"
-  }
+const T={
+ bg:{h1:"Опознайте купувачите си преди да изпратите",lead:"Споделен регистър, който помага на онлайн магазините да различават надеждните клиенти от рисковите — по-малко фалшиви поръчки и неизкупени пратки, по-честно обслужване за коректните.",cta1:"Как работи",cta2:"GitHub",
+  c1t:"Какво е",c1b:"Споделен регистър за репутация на купувачи — по телефон или име. Магазините съобщават за фалшиви поръчки, неизкупени пратки и злоупотреби.",
+  c2t:"Как се ползва",c2b:"Чрез безплатния плъгин Problem Client за WooCommerce — включете синхронизацията в настройките.",
+  c3t:"Честно и прозрачно",c3b:"Само контактни данни и причина — без чувствителни данни. Записите са сигнал, не присъда.",
+  apit:"Отворен API",apib:"Четенето на списъка е отворено; записът изисква оторизиран ключ.",
+  ap_title:"Смятате, че сте в списъка по грешка?",ap_intro:"Ако телефонът или името ви са добавени несправедливо, изпратете кратко съобщение и ще го прегледаме. Не публикуваме e-mail, за да избегнем спам — използвайте формата по-долу.",
+  ap_name:"Вашето име",ap_phone:"Телефон в списъка",ap_msg:"Съобщение (защо смятате, че е по грешка)",ap_send:"Изпрати заявка",
+  ap_ok:"Благодарим — ще прегледаме заявката ви.",ap_err:"Грешка. Опитайте отново по-късно.",ap_empty:"Попълнете поне телефон или съобщение.",
+  terms:"Условия",privacy:"Поверителност"},
+ ua:{h1:"Знайте своїх покупців до відправлення",lead:"Спільний реєстр, який допомагає онлайн-магазинам відрізняти надійних клієнтів від ризикових — менше фейкових замовлень і невикуплених посилок, чесніший сервіс для добросовісних.",cta1:"Як це працює",cta2:"GitHub",
+  c1t:"Що це",c1b:"Спільний реєстр репутації покупців — за телефоном або іменем. Магазини повідомляють про фейкові замовлення, невикуплені посилки та зловживання.",
+  c2t:"Як користуватися",c2b:"Через безкоштовний плагін Problem Client для WooCommerce — увімкніть синхронізацію в налаштуваннях.",
+  c3t:"Чесно й прозоро",c3b:"Лише контактні дані й причина — без чутливих даних. Записи це сигнал, а не вирок.",
+  apit:"Відкритий API",apib:"Читання списку відкрите; запис потребує авторизованого ключа.",
+  ap_title:"Вважаєте, що вас внесли помилково?",ap_intro:"Якщо ваш телефон або ім'я додані несправедливо — надішліть коротке повідомлення, і ми його розглянемо. Ми не публікуємо e-mail, щоб уникнути спаму — скористайтеся формою нижче.",
+  ap_name:"Ваше ім'я",ap_phone:"Телефон у списку",ap_msg:"Повідомлення (чому вважаєте, що помилково)",ap_send:"Надіслати запит",
+  ap_ok:"Дякуємо — ми розглянемо ваш запит.",ap_err:"Помилка. Спробуйте пізніше.",ap_empty:"Вкажіть хоча б телефон або повідомлення.",
+  terms:"Умови",privacy:"Приватність"},
+ en:{h1:"Know your buyers before you ship",lead:"A shared registry that helps online stores tell trustworthy customers from risky ones — fewer fake orders and uncollected parcels, fairer service for the honest majority.",cta1:"How it works",cta2:"GitHub",
+  c1t:"What it is",c1b:"A shared registry of buyer reputation, by phone or name. Stores report fake orders, uncollected parcels, and abuse.",
+  c2t:"How to use it",c2b:"Through the free Problem Client plugin for WooCommerce — enable synchronization in its settings.",
+  c3t:"Fair & transparent",c3b:"Only contact details and a reason — no sensitive data. Entries are a signal, not a verdict.",
+  apit:"Open API",apib:"Reading the list is open; writing requires an authorized key.",
+  ap_title:"Listed by mistake?",ap_intro:"If your phone or name was added unfairly, send a short note and we'll review it. We don't publish an e-mail (to avoid spam) — please use the form below.",
+  ap_name:"Your name",ap_phone:"Phone on the list",ap_msg:"Message (why you think it's a mistake)",ap_send:"Send request",
+  ap_ok:"Thanks — we'll review your request.",ap_err:"Something went wrong. Please try again later.",ap_empty:"Please provide at least a phone or a message.",
+  terms:"Terms",privacy:"Privacy"}
 };
-function setLang(l){
-  if(!I18N[l]) l="bg";
-  document.documentElement.lang = l==="ua"?"uk":l;
-  document.querySelectorAll("[data-i18n]").forEach(el=>{ const k=el.getAttribute("data-i18n"); if(I18N[l][k]!=null) el.textContent=I18N[l][k]; });
-  document.querySelectorAll("#langs button").forEach(b=>b.classList.toggle("active", b.dataset.lang===l));
-  try{ localStorage.setItem("rb_lang", l); }catch(e){}
-}
-document.getElementById("langs").addEventListener("click",e=>{ const b=e.target.closest("button"); if(b) setLang(b.dataset.lang); });
-let saved="bg"; try{ saved=localStorage.getItem("rb_lang")||"bg"; }catch(e){}
-setLang(saved);
-
-// slide-in on scroll
-const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.add("in"); io.unobserve(en.target);} }),{threshold:.15});
-document.querySelectorAll(".card").forEach((c,i)=>{ c.style.transitionDelay=(i%3*90)+"ms"; io.observe(c); });
+let LANG="bg";
+function setLang(l){if(!T[l])l="bg";LANG=l;document.documentElement.lang=l==="ua"?"uk":l;
+ document.querySelectorAll("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");if(T[l][k]!=null)e.textContent=T[l][k]});
+ document.querySelectorAll("[data-ph]").forEach(e=>{const k=e.getAttribute("data-ph");if(T[l][k]!=null)e.placeholder=T[l][k]});
+ document.querySelectorAll("#langs button").forEach(b=>b.classList.toggle("active",b.dataset.lang===l));
+ try{localStorage.setItem("rb_lang",l)}catch(e){}}
+document.getElementById("langs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setLang(b.dataset.lang)});
+let s="bg";try{s=localStorage.getItem("rb_lang")||"bg"}catch(e){}setLang(s);
+const io=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){en.target.classList.add("in");io.unobserve(en.target)}}),{threshold:.15});
+document.querySelectorAll(".card").forEach((c,i)=>{c.style.transitionDelay=(i%3*80)+"ms";io.observe(c)});
+document.getElementById("ap-form").addEventListener("submit",function(ev){ev.preventDefault();
+ const st=document.getElementById("ap-status");
+ const body={name:document.getElementById("ap-name").value,phone:document.getElementById("ap-phone").value,message:document.getElementById("ap-msg").value,website:document.getElementById("ap-website").value};
+ if(!body.phone.trim()&&!body.message.trim()){st.style.color="#e0a341";st.textContent=T[LANG].ap_empty;return;}
+ st.style.color="var(--muted)";st.textContent="…";
+ fetch("/v1/appeal",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+  .then(r=>{if(!r.ok)throw 0;return r.json();})
+  .then(()=>{st.style.color="#5fd08a";st.textContent=T[LANG].ap_ok;document.getElementById("ap-form").reset();})
+  .catch(()=>{st.style.color="#e0413f";st.textContent=T[LANG].ap_err;});
+});
 </script>
 </body>
 </html>
