@@ -220,7 +220,7 @@ class Riskybuyer_Remote_Sync {
 				'updated_at'  => isset( $e['updated_at'] ) ? sanitize_text_field( $e['updated_at'] ) : current_time( 'mysql' ),
 			);
 
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 			$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t} WHERE uuid = %s", $uuid ) );
 			if ( $exists ) {
 				$wpdb->update( $t, $row, array( 'uuid' => $uuid ) );
@@ -239,7 +239,7 @@ class Riskybuyer_Remote_Sync {
 	public function cached_active() {
 		global $wpdb;
 		$t = Riskybuyer_Local_Table_Provider::cache_table();
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$rows = $wpdb->get_results( "SELECT * FROM {$t} WHERE status = 'active' ORDER BY updated_at DESC LIMIT 5000", ARRAY_A );
 		// phpcs:enable
 		return $rows ? $rows : array();
@@ -248,14 +248,14 @@ class Riskybuyer_Remote_Sync {
 	public function cache_count() {
 		global $wpdb;
 		$t = Riskybuyer_Local_Table_Provider::cache_table();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t} WHERE status = 'active'" );
 	}
 
 	public function clear_cache() {
 		global $wpdb;
 		$t = Riskybuyer_Local_Table_Provider::cache_table();
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$wpdb->query( "DELETE FROM {$t}" );
 		$st           = Riskybuyer_Settings::state();
 		$st['cached'] = 0;

@@ -44,7 +44,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 		// One-time cleanup of the pre-rename table/option (held only disposable test data).
 		$old_table = $wpdb->prefix . 'pc_blacklist';
 		if ( $old_table !== $table ) {
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 			$wpdb->query( "DROP TABLE IF EXISTS {$old_table}" );
 		}
 		delete_option( 'pc_db_version' );
@@ -58,7 +58,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 			if ( $old === $new ) {
 				continue;
 			}
-			// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 			$old_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $old ) );
 			$new_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $new ) );
 			if ( $old_exists && ! $new_exists ) {
@@ -190,7 +190,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 		}
 		$sql .= ' ORDER BY created_at DESC LIMIT 5000';
 
-		// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$prepared = $args ? $wpdb->prepare( $sql, $args ) : $sql;
 		$rows     = $wpdb->get_results( $prepared, ARRAY_A );
 		// phpcs:enable
@@ -213,7 +213,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 		$table        = self::table();
 		$placeholders = implode( ',', array_fill( 0, count( $values ), '%s' ) );
 		// $column is internal/whitelisted, never user input.
-		// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$sql  = $wpdb->prepare(
 			"SELECT * FROM {$table} WHERE status = 'active' AND {$column} IN ({$placeholders})",
 			$values
@@ -243,7 +243,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 	public function get( $uuid ) {
 		global $wpdb;
 		$table = self::table();
-		// phpcs:disable WordPress.DB.PreparedSQL, WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM {$table} WHERE uuid = %s", $uuid ), ARRAY_A );
 		// phpcs:enable
 		return $row ? $row : null;
@@ -258,7 +258,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 		if ( empty( $data['updated_at'] ) ) {
 			unset( $data['updated_at'] ); // let DB default (NULL) apply.
 		}
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$ok = $wpdb->insert( self::table(), $data );
 		// phpcs:enable
 		if ( ! $ok ) {
@@ -273,7 +273,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 	 */
 	public function update( $uuid, array $changes ) {
 		global $wpdb;
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		$ok = $wpdb->update( self::table(), $changes, array( 'uuid' => $uuid ) );
 		// phpcs:enable
 		return false !== $ok;

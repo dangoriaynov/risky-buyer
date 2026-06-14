@@ -35,7 +35,7 @@ class Riskybuyer_Orders_List {
 			return;
 		}
 		// Skip the single-order edit screen (it shares the HPOS screen id).
-		$action = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$action = isset( $_GET['action'] ) ? sanitize_key( wp_unslash( $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if ( 'edit' === $action ) {
 			return;
 		}

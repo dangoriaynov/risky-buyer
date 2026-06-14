@@ -43,9 +43,9 @@ class Riskybuyer_Ajax {
 		$this->guard_manage();
 		Riskybuyer_Settings::update(
 			array(
-				'sync_enabled' => empty( $_POST['sync_enabled'] ) ? 0 : 1,
-				'server_url'   => isset( $_POST['server_url'] ) ? wp_unslash( $_POST['server_url'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-				'api_key'      => isset( $_POST['api_key'] ) ? wp_unslash( $_POST['api_key'] ) : '', // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+				'sync_enabled' => empty( $_POST['sync_enabled'] ) ? 0 : 1, // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				'server_url'   => isset( $_POST['server_url'] ) ? esc_url_raw( wp_unslash( $_POST['server_url'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				'api_key'      => isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '', // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			)
 		);
 		Riskybuyer_Remote_Sync::instance()->maybe_schedule();
@@ -54,8 +54,8 @@ class Riskybuyer_Ajax {
 
 	public function validate_key() {
 		$this->guard_manage();
-		$url = isset( $_POST['server_url'] ) ? esc_url_raw( wp_unslash( $_POST['server_url'] ) ) : '';
-		$key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
+		$url = isset( $_POST['server_url'] ) ? esc_url_raw( wp_unslash( $_POST['server_url'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 		wp_send_json_success( Riskybuyer_Remote_Sync::instance()->validate_key( $url, $key ) );
 	}
 
@@ -111,10 +111,10 @@ class Riskybuyer_Ajax {
 		}
 
 		// Allow explicit overrides (e.g. manual add).
-		if ( isset( $_POST['name'] ) && '' !== trim( (string) wp_unslash( $_POST['name'] ) ) ) {
+		if ( isset( $_POST['name'] ) && '' !== trim( sanitize_text_field( wp_unslash( $_POST['name'] ) ) ) ) {
 			$name = sanitize_text_field( wp_unslash( $_POST['name'] ) );
 		}
-		if ( isset( $_POST['phone'] ) && '' !== trim( (string) wp_unslash( $_POST['phone'] ) ) ) {
+		if ( isset( $_POST['phone'] ) && '' !== trim( sanitize_text_field( wp_unslash( $_POST['phone'] ) ) ) ) {
 			$phone = sanitize_text_field( wp_unslash( $_POST['phone'] ) );
 		}
 

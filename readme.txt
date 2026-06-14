@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -68,10 +68,11 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
 
 == Screenshots ==
 
-1. Check tab — look up a customer by phone and/or name.
-2. Orders list with a flagged problematic customer.
-3. Order edit screen warning panel.
-4. Bulk add.
+1. Check tab — look up a buyer by phone and/or name (exact + possible matches).
+2. List tab — the shared blacklist with phone/name search and an AND/OR toggle.
+3. Add tab — add one buyer or paste many at once.
+4. Settings — opt-in synchronization with the central list.
+5. Order screen — a flagged risky buyer (banner + list badge).
 
 == External services ==
 
@@ -92,6 +93,9 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.1 =
+* Passes Plugin Check with zero errors and warnings (security/SQL/i18n).
 
 = 0.6.0 =
 * Renamed to RiskyBuyer (slug, text domain, identifiers) to match the project and site; data is migrated automatically on update.

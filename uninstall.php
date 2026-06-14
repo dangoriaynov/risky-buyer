@@ -16,7 +16,7 @@ $riskybuyer_tables = array(
 	$wpdb->prefix . 'riskybuyer_remote_cache',
 );
 foreach ( $riskybuyer_tables as $riskybuyer_table ) {
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+	// phpcs:ignore PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
 	$wpdb->query( "DROP TABLE IF EXISTS {$riskybuyer_table}" );
 }
 

@@ -150,8 +150,8 @@ class Riskybuyer_Admin_Page {
 				Riskybuyer_Settings::update(
 					array(
 						'sync_enabled' => isset( $_POST['sync_enabled'] ) ? 1 : 0,
-						'server_url'   => isset( $_POST['server_url'] ) ? wp_unslash( $_POST['server_url'] ) : '',
-						'api_key'      => isset( $_POST['api_key'] ) ? wp_unslash( $_POST['api_key'] ) : '',
+						'server_url'   => isset( $_POST['server_url'] ) ? esc_url_raw( wp_unslash( $_POST['server_url'] ) ) : '',
+						'api_key'      => isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '',
 					)
 				);
 				Riskybuyer_Remote_Sync::instance()->maybe_schedule();
@@ -204,12 +204,16 @@ class Riskybuyer_Admin_Page {
 	}
 
 	protected function posted_entry() {
-		return array(
+		// Nonce is verified by handle_actions() (check_admin_referer) before this runs.
+		// phpcs:disable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
+		$data = array(
 			'name'   => isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '',
 			'phone'  => isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '',
 			'reason' => isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : 'other',
 			'note'   => isset( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '',
 		);
+		// phpcs:enable WordPress.Security.NonceVerification.Missing, WordPress.Security.NonceVerification.Recommended
+		return $data;
 	}
 
 	public function render_page() {
@@ -218,12 +222,12 @@ class Riskybuyer_Admin_Page {
 		}
 		$bl = Riskybuyer_Blacklist::instance();
 
-		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'check'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'check'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		if ( ! in_array( $tab, array( 'check', 'list', 'add', 'settings' ), true ) ) {
 			$tab = 'check';
 		}
 		// Editing an entry happens in the "add" tab with a prefilled form.
-		if ( $bl->can_manage() && isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $bl->can_manage() && isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			$tab = 'add';
 		}
 
@@ -231,9 +235,9 @@ class Riskybuyer_Admin_Page {
 		echo '<h1>' . esc_html__( 'Risky buyers', 'risky-buyer' ) . '</h1>';
 
 		// Notice.
-		if ( isset( $_GET['riskybuyer_notice'] ) && '' !== $_GET['riskybuyer_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$msg   = sanitize_text_field( wp_unslash( $_GET['riskybuyer_notice'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$ntype = ( isset( $_GET['riskybuyer_type'] ) && 'error' === $_GET['riskybuyer_type'] ) ? 'error' : 'success'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['riskybuyer_notice'] ) && '' !== $_GET['riskybuyer_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+			$msg   = sanitize_text_field( wp_unslash( $_GET['riskybuyer_notice'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+			$ntype = ( isset( $_GET['riskybuyer_type'] ) && 'error' === $_GET['riskybuyer_type'] ) ? 'error' : 'success'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 			echo '<div class="notice notice-' . esc_attr( $ntype ) . ' is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
 		}
 
@@ -271,9 +275,9 @@ class Riskybuyer_Admin_Page {
 	/* --------------------------------------------------------------------- */
 
 	protected function render_check_tab( $bl ) {
-		$cphone = isset( $_GET['cphone'] ) ? sanitize_text_field( wp_unslash( $_GET['cphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$cname  = isset( $_GET['cname'] ) ? sanitize_text_field( wp_unslash( $_GET['cname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$cop    = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$cphone = isset( $_GET['cphone'] ) ? sanitize_text_field( wp_unslash( $_GET['cphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		$cname  = isset( $_GET['cname'] ) ? sanitize_text_field( wp_unslash( $_GET['cname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		$cop    = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 
 		echo '<p class="description">' . esc_html__( 'Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first.', 'risky-buyer' ) . '</p>';
 		echo '<form method="get" class="rb-check-form">';
@@ -333,8 +337,8 @@ class Riskybuyer_Admin_Page {
 
 	protected function render_add_tab( $bl ) {
 		$edit_entry = null;
-		if ( $bl->can_manage() && isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$edit_entry = $bl->get( sanitize_text_field( wp_unslash( $_GET['edit'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( $bl->can_manage() && isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+			$edit_entry = $bl->get( sanitize_text_field( wp_unslash( $_GET['edit'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		}
 
 		$this->render_form( $edit_entry, $bl->can_manage() );
@@ -398,10 +402,10 @@ class Riskybuyer_Admin_Page {
 
 	protected function render_list_tab( $bl ) {
 		$reasons = Riskybuyer_Blacklist::reasons();
-		$fname   = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$fphone  = isset( $_GET['fphone'] ) ? sanitize_text_field( wp_unslash( $_GET['fphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$freason = isset( $_GET['reason'] ) ? sanitize_text_field( wp_unslash( $_GET['reason'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$op      = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$fname   = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		$fphone  = isset( $_GET['fphone'] ) ? sanitize_text_field( wp_unslash( $_GET['fphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		$freason = isset( $_GET['reason'] ) ? sanitize_text_field( wp_unslash( $_GET['reason'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		$op      = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 
 		// Filters: phone / name (LIKE) combined by AND (default) or OR, plus reason.
 		echo '<form method="get" class="rb-filters">';

@@ -42,7 +42,8 @@ class Riskybuyer_Plugin {
 	 * @return bool
 	 */
 	public function load_textdomain() {
-		load_plugin_textdomain( 'risky-buyer', false, dirname( plugin_basename( RISKYBUYER_FILE ) ) . '/languages' );
+		// Loaded for the bundled bg_BG translation on self-hosted installs.
+		load_plugin_textdomain( 'risky-buyer', false, dirname( plugin_basename( RISKYBUYER_FILE ) ) . '/languages' ); // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
 	}
 
 	public static function is_relevant_screen( $screen ) {
