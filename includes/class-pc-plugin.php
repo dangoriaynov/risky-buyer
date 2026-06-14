@@ -78,6 +78,10 @@ class Probclient_Plugin {
 				'i18n'       => array(
 					'confirm_remove' => __( 'Remove this client from the list?', 'problem-client' ),
 					'error'          => __( 'An error occurred.', 'problem-client' ),
+					'saving'         => __( 'Saving…', 'problem-client' ),
+					'saved'          => __( 'Saved', 'problem-client' ),
+					'checking'       => __( 'Checking…', 'problem-client' ),
+					'key_invalid'    => __( 'Invalid or unreachable key', 'problem-client' ),
 				),
 			)
 		);

@@ -85,6 +85,53 @@ class Probclient_Remote_Sync {
 		return $h;
 	}
 
+	/**
+	 * Validate a key against the server's /v1/whoami.
+	 *
+	 * @param string|null $server_url Server base URL (defaults to saved).
+	 * @param string|null $key        API key (defaults to saved).
+	 * @return array {valid:bool, scope?:string, domain?:string, error?:string}
+	 */
+	public function validate_key( $server_url = null, $key = null ) {
+		$server_url = ( null !== $server_url ) ? untrailingslashit( trim( (string) $server_url ) ) : Probclient_Settings::server_url();
+		$key        = ( null !== $key ) ? trim( (string) $key ) : Probclient_Settings::api_key();
+		if ( '' === $server_url || '' === $key ) {
+			return array(
+				'valid' => false,
+				'error' => 'missing',
+			);
+		}
+		$res = wp_remote_get(
+			$server_url . '/whoami',
+			array(
+				'timeout' => 12,
+				'headers' => array(
+					'Accept'        => 'application/json',
+					'Authorization' => 'Bearer ' . $key,
+				),
+			)
+		);
+		if ( is_wp_error( $res ) ) {
+			return array(
+				'valid' => false,
+				'error' => $res->get_error_message(),
+			);
+		}
+		$code = (int) wp_remote_retrieve_response_code( $res );
+		if ( 200 !== $code ) {
+			return array(
+				'valid' => false,
+				'error' => 'HTTP ' . $code,
+			);
+		}
+		$body = json_decode( wp_remote_retrieve_body( $res ), true );
+		return array(
+			'valid'  => true,
+			'scope'  => isset( $body['scope'] ) ? $body['scope'] : 'read',
+			'domain' => isset( $body['site_domain'] ) ? $body['site_domain'] : '',
+		);
+	}
+
 	protected function record_error( $msg ) {
 		$st               = Probclient_Settings::state();
 		$st['last_error'] = (string) $msg;

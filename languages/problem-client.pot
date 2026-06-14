@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Problem Client 0.4.2\n"
+"Project-Id-Version: Problem Client 0.5.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/problem-client\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-14T06:25:09+00:00\n"
+"POT-Creation-Date: 2026-06-14T19:34:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: problem-client\n"
@@ -67,6 +67,7 @@ msgstr ""
 #: includes/admin/class-pc-admin-page.php:163
 #: includes/admin/class-pc-admin-page.php:180
 #: includes/admin/class-pc-admin-page.php:442
+#: includes/class-pc-ajax.php:38
 msgid "Only an administrator can change settings."
 msgstr ""
 
@@ -76,24 +77,28 @@ msgstr ""
 
 #. translators: %d: number of cached entries
 #: includes/admin/class-pc-admin-page.php:170
+#: includes/class-pc-ajax.php:68
 #, php-format
 msgid "Sync done: %d entries cached."
 msgstr ""
 
 #. translators: %s: error message
 #: includes/admin/class-pc-admin-page.php:174
+#: includes/class-pc-ajax.php:71
 #, php-format
 msgid "Sync error: %s"
 msgstr ""
 
 #. translators: %s: error message
 #: includes/admin/class-pc-admin-page.php:187
+#: includes/class-pc-ajax.php:79
 #, php-format
 msgid "Push error: %s"
 msgstr ""
 
 #. translators: %d: number of entries pushed
 #: includes/admin/class-pc-admin-page.php:190
+#: includes/class-pc-ajax.php:82
 #, php-format
 msgid "Pushed %d entries to the server."
 msgstr ""
@@ -122,7 +127,7 @@ msgstr ""
 #: includes/admin/class-pc-admin-page.php:320
 #: includes/admin/class-pc-admin-page.php:359
 #: includes/admin/class-pc-admin-page.php:410
-#: includes/admin/class-pc-admin-page.php:492
+#: includes/admin/class-pc-admin-page.php:483
 msgid "Phone"
 msgstr ""
 
@@ -130,7 +135,7 @@ msgstr ""
 #: includes/admin/class-pc-admin-page.php:319
 #: includes/admin/class-pc-admin-page.php:358
 #: includes/admin/class-pc-admin-page.php:411
-#: includes/admin/class-pc-admin-page.php:491
+#: includes/admin/class-pc-admin-page.php:482
 msgid "Name"
 msgstr ""
 
@@ -172,7 +177,7 @@ msgstr ""
 #: includes/admin/class-pc-admin-page.php:321
 #: includes/admin/class-pc-admin-page.php:360
 #: includes/admin/class-pc-admin-page.php:384
-#: includes/admin/class-pc-admin-page.php:493
+#: includes/admin/class-pc-admin-page.php:484
 #: includes/admin/class-pc-order-metabox.php:151
 msgid "Reason"
 msgstr ""
@@ -180,17 +185,17 @@ msgstr ""
 #: includes/admin/class-pc-admin-page.php:323
 #: includes/admin/class-pc-admin-page.php:366
 #: includes/admin/class-pc-admin-page.php:389
-#: includes/admin/class-pc-admin-page.php:494
+#: includes/admin/class-pc-admin-page.php:485
 msgid "Note"
 msgstr ""
 
 #: includes/admin/class-pc-admin-page.php:325
-#: includes/admin/class-pc-admin-page.php:495
+#: includes/admin/class-pc-admin-page.php:486
 msgid "Source"
 msgstr ""
 
 #: includes/admin/class-pc-admin-page.php:326
-#: includes/admin/class-pc-admin-page.php:496
+#: includes/admin/class-pc-admin-page.php:487
 #: includes/admin/class-pc-order-metabox.php:99
 msgid "Added by"
 msgstr ""
@@ -235,91 +240,79 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:448
+#: includes/admin/class-pc-admin-page.php:447
+msgid "never"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:451
 msgid "Synchronization with the central server"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:449
+#: includes/admin/class-pc-admin-page.php:452
 msgid "When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:450
+#: includes/admin/class-pc-admin-page.php:453
 msgid "Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain."
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:456
-msgid "Synchronization"
 msgstr ""
 
 #: includes/admin/class-pc-admin-page.php:456
 msgid "Enable sync with the central server"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:457
+#: includes/admin/class-pc-admin-page.php:460
 msgid "Server URL"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:458
+#: includes/admin/class-pc-admin-page.php:461
 msgid "API key"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:458
+#: includes/admin/class-pc-admin-page.php:461
 msgid "Only needed to write your entries to the server. Reading the shared list is open."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:460
-msgid "Save settings"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:463
-msgid "never"
-msgstr ""
-
 #: includes/admin/class-pc-admin-page.php:464
-msgid "Status"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:465
-msgid "Last sync:"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:465
-msgid "Cached entries:"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:467
-msgid "Last error:"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:473
 msgid "Sync now"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:479
+#: includes/admin/class-pc-admin-page.php:465
 msgid "Push my list to the server"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:497
+#: includes/admin/class-pc-admin-page.php:467
+msgid "Last sync:"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:467
+msgid "Cached entries:"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:469
+msgid "Last error:"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:488
 msgid "Date"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:499
+#: includes/admin/class-pc-admin-page.php:490
 msgid "Actions"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:505
+#: includes/admin/class-pc-admin-page.php:496
 msgid "No entries."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:529
+#: includes/admin/class-pc-admin-page.php:520
 msgid "Edit"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:530
+#: includes/admin/class-pc-admin-page.php:521
 msgid "Remove this entry?"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:534
+#: includes/admin/class-pc-admin-page.php:525
 msgid "Delete"
 msgstr ""
 
@@ -357,19 +350,19 @@ msgstr ""
 msgid "You do not have permission to mark clients."
 msgstr ""
 
-#: includes/class-pc-ajax.php:36
+#: includes/class-pc-ajax.php:93
 msgid "You do not have permission."
 msgstr ""
 
-#: includes/class-pc-ajax.php:85
+#: includes/class-pc-ajax.php:142
 msgid "Client marked."
 msgstr ""
 
-#: includes/class-pc-ajax.php:99
+#: includes/class-pc-ajax.php:156
 msgid "Missing identifier."
 msgstr ""
 
-#: includes/class-pc-ajax.php:107
+#: includes/class-pc-ajax.php:164
 msgid "Marker removed."
 msgstr ""
 
@@ -412,6 +405,22 @@ msgstr ""
 
 #: includes/class-pc-plugin.php:80
 msgid "An error occurred."
+msgstr ""
+
+#: includes/class-pc-plugin.php:81
+msgid "Saving…"
+msgstr ""
+
+#: includes/class-pc-plugin.php:82
+msgid "Saved"
+msgstr ""
+
+#: includes/class-pc-plugin.php:83
+msgid "Checking…"
+msgstr ""
+
+#: includes/class-pc-plugin.php:84
+msgid "Invalid or unreachable key"
 msgstr ""
 
 #: includes/class-pc-remote-sync.php:226

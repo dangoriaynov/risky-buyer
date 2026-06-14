@@ -442,42 +442,33 @@ class Probclient_Admin_Page {
 			echo '<p><em>' . esc_html__( 'Only an administrator can change settings.', 'problem-client' ) . '</em></p>';
 			return;
 		}
-		$s     = Probclient_Settings::get();
-		$state = Probclient_Settings::state();
+		$s       = Probclient_Settings::get();
+		$state   = Probclient_Settings::state();
+		$last    = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'problem-client' );
+		$enabled = ! empty( $s['sync_enabled'] );
 
+		echo '<div class="pc-settings">';
 		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'problem-client' ) . '</h2>';
 		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'problem-client' ) . '</p>';
 		echo '<p class="description">' . esc_html__( 'Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain.', 'problem-client' ) . '</p>';
 
-		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
-		wp_nonce_field( 'probclient_admin' );
-		echo '<input type="hidden" name="probclient_action" value="save_settings">';
-		echo '<table class="form-table"><tbody>';
-		echo '<tr><th>' . esc_html__( 'Synchronization', 'problem-client' ) . '</th><td><label><input type="checkbox" name="sync_enabled" value="1"' . checked( ! empty( $s['sync_enabled'] ), true, false ) . '> ' . esc_html__( 'Enable sync with the central server', 'problem-client' ) . '</label></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Server URL', 'problem-client' ) . '</label></th><td><input type="url" name="server_url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '"></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'API key', 'problem-client' ) . '</label></th><td><input type="text" name="api_key" class="regular-text" value="' . esc_attr( $s['api_key'] ) . '"><p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'problem-client' ) . '</p></td></tr>';
-		echo '</tbody></table>';
-		submit_button( __( 'Save settings', 'problem-client' ) );
-		echo '</form>';
+		// Settings save automatically (no page reload, no Save button).
+		echo '<p><label><input type="checkbox" id="pc-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'problem-client' ) . '</strong></label> <span id="pc-save-status" class="description"></span></p>';
 
-		$last = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'problem-client' );
-		echo '<hr><h2>' . esc_html__( 'Status', 'problem-client' ) . '</h2>';
-		echo '<p>' . esc_html__( 'Last sync:', 'problem-client' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Cached entries:', 'problem-client' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
+		echo '<div id="pc-sync-fields"' . ( $enabled ? '' : ' style="display:none"' ) . '>';
+		echo '<table class="form-table"><tbody>';
+		echo '<tr><th><label for="pc-server-url">' . esc_html__( 'Server URL', 'problem-client' ) . '</label></th><td><input type="url" id="pc-server-url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '"></td></tr>';
+		echo '<tr><th><label for="pc-api-key">' . esc_html__( 'API key', 'problem-client' ) . '</label></th><td><input type="text" id="pc-api-key" class="regular-text" value="' . esc_attr( $s['api_key'] ) . '"> <span id="pc-key-status" class="description"></span><p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'problem-client' ) . '</p></td></tr>';
+		echo '</tbody></table>';
+
+		echo '<p><button type="button" class="button" id="pc-sync-now">' . esc_html__( 'Sync now', 'problem-client' ) . '</button> ';
+		echo '<button type="button" class="button" id="pc-push" style="display:none">' . esc_html__( 'Push my list to the server', 'problem-client' ) . '</button></p>';
+
+		echo '<p id="pc-sync-state">' . esc_html__( 'Last sync:', 'problem-client' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Cached entries:', 'problem-client' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
 		if ( ! empty( $state['last_error'] ) ) {
 			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'problem-client' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
 		}
-
-		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline">';
-		wp_nonce_field( 'probclient_admin' );
-		echo '<input type="hidden" name="probclient_action" value="sync_now">';
-		submit_button( __( 'Sync now', 'problem-client' ), 'secondary', '', false );
-		echo '</form> ';
-
-		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline">';
-		wp_nonce_field( 'probclient_admin' );
-		echo '<input type="hidden" name="probclient_action" value="push_all">';
-		submit_button( __( 'Push my list to the server', 'problem-client' ), 'secondary', '', false );
-		echo '</form>';
+		echo '</div></div>';
 	}
 
 	/**

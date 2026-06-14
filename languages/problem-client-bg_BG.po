@@ -271,3 +271,15 @@ msgstr "Всички (AND)"
 
 msgid "Any (OR)"
 msgstr "Поне едно (OR)"
+
+msgid "Saving…"
+msgstr "Запазване…"
+
+msgid "Saved"
+msgstr "Запазено"
+
+msgid "Checking…"
+msgstr "Проверка…"
+
+msgid "Invalid or unreachable key"
+msgstr "Невалиден или недостъпен ключ"
