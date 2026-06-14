@@ -434,3 +434,18 @@ msgstr ""
 #: includes/storage/class-riskybuyer-local-table-provider.php:265
 msgid "Database write error."
 msgstr ""
+
+msgid "Clients (one per line)"
+msgstr ""
+
+msgid "Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note below apply to the whole list. Existing entries (by phone or name) are skipped."
+msgstr ""
+
+msgid "Showing"
+msgstr ""
+
+msgid "Clear"
+msgstr ""
+
+msgid "No matches for the current filter."
+msgstr ""

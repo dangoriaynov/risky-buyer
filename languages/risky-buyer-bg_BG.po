@@ -283,3 +283,18 @@ msgstr "Проверка…"
 
 msgid "Invalid or unreachable key"
 msgstr "Невалиден или недостъпен ключ"
+
+msgid "Clients (one per line)"
+msgstr "Клиенти (по един на ред)"
+
+msgid "Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note below apply to the whole list. Existing entries (by phone or name) are skipped."
+msgstr "Полета, разделени със запетая / табулация / точка и запетая. Стойност с 6+ цифри се приема за телефон, останалото — за име. Причината и бележката по-долу се прилагат за целия списък. Вече съществуващи (по телефон или име) се пропускат."
+
+msgid "Showing"
+msgstr "Показани"
+
+msgid "Clear"
+msgstr "Изчисти"
+
+msgid "No matches for the current filter."
+msgstr "Няма съвпадения за текущия филтър."

@@ -1,6 +1,6 @@
 <?php
 /**
- * Admin management page with tabs: Check / List / Add.
+ * Admin management page with tabs: List / Add / Settings.
  *
  * @package RiskyBuyer
  */
@@ -222,9 +222,9 @@ class Riskybuyer_Admin_Page {
 		}
 		$bl = Riskybuyer_Blacklist::instance();
 
-		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'check'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-		if ( ! in_array( $tab, array( 'check', 'list', 'add', 'settings' ), true ) ) {
-			$tab = 'check';
+		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'list'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		if ( ! in_array( $tab, array( 'list', 'add', 'settings' ), true ) ) {
+			$tab = 'list';
 		}
 		// Editing an entry happens in the "add" tab with a prefilled form.
 		if ( $bl->can_manage() && isset( $_GET['edit'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
@@ -243,9 +243,8 @@ class Riskybuyer_Admin_Page {
 
 		// Tabs.
 		$tabs = array(
-			'check' => __( 'Check', 'risky-buyer' ),
-			'list'  => __( 'List', 'risky-buyer' ),
-			'add'   => __( 'Add', 'risky-buyer' ),
+			'list' => __( 'List', 'risky-buyer' ),
+			'add'  => __( 'Add', 'risky-buyer' ),
 		);
 		if ( $bl->can_manage() ) {
 			$tabs['settings'] = __( 'Settings', 'risky-buyer' );
@@ -257,9 +256,7 @@ class Riskybuyer_Admin_Page {
 		}
 		echo '</h2>';
 
-		if ( 'check' === $tab ) {
-			$this->render_check_tab( $bl );
-		} elseif ( 'add' === $tab ) {
+		if ( 'add' === $tab ) {
 			$this->render_add_tab( $bl );
 		} elseif ( 'settings' === $tab ) {
 			$this->render_settings_tab( $bl );
@@ -268,67 +265,6 @@ class Riskybuyer_Admin_Page {
 		}
 
 		echo '</div>';
-	}
-
-	/* --------------------------------------------------------------------- */
-	/* Tab: Check                                                            */
-	/* --------------------------------------------------------------------- */
-
-	protected function render_check_tab( $bl ) {
-		$cphone = isset( $_GET['cphone'] ) ? sanitize_text_field( wp_unslash( $_GET['cphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-		$cname  = isset( $_GET['cname'] ) ? sanitize_text_field( wp_unslash( $_GET['cname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-		$cop    = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-
-		echo '<p class="description">' . esc_html__( 'Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first.', 'risky-buyer' ) . '</p>';
-		echo '<form method="get" class="rb-check-form">';
-		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
-		echo '<input type="hidden" name="tab" value="check">';
-		echo '<input type="text" name="cphone" value="' . esc_attr( $cphone ) . '" placeholder="' . esc_attr__( 'Phone', 'risky-buyer' ) . '"> ';
-		echo '<input type="text" name="cname" value="' . esc_attr( $cname ) . '" placeholder="' . esc_attr__( 'Name', 'risky-buyer' ) . '"> ';
-		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'risky-buyer' ) . '">';
-		echo '<option value="AND"' . selected( $cop, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
-		echo '<option value="OR"' . selected( $cop, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
-		echo '</select> ';
-		submit_button( __( 'Look up', 'risky-buyer' ), 'primary', '', false );
-		echo '</form>';
-
-		if ( '' === $cphone && '' === $cname ) {
-			return;
-		}
-
-		$exact = $bl->match( Riskybuyer_Blacklist::normalize_phone( $cphone ), Riskybuyer_Blacklist::normalize_name( $cname ) );
-
-		if ( $exact ) {
-			echo '<div class="rb-result rb-result-yes">';
-			echo '<h2>⛔ ' . esc_html__( 'YES — this client is in the list', 'risky-buyer' ) . '</h2>';
-			$this->render_entry_card( $exact );
-			echo '</div>';
-		} else {
-			echo '<div class="rb-result rb-result-no"><h2>✓ ' . esc_html__( 'No exact match', 'risky-buyer' ) . '</h2>';
-			echo '<p>' . esc_html__( 'Not found by exact phone/name. Check the possible matches below.', 'risky-buyer' ) . '</p></div>';
-		}
-
-		$possible = $bl->possible_matches( $cphone, $cname, $exact ? $exact['uuid'] : '', $cop );
-		if ( ! empty( $possible ) ) {
-			echo '<h3>' . esc_html__( 'Possible matches (for manual verification)', 'risky-buyer' ) . '</h3>';
-			$this->render_entries_table( $possible, false );
-		}
-	}
-
-	protected function render_entry_card( $e ) {
-		$color = Riskybuyer_Blacklist::reason_color( $e['reason_code'] );
-		$label = Riskybuyer_Blacklist::reason_label( $e['reason_code'] );
-		$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
-		echo '<table class="rb-card">';
-		echo '<tr><th>' . esc_html__( 'Name', 'risky-buyer' ) . '</th><td>' . esc_html( $e['name_raw'] ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Phone', 'risky-buyer' ) . '</th><td>' . esc_html( $e['phone_raw'] ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Reason', 'risky-buyer' ) . '</th><td><span class="rb-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td></tr>';
-		if ( ! empty( $e['note'] ) ) {
-			echo '<tr><th>' . esc_html__( 'Note', 'risky-buyer' ) . '</th><td>' . esc_html( $e['note'] ) . '</td></tr>';
-		}
-		echo '<tr><th>' . esc_html__( 'Source', 'risky-buyer' ) . '</th><td>' . esc_html( $e['source_site'] ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Added by', 'risky-buyer' ) . '</th><td>' . esc_html( $e['created_by_name'] ) . ( $date ? ' · ' . esc_html( $date ) : '' ) . '</td></tr>';
-		echo '</table>';
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -348,8 +284,18 @@ class Riskybuyer_Admin_Page {
 		}
 	}
 
+	/**
+	 * Render the reason <select> options.
+	 *
+	 * @param string $current Selected reason code.
+	 */
+	protected function reason_options( $current = 'other' ) {
+		foreach ( Riskybuyer_Blacklist::reasons() as $code => $r ) {
+			echo '<option value="' . esc_attr( $code ) . '"' . selected( $current, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
+		}
+	}
+
 	protected function render_form( $edit_entry, $can_manage ) {
-		$reasons = Riskybuyer_Blacklist::reasons();
 		$is_edit = ( $edit_entry && $can_manage );
 		echo '<h2>' . ( $is_edit ? esc_html__( 'Edit entry', 'risky-buyer' ) : esc_html__( 'Add one client', 'risky-buyer' ) ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
@@ -358,41 +304,51 @@ class Riskybuyer_Admin_Page {
 		if ( $is_edit ) {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
 		}
-		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label>' . esc_html__( 'Name', 'risky-buyer' ) . '</label></th><td><input type="text" name="name" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Phone', 'risky-buyer' ) . '</label></th><td><input type="text" name="phone" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '</label></th><td><select name="reason">';
-		$cur = $is_edit ? $edit_entry['reason_code'] : 'other';
-		foreach ( $reasons as $code => $r ) {
-			echo '<option value="' . esc_attr( $code ) . '"' . selected( $cur, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
-		}
-		echo '</select></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Note', 'risky-buyer' ) . '</label></th><td><textarea name="note" rows="2" class="large-text">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></td></tr>';
-		echo '</tbody></table>';
-		submit_button( $is_edit ? __( 'Save changes', 'risky-buyer' ) : __( 'Add client', 'risky-buyer' ) );
+
+		echo '<p class="rb-field"><label for="rb-name">' . esc_html__( 'Name', 'risky-buyer' ) . '</label>';
+		echo '<input type="text" id="rb-name" name="name" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></p>';
+
+		echo '<p class="rb-field"><label for="rb-phone">' . esc_html__( 'Phone', 'risky-buyer' ) . '</label>';
+		echo '<input type="text" id="rb-phone" name="phone" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></p>';
+
+		echo '<p class="rb-field"><label for="rb-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
+		echo '<select id="rb-reason" name="reason">';
+		$this->reason_options( $is_edit ? $edit_entry['reason_code'] : 'other' );
+		echo '</select></p>';
+
+		echo '<p class="rb-field"><label for="rb-note">' . esc_html__( 'Note', 'risky-buyer' ) . '</label>';
+		echo '<textarea id="rb-note" name="note" rows="2">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></p>';
+
+		echo '<p class="rb-actions">';
+		submit_button( $is_edit ? __( 'Save changes', 'risky-buyer' ) : __( 'Add client', 'risky-buyer' ), 'primary', 'submit', false );
 		if ( $is_edit ) {
 			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">' . esc_html__( 'Cancel', 'risky-buyer' ) . '</a>';
 		}
+		echo '</p>';
 		echo '</form>';
 	}
 
 	protected function render_bulk_form() {
-		$reasons = Riskybuyer_Blacklist::reasons();
-		echo '<hr><h2>' . esc_html__( 'Bulk add', 'risky-buyer' ) . '</h2>';
-		echo '<p class="description">' . esc_html__( 'One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped.', 'risky-buyer' ) . '</p>';
+		echo '<h2 class="rb-bulk-title">' . esc_html__( 'Bulk add', 'risky-buyer' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
 		wp_nonce_field( 'riskybuyer_admin' );
 		echo '<input type="hidden" name="riskybuyer_action" value="bulk_add">';
-		echo '<p><textarea name="bulk" rows="8" class="large-text code" placeholder="0888123456, Ivan Ivanov&#10;0877000111&#10;Maria Petrova"></textarea></p>';
-		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '</label></th><td><select name="reason">';
-		foreach ( $reasons as $code => $r ) {
-			echo '<option value="' . esc_attr( $code ) . '"' . selected( 'other', $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
-		}
-		echo '</select></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Note', 'risky-buyer' ) . '</label></th><td><textarea name="note" rows="2" class="large-text"></textarea></td></tr>';
-		echo '</tbody></table>';
-		submit_button( __( 'Add in bulk', 'risky-buyer' ) );
+
+		echo '<p class="rb-field"><label for="rb-bulk">' . esc_html__( 'Clients (one per line)', 'risky-buyer' ) . '</label>';
+		echo '<textarea id="rb-bulk" name="bulk" rows="8" class="code" placeholder="0888123456, Ivan Ivanov&#10;0877000111&#10;Maria Petrova"></textarea>';
+		echo '<span class="description">' . esc_html__( 'Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note below apply to the whole list. Existing entries (by phone or name) are skipped.', 'risky-buyer' ) . '</span></p>';
+
+		echo '<p class="rb-field"><label for="rb-bulk-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
+		echo '<select id="rb-bulk-reason" name="reason">';
+		$this->reason_options( 'other' );
+		echo '</select></p>';
+
+		echo '<p class="rb-field"><label for="rb-bulk-note">' . esc_html__( 'Note', 'risky-buyer' ) . '</label>';
+		echo '<textarea id="rb-bulk-note" name="note" rows="2"></textarea></p>';
+
+		echo '<p class="rb-actions">';
+		submit_button( __( 'Add in bulk', 'risky-buyer' ), 'primary', 'submit', false );
+		echo '</p>';
 		echo '</form>';
 	}
 
@@ -402,38 +358,25 @@ class Riskybuyer_Admin_Page {
 
 	protected function render_list_tab( $bl ) {
 		$reasons = Riskybuyer_Blacklist::reasons();
-		$fname   = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-		$fphone  = isset( $_GET['fphone'] ) ? sanitize_text_field( wp_unslash( $_GET['fphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-		$freason = isset( $_GET['reason'] ) ? sanitize_text_field( wp_unslash( $_GET['reason'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
-		$op      = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+		$entries = $bl->all( array( 'status' => 'active' ) );
 
-		// Filters: phone / name (LIKE) combined by AND (default) or OR, plus reason.
-		echo '<form method="get" class="rb-filters">';
-		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
-		echo '<input type="hidden" name="tab" value="list">';
-		echo '<input type="search" name="fphone" value="' . esc_attr( $fphone ) . '" placeholder="' . esc_attr__( 'Phone', 'risky-buyer' ) . '"> ';
-		echo '<input type="search" name="fname" value="' . esc_attr( $fname ) . '" placeholder="' . esc_attr__( 'Name', 'risky-buyer' ) . '"> ';
-		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'risky-buyer' ) . '">';
-		echo '<option value="AND"' . selected( $op, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
-		echo '<option value="OR"' . selected( $op, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
-		echo '</select> ';
-		echo '<select name="reason"><option value="">' . esc_html__( 'All reasons', 'risky-buyer' ) . '</option>';
+		// Instant in-browser filter (all rows are rendered; JS hides non-matching ones).
+		echo '<div class="rb-filters" id="rb-filterbar">';
+		echo '<input type="search" id="rb-fphone" placeholder="' . esc_attr__( 'Phone', 'risky-buyer' ) . '" autocomplete="off">';
+		echo '<input type="search" id="rb-fname" placeholder="' . esc_attr__( 'Name', 'risky-buyer' ) . '" autocomplete="off">';
+		echo '<select id="rb-op" title="' . esc_attr__( 'Combine criteria', 'risky-buyer' ) . '">';
+		echo '<option value="AND">' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
+		echo '<option value="OR">' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
+		echo '</select>';
+		echo '<select id="rb-freason"><option value="">' . esc_html__( 'All reasons', 'risky-buyer' ) . '</option>';
 		foreach ( $reasons as $code => $r ) {
-			echo '<option value="' . esc_attr( $code ) . '"' . selected( $freason, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
+			echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $r['label'] ) . '</option>';
 		}
-		echo '</select> ';
-		submit_button( __( 'Filter', 'risky-buyer' ), 'secondary', '', false );
-		echo '</form>';
+		echo '</select>';
+		echo '<button type="button" class="button-link" id="rb-clear">' . esc_html__( 'Clear', 'risky-buyer' ) . '</button>';
+		echo '<span class="rb-count description">' . esc_html__( 'Showing', 'risky-buyer' ) . ' <span id="rb-count"></span></span>';
+		echo '</div>';
 
-		$entries = $bl->all(
-			array(
-				'status' => 'active',
-				'name'   => $fname,
-				'phone'  => $fphone,
-				'reason' => $freason,
-				'op'     => $op,
-			)
-		);
 		$this->render_entries_table( $entries, $bl->can_manage() );
 	}
 
@@ -482,7 +425,7 @@ class Riskybuyer_Admin_Page {
 	 * @param bool  $with_actions Show actions column.
 	 */
 	protected function render_entries_table( $entries, $with_actions ) {
-		echo '<table class="wp-list-table widefat fixed striped rb-table"><thead><tr>';
+		echo '<table id="rb-list" class="wp-list-table widefat fixed striped rb-table"><thead><tr>';
 		echo '<th>' . esc_html__( 'Name', 'risky-buyer' ) . '</th>';
 		echo '<th>' . esc_html__( 'Phone', 'risky-buyer' ) . '</th>';
 		echo '<th>' . esc_html__( 'Reason', 'risky-buyer' ) . '</th>';
@@ -500,10 +443,12 @@ class Riskybuyer_Admin_Page {
 			echo '<tr><td colspan="' . (int) $cols . '">' . esc_html__( 'No entries.', 'risky-buyer' ) . '</td></tr>';
 		} else {
 			foreach ( $entries as $e ) {
-				$color = Riskybuyer_Blacklist::reason_color( $e['reason_code'] );
-				$label = Riskybuyer_Blacklist::reason_label( $e['reason_code'] );
-				$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
-				echo '<tr>';
+				$color  = Riskybuyer_Blacklist::reason_color( $e['reason_code'] );
+				$label  = Riskybuyer_Blacklist::reason_label( $e['reason_code'] );
+				$date   = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
+				$dname  = function_exists( 'mb_strtolower' ) ? mb_strtolower( (string) $e['name_raw'], 'UTF-8' ) : strtolower( (string) $e['name_raw'] );
+				$dphone = preg_replace( '/\D+/', '', (string) $e['phone_raw'] );
+				echo '<tr class="rb-row" data-name="' . esc_attr( $dname ) . '" data-phone="' . esc_attr( $dphone ) . '" data-reason="' . esc_attr( $e['reason_code'] ) . '">';
 				echo '<td>' . esc_html( $e['name_raw'] ) . '</td>';
 				echo '<td>' . esc_html( $e['phone_raw'] ) . '</td>';
 				echo '<td><span class="rb-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td>';
@@ -532,6 +477,7 @@ class Riskybuyer_Admin_Page {
 				}
 				echo '</tr>';
 			}
+			echo '<tr class="rb-nomatch" style="display:none"><td colspan="' . (int) $cols . '">' . esc_html__( 'No matches for the current filter.', 'risky-buyer' ) . '</td></tr>';
 		}
 
 		echo '</tbody></table>';

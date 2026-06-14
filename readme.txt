@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.1
+Stable tag: 0.6.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,10 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.2 =
+* Admin: removed the redundant Check tab — the List tab now filters instantly in the browser (phone/name with AND/OR + reason, no reload).
+* Admin: cleaner Add/Edit forms and centered, bold table headers.
 
 = 0.6.1 =
 * Passes Plugin Check with zero errors and warnings (security/SQL/i18n).

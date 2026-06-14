@@ -28,74 +28,77 @@
 
 .rb-wrap .rb-form {
 	margin: 12px 0 22px;
-	padding: 6px 18px 14px;
+	padding: 18px 22px 20px;
 	background: #fff;
 	border: 1px solid #dcdcde;
 	border-radius: 8px;
-	max-width: 720px;
+	max-width: 600px;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
 }
-.rb-wrap .rb-filters {
-	margin: 12px 0;
+
+/* Stacked add/edit form fields. */
+.rb-wrap .rb-field {
+	margin: 0 0 16px;
 }
-.rb-wrap .rb-filters input[type="search"] {
-	min-width: 180px;
+.rb-wrap .rb-field label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 5px;
 }
-.rb-wrap .rb-table {
-	margin-top: 10px;
+.rb-wrap .rb-field input[type="text"],
+.rb-wrap .rb-field input[type="search"],
+.rb-wrap .rb-field select,
+.rb-wrap .rb-field textarea {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
 }
-.rb-wrap .button-link-delete {
-	color: #b32d2e;
+.rb-wrap .rb-field .description {
+	display: block;
+	margin-top: 6px;
+}
+.rb-wrap .rb-actions {
+	margin: 18px 0 0;
+}
+.rb-wrap .rb-bulk-title {
+	margin-top: 28px;
+	padding-top: 20px;
+	border-top: 1px solid #e3e3e6;
 }
 
-.rb-check-form {
-	margin: 14px 0 4px;
+/* Live filter bar (List tab). */
+.rb-wrap .rb-filters {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
 	align-items: center;
+	margin: 14px 0;
+	padding: 12px 14px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
 }
-.rb-check-form input[type="text"] {
+.rb-wrap .rb-filters input[type="search"] {
 	min-width: 200px;
 }
-
-.rb-result {
-	margin: 18px 0;
-	padding: 12px 18px;
-	border-radius: 8px;
-	border-left-width: 5px;
-	border-left-style: solid;
+.rb-wrap .rb-filters .rb-count {
+	margin-left: auto;
 }
-.rb-result h2 {
-	margin: 4px 0;
-	font-size: 18px;
+.rb-wrap #rb-clear {
+	color: #b32d2e;
 }
-.rb-result-yes {
-	background: #fdecea;
-	border: 1px solid #f1b0b0;
-	border-left-color: #d63638;
+.rb-wrap .rb-table {
+	margin-top: 10px;
 }
-.rb-result-no {
-	background: #edf7ed;
-	border: 1px solid #b7e0bd;
-	border-left-color: #2e9e4f;
+.rb-wrap .rb-table thead th {
+	text-align: center;
+	font-weight: 700;
 }
-
-.rb-card {
-	background: transparent;
-	border-collapse: collapse;
-	margin-top: 8px;
+.rb-wrap .rb-table td {
+	vertical-align: middle;
 }
-.rb-card th {
-	text-align: left;
-	padding: 4px 16px 4px 0;
-	white-space: nowrap;
-	color: #555;
-	vertical-align: top;
-	font-weight: 600;
-}
-.rb-card td {
-	padding: 4px 0;
+.rb-wrap .button-link-delete {
+	color: #b32d2e;
 }
 
 /* Settings tab */

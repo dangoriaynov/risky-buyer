@@ -126,3 +126,66 @@
 
 	if ( $en.is( ':checked' ) && $( '#rb-api-key' ).val() ) { validate(); }
 } )( jQuery );
+
+/* List tab — instant in-browser filtering (no reload, no AJAX). */
+( function ( $ ) {
+	'use strict';
+	var $bar = $( '#rb-filterbar' );
+	var $table = $( '#rb-list' );
+	if ( ! $bar.length || ! $table.length ) {
+		return;
+	}
+
+	var $rows = $table.find( 'tbody tr.rb-row' );
+	var $nomatch = $table.find( 'tr.rb-nomatch' );
+	var $count = $( '#rb-count' );
+	var $phone = $( '#rb-fphone' );
+	var $name = $( '#rb-fname' );
+	var $op = $( '#rb-op' );
+	var $reason = $( '#rb-freason' );
+
+	function digits( s ) {
+		return ( s || '' ).replace( /\D+/g, '' );
+	}
+
+	function apply() {
+		var ph = digits( $phone.val() );
+		var nm = ( $name.val() || '' ).trim().toLowerCase();
+		var or = $op.val() === 'OR';
+		var rs = $reason.val();
+		var visible = 0;
+
+		$rows.each( function () {
+			var row = this;
+			var okPhone = ! ph || ( row.getAttribute( 'data-phone' ) || '' ).indexOf( ph ) > -1;
+			var okName = ! nm || ( row.getAttribute( 'data-name' ) || '' ).indexOf( nm ) > -1;
+			var textOk;
+			if ( ph && nm ) {
+				textOk = or ? ( okPhone || okName ) : ( okPhone && okName );
+			} else {
+				textOk = okPhone && okName;
+			}
+			var okReason = ! rs || row.getAttribute( 'data-reason' ) === rs;
+			var show = textOk && okReason;
+			row.style.display = show ? '' : 'none';
+			if ( show ) {
+				visible++;
+			}
+		} );
+
+		$nomatch.css( 'display', visible === 0 ? '' : 'none' );
+		$count.text( visible + ' / ' + $rows.length );
+	}
+
+	$phone.add( $name ).on( 'input', apply );
+	$op.add( $reason ).on( 'change', apply );
+	$( '#rb-clear' ).on( 'click', function () {
+		$phone.val( '' );
+		$name.val( '' );
+		$op.val( 'AND' );
+		$reason.val( '' );
+		apply();
+	} );
+
+	apply();
+} )( jQuery );
