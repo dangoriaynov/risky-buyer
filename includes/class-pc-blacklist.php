@@ -337,7 +337,7 @@ class Probclient_Blacklist {
 	 * @param string $exclude_uuid Exact-match uuid to exclude.
 	 * @return array<int,array>
 	 */
-	public function possible_matches( $phone, $name, $exclude_uuid = '' ) {
+	public function possible_matches( $phone, $name, $exclude_uuid = '', $op = 'AND' ) {
 		// Phone needle: the typed digits (>= 3) matched as a substring of the stored phone.
 		$digits = preg_replace( '/\D+/', '', (string) $phone );
 		$pneedle = strlen( $digits ) >= 3 ? $digits : '';
@@ -359,32 +359,44 @@ class Probclient_Blacklist {
 		if ( '' === $pneedle && '' === $nname ) {
 			return array();
 		}
+		$op = ( 'OR' === strtoupper( (string) $op ) ) ? 'OR' : 'AND';
 
-		// all() is ordered by created_at DESC, so results stay newest-first.
+		// active_for_match() is newest-first, so results stay newest-first.
 		$out = array();
 		foreach ( $this->active_for_match() as $e ) {
 			if ( $exclude_uuid && isset( $e['uuid'] ) && $e['uuid'] === $exclude_uuid ) {
 				continue;
 			}
 
-			$hit = false;
-			if ( '' !== $pneedle && ! empty( $e['phone_norm'] ) && false !== strpos( $e['phone_norm'], $pneedle ) ) {
-				$hit = true;
-			}
-			if ( ! $hit && '' !== $nname && ! empty( $e['name_norm'] ) ) {
+			$phone_hit = ( '' !== $pneedle && ! empty( $e['phone_norm'] ) && false !== strpos( $e['phone_norm'], $pneedle ) );
+			$name_hit  = false;
+			if ( '' !== $nname && ! empty( $e['name_norm'] ) ) {
 				if ( false !== strpos( $e['name_norm'], $nname ) ) {
-					$hit = true;
+					$name_hit = true;
 				} else {
 					foreach ( $words as $w ) {
 						if ( false !== strpos( $e['name_norm'], $w ) ) {
-							$hit = true;
+							$name_hit = true;
 							break;
 						}
 					}
 				}
 			}
 
-			if ( $hit ) {
+			if ( 'AND' === $op ) {
+				// All provided criteria must match.
+				$ok = true;
+				if ( '' !== $pneedle && ! $phone_hit ) {
+					$ok = false;
+				}
+				if ( '' !== $nname && ! $name_hit ) {
+					$ok = false;
+				}
+			} else {
+				$ok = ( $phone_hit || $name_hit );
+			}
+
+			if ( $ok ) {
 				$out[] = $e;
 			}
 		}

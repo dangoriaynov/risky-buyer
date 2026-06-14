@@ -273,6 +273,7 @@ class Probclient_Admin_Page {
 	protected function render_check_tab( $bl ) {
 		$cphone = isset( $_GET['cphone'] ) ? sanitize_text_field( wp_unslash( $_GET['cphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$cname  = isset( $_GET['cname'] ) ? sanitize_text_field( wp_unslash( $_GET['cname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$cop    = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		echo '<p class="description">' . esc_html__( 'Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first.', 'problem-client' ) . '</p>';
 		echo '<form method="get" class="pc-check-form">';
@@ -280,6 +281,10 @@ class Probclient_Admin_Page {
 		echo '<input type="hidden" name="tab" value="check">';
 		echo '<input type="text" name="cphone" value="' . esc_attr( $cphone ) . '" placeholder="' . esc_attr__( 'Phone', 'problem-client' ) . '"> ';
 		echo '<input type="text" name="cname" value="' . esc_attr( $cname ) . '" placeholder="' . esc_attr__( 'Name', 'problem-client' ) . '"> ';
+		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'problem-client' ) . '">';
+		echo '<option value="AND"' . selected( $cop, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'problem-client' ) . '</option>';
+		echo '<option value="OR"' . selected( $cop, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'problem-client' ) . '</option>';
+		echo '</select> ';
 		submit_button( __( 'Look up', 'problem-client' ), 'primary', '', false );
 		echo '</form>';
 
@@ -299,7 +304,7 @@ class Probclient_Admin_Page {
 			echo '<p>' . esc_html__( 'Not found by exact phone/name. Check the possible matches below.', 'problem-client' ) . '</p></div>';
 		}
 
-		$possible = $bl->possible_matches( $cphone, $cname, $exact ? $exact['uuid'] : '' );
+		$possible = $bl->possible_matches( $cphone, $cname, $exact ? $exact['uuid'] : '', $cop );
 		if ( ! empty( $possible ) ) {
 			echo '<h3>' . esc_html__( 'Possible matches (for manual verification)', 'problem-client' ) . '</h3>';
 			$this->render_entries_table( $possible, false );

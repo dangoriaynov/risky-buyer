@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Problem Client 0.4.1\n"
+"Project-Id-Version: Problem Client 0.4.2\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/problem-client\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-13T22:30:27+00:00\n"
+"POT-Creation-Date: 2026-06-14T06:25:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: problem-client\n"
@@ -66,7 +66,7 @@ msgstr ""
 #: includes/admin/class-pc-admin-page.php:147
 #: includes/admin/class-pc-admin-page.php:163
 #: includes/admin/class-pc-admin-page.php:180
-#: includes/admin/class-pc-admin-page.php:437
+#: includes/admin/class-pc-admin-page.php:442
 msgid "Only an administrator can change settings."
 msgstr ""
 
@@ -114,209 +114,212 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:277
+#: includes/admin/class-pc-admin-page.php:278
 msgid "Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:281
-#: includes/admin/class-pc-admin-page.php:315
-#: includes/admin/class-pc-admin-page.php:354
-#: includes/admin/class-pc-admin-page.php:405
-#: includes/admin/class-pc-admin-page.php:487
+#: includes/admin/class-pc-admin-page.php:282
+#: includes/admin/class-pc-admin-page.php:320
+#: includes/admin/class-pc-admin-page.php:359
+#: includes/admin/class-pc-admin-page.php:410
+#: includes/admin/class-pc-admin-page.php:492
 msgid "Phone"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:282
-#: includes/admin/class-pc-admin-page.php:314
-#: includes/admin/class-pc-admin-page.php:353
-#: includes/admin/class-pc-admin-page.php:406
-#: includes/admin/class-pc-admin-page.php:486
+#: includes/admin/class-pc-admin-page.php:283
+#: includes/admin/class-pc-admin-page.php:319
+#: includes/admin/class-pc-admin-page.php:358
+#: includes/admin/class-pc-admin-page.php:411
+#: includes/admin/class-pc-admin-page.php:491
 msgid "Name"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:283
+#: includes/admin/class-pc-admin-page.php:284
+#: includes/admin/class-pc-admin-page.php:412
+msgid "Combine criteria"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:285
+#: includes/admin/class-pc-admin-page.php:413
+msgid "All (AND)"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:286
+#: includes/admin/class-pc-admin-page.php:414
+msgid "Any (OR)"
+msgstr ""
+
+#: includes/admin/class-pc-admin-page.php:288
 msgid "Look up"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:294
+#: includes/admin/class-pc-admin-page.php:299
 msgid "YES — this client is in the list"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:298
+#: includes/admin/class-pc-admin-page.php:303
 msgid "No exact match"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:299
+#: includes/admin/class-pc-admin-page.php:304
 msgid "Not found by exact phone/name. Check the possible matches below."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:304
+#: includes/admin/class-pc-admin-page.php:309
 msgid "Possible matches (for manual verification)"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:316
-#: includes/admin/class-pc-admin-page.php:355
-#: includes/admin/class-pc-admin-page.php:379
-#: includes/admin/class-pc-admin-page.php:488
+#: includes/admin/class-pc-admin-page.php:321
+#: includes/admin/class-pc-admin-page.php:360
+#: includes/admin/class-pc-admin-page.php:384
+#: includes/admin/class-pc-admin-page.php:493
 #: includes/admin/class-pc-order-metabox.php:151
 msgid "Reason"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:318
-#: includes/admin/class-pc-admin-page.php:361
-#: includes/admin/class-pc-admin-page.php:384
-#: includes/admin/class-pc-admin-page.php:489
+#: includes/admin/class-pc-admin-page.php:323
+#: includes/admin/class-pc-admin-page.php:366
+#: includes/admin/class-pc-admin-page.php:389
+#: includes/admin/class-pc-admin-page.php:494
 msgid "Note"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:320
-#: includes/admin/class-pc-admin-page.php:490
+#: includes/admin/class-pc-admin-page.php:325
+#: includes/admin/class-pc-admin-page.php:495
 msgid "Source"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:321
-#: includes/admin/class-pc-admin-page.php:491
+#: includes/admin/class-pc-admin-page.php:326
+#: includes/admin/class-pc-admin-page.php:496
 #: includes/admin/class-pc-order-metabox.php:99
 msgid "Added by"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:345
+#: includes/admin/class-pc-admin-page.php:350
 msgid "Edit entry"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:345
+#: includes/admin/class-pc-admin-page.php:350
 msgid "Add one client"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:363
+#: includes/admin/class-pc-admin-page.php:368
 msgid "Save changes"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:363
+#: includes/admin/class-pc-admin-page.php:368
 msgid "Add client"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:365
+#: includes/admin/class-pc-admin-page.php:370
 msgid "Cancel"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:372
+#: includes/admin/class-pc-admin-page.php:377
 msgid "Bulk add"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:373
+#: includes/admin/class-pc-admin-page.php:378
 msgid "One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:386
+#: includes/admin/class-pc-admin-page.php:391
 msgid "Add in bulk"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:407
-msgid "Combine criteria"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:408
-msgid "All (AND)"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:409
-msgid "Any (OR)"
-msgstr ""
-
-#: includes/admin/class-pc-admin-page.php:411
+#: includes/admin/class-pc-admin-page.php:416
 msgid "All reasons"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:416
+#: includes/admin/class-pc-admin-page.php:421
 msgid "Filter"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:443
+#: includes/admin/class-pc-admin-page.php:448
 msgid "Synchronization with the central server"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:444
+#: includes/admin/class-pc-admin-page.php:449
 msgid "When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:445
+#: includes/admin/class-pc-admin-page.php:450
 msgid "Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:451
+#: includes/admin/class-pc-admin-page.php:456
 msgid "Synchronization"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:451
+#: includes/admin/class-pc-admin-page.php:456
 msgid "Enable sync with the central server"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:452
+#: includes/admin/class-pc-admin-page.php:457
 msgid "Server URL"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:453
+#: includes/admin/class-pc-admin-page.php:458
 msgid "API key"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:453
+#: includes/admin/class-pc-admin-page.php:458
 msgid "Only needed to write your entries to the server. Reading the shared list is open."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:455
+#: includes/admin/class-pc-admin-page.php:460
 msgid "Save settings"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:458
+#: includes/admin/class-pc-admin-page.php:463
 msgid "never"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:459
+#: includes/admin/class-pc-admin-page.php:464
 msgid "Status"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:460
+#: includes/admin/class-pc-admin-page.php:465
 msgid "Last sync:"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:460
+#: includes/admin/class-pc-admin-page.php:465
 msgid "Cached entries:"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:462
+#: includes/admin/class-pc-admin-page.php:467
 msgid "Last error:"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:468
+#: includes/admin/class-pc-admin-page.php:473
 msgid "Sync now"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:474
+#: includes/admin/class-pc-admin-page.php:479
 msgid "Push my list to the server"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:492
+#: includes/admin/class-pc-admin-page.php:497
 msgid "Date"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:494
+#: includes/admin/class-pc-admin-page.php:499
 msgid "Actions"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:500
+#: includes/admin/class-pc-admin-page.php:505
 msgid "No entries."
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:524
+#: includes/admin/class-pc-admin-page.php:529
 msgid "Edit"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:525
+#: includes/admin/class-pc-admin-page.php:530
 msgid "Remove this entry?"
 msgstr ""
 
-#: includes/admin/class-pc-admin-page.php:529
+#: includes/admin/class-pc-admin-page.php:534
 msgid "Delete"
 msgstr ""
 
@@ -387,7 +390,7 @@ msgid "Other"
 msgstr ""
 
 #: includes/class-pc-blacklist.php:124
-#: includes/class-pc-blacklist.php:406
+#: includes/class-pc-blacklist.php:418
 msgid "You do not have permission to add."
 msgstr ""
 
