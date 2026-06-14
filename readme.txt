@@ -1,10 +1,10 @@
-=== Problem Client ===
+=== RiskyBuyer ===
 Contributors: dangoriaynov
 Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Flag problematic WooCommerce customers by phone or name and automatically mark t
 
 == Description ==
 
-Problem Client lets your team keep a shared list of problematic customers
+RiskyBuyer lets your team keep a shared list of problematic customers
 (uncollected COD shipments, fake orders, abusive behaviour, etc.) and flags
 their orders right in the WooCommerce orders list.
 
@@ -42,10 +42,10 @@ so multiple sites can contribute to and read the same list.
 
 == Installation ==
 
-1. Upload the `problem-client` folder to `/wp-content/plugins/`, or install it
+1. Upload the `risky-buyer` folder to `/wp-content/plugins/`, or install it
    from the Plugins screen.
 2. Activate the plugin (this creates the database table).
-3. Manage the list under **WooCommerce → Проблемни клиенти**.
+3. Manage the list under **WooCommerce → Risky buyers**.
 
 Requires WooCommerce.
 
@@ -78,7 +78,7 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
 This plugin can optionally synchronize with a central, shared blacklist service
 at **riskybuyer.com** so that your checks are extended with phone numbers
 reported by other sites. **This is opt-in and disabled by default** — no data is
-sent or received until you enable it under WooCommerce → Problem clients →
+sent or received until you enable it under WooCommerce → Risky buyers →
 Settings.
 
 When sync is enabled:
@@ -92,6 +92,10 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.0 =
+* Renamed to RiskyBuyer (slug, text domain, identifiers) to match the project and site; data is migrated automatically on update.
+* Tested up to WordPress 7.0.
 
 = 0.5.0 =
 * Settings tab is now AJAX: enabling sync reveals the URL/key fields and saves automatically (no reload, no Save button). The API key is validated against the server; the "Push my list" button appears only for a valid write key.

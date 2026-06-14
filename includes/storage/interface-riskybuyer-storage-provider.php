@@ -4,8 +4,8 @@
  *
  * The whole plugin talks to the blacklist through this interface only, so the
  * backing store can be swapped without touching the rest of the code:
- *   - Probclient_Local_Table_Provider  — current (a custom DB table on this site).
- *   - (future) Probclient_Remote_Api_Provider — a shared central service where many
+ *   - Riskybuyer_Local_Table_Provider  — current (a custom DB table on this site).
+ *   - (future) Riskybuyer_Remote_Api_Provider — a shared central service where many
  *     sites contribute to and read the same list. See docs/PLAN.md for the
  *     planned REST contract, auth and conflict-resolution (central = source of
  *     truth; local cache + pull; add = push; edit/delete gated by ownership).
@@ -15,14 +15,14 @@
  *   source_site, status, created_by, created_by_name, created_at,
  *   updated_by, updated_at.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-interface Probclient_Storage_Provider {
+interface Riskybuyer_Storage_Provider {
 
 	/**
 	 * Return entries. $filters: status ('active'|'removed'|'all'), reason, search.

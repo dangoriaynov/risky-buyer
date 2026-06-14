@@ -2,14 +2,14 @@
 /**
  * Local storage: a custom DB table on this site.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
+class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 
 	/**
 	 * Fully-qualified table name.
@@ -18,7 +18,7 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 	 */
 	public static function table() {
 		global $wpdb;
-		return $wpdb->prefix . 'probclient_blacklist';
+		return $wpdb->prefix . 'riskybuyer_blacklist';
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 	 */
 	public static function cache_table() {
 		global $wpdb;
-		return $wpdb->prefix . 'probclient_remote_cache';
+		return $wpdb->prefix . 'riskybuyer_remote_cache';
 	}
 
 	/**
@@ -48,6 +48,33 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 			$wpdb->query( "DROP TABLE IF EXISTS {$old_table}" );
 		}
 		delete_option( 'pc_db_version' );
+
+		// Migrate from the previous "probclient" prefix (rename), preserving data.
+		$renames = array(
+			$wpdb->prefix . 'probclient_blacklist'    => $table,
+			$wpdb->prefix . 'probclient_remote_cache' => self::cache_table(),
+		);
+		foreach ( $renames as $old => $new ) {
+			if ( $old === $new ) {
+				continue;
+			}
+			// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+			$old_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $old ) );
+			$new_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $new ) );
+			if ( $old_exists && ! $new_exists ) {
+				$wpdb->query( "RENAME TABLE `{$old}` TO `{$new}`" );
+			}
+			// phpcs:enable
+		}
+		foreach ( array( 'settings', 'sync_state', 'db_version' ) as $opt ) {
+			$oldk = 'probclient_' . $opt;
+			$val  = get_option( $oldk, null );
+			if ( null !== $val && false === get_option( 'riskybuyer_' . $opt, false ) ) {
+				update_option( 'riskybuyer_' . $opt, $val );
+			}
+			delete_option( $oldk );
+		}
+		wp_clear_scheduled_hook( 'probclient_sync_event' );
 
 		$sql = "CREATE TABLE {$table} (
 			id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -95,14 +122,14 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 		) {$charset_collate};";
 		dbDelta( $sql_cache );
 
-		update_option( 'probclient_db_version', PROBCLIENT_DB_VERSION );
+		update_option( 'riskybuyer_db_version', RISKYBUYER_DB_VERSION );
 	}
 
 	/**
 	 * Create the table on demand if missing/outdated (robust to manual uploads).
 	 */
 	public static function maybe_install() {
-		if ( get_option( 'probclient_db_version' ) !== PROBCLIENT_DB_VERSION ) {
+		if ( get_option( 'riskybuyer_db_version' ) !== RISKYBUYER_DB_VERSION ) {
 			self::install();
 		}
 	}
@@ -235,7 +262,7 @@ class Probclient_Local_Table_Provider implements Probclient_Storage_Provider {
 		$ok = $wpdb->insert( self::table(), $data );
 		// phpcs:enable
 		if ( ! $ok ) {
-			return new WP_Error( 'probclient_db', __( 'Database write error.', 'problem-client' ) );
+			return new WP_Error( 'riskybuyer_db', __( 'Database write error.', 'risky-buyer' ) );
 		}
 		$entry['id'] = (int) $wpdb->insert_id;
 		return $entry;

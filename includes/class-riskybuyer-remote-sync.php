@@ -8,16 +8,16 @@
  *
  * PUSH: sends this site's own entries to the server (writers only).
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Remote_Sync {
+class Riskybuyer_Remote_Sync {
 
-	const CRON = 'probclient_sync_event';
+	const CRON = 'riskybuyer_sync_event';
 
 	protected static $instance = null;
 
@@ -38,7 +38,7 @@ class Probclient_Remote_Sync {
 	 */
 	public function maybe_schedule() {
 		$scheduled = wp_next_scheduled( self::CRON );
-		if ( Probclient_Settings::is_sync_enabled() ) {
+		if ( Riskybuyer_Settings::is_sync_enabled() ) {
 			if ( ! $scheduled ) {
 				wp_schedule_event( self::next_run_ts(), 'daily', self::CRON );
 			}
@@ -78,7 +78,7 @@ class Probclient_Remote_Sync {
 	 */
 	protected function headers() {
 		$h   = array( 'Accept' => 'application/json' );
-		$key = Probclient_Settings::api_key();
+		$key = Riskybuyer_Settings::api_key();
 		if ( '' !== $key ) {
 			$h['Authorization'] = 'Bearer ' . $key;
 		}
@@ -93,8 +93,8 @@ class Probclient_Remote_Sync {
 	 * @return array {valid:bool, scope?:string, domain?:string, error?:string}
 	 */
 	public function validate_key( $server_url = null, $key = null ) {
-		$server_url = ( null !== $server_url ) ? untrailingslashit( trim( (string) $server_url ) ) : Probclient_Settings::server_url();
-		$key        = ( null !== $key ) ? trim( (string) $key ) : Probclient_Settings::api_key();
+		$server_url = ( null !== $server_url ) ? untrailingslashit( trim( (string) $server_url ) ) : Riskybuyer_Settings::server_url();
+		$key        = ( null !== $key ) ? trim( (string) $key ) : Riskybuyer_Settings::api_key();
 		if ( '' === $server_url || '' === $key ) {
 			return array(
 				'valid' => false,
@@ -133,9 +133,9 @@ class Probclient_Remote_Sync {
 	}
 
 	protected function record_error( $msg ) {
-		$st               = Probclient_Settings::state();
+		$st               = Riskybuyer_Settings::state();
 		$st['last_error'] = (string) $msg;
-		Probclient_Settings::set_state( $st );
+		Riskybuyer_Settings::set_state( $st );
 	}
 
 	/**
@@ -144,12 +144,12 @@ class Probclient_Remote_Sync {
 	 * @return bool
 	 */
 	public function pull() {
-		if ( ! Probclient_Settings::is_sync_enabled() ) {
+		if ( ! Riskybuyer_Settings::is_sync_enabled() ) {
 			return false;
 		}
 
-		$state = Probclient_Settings::state();
-		$url   = Probclient_Settings::server_url() . '/entries';
+		$state = Riskybuyer_Settings::state();
+		$url   = Riskybuyer_Settings::server_url() . '/entries';
 		if ( ! empty( $state['last_since'] ) ) {
 			$url = add_query_arg( 'since', rawurlencode( $state['last_since'] ), $url );
 		}
@@ -180,14 +180,14 @@ class Probclient_Remote_Sync {
 		}
 		$this->upsert_cache( $entries );
 
-		$st              = Probclient_Settings::state();
+		$st              = Riskybuyer_Settings::state();
 		$st['last_sync'] = time();
 		$st['last_error'] = '';
 		if ( ! empty( $body['now'] ) ) {
 			$st['last_since'] = $body['now'];
 		}
 		$st['cached'] = $this->cache_count();
-		Probclient_Settings::set_state( $st );
+		Riskybuyer_Settings::set_state( $st );
 		return true;
 	}
 
@@ -198,7 +198,7 @@ class Probclient_Remote_Sync {
 	 */
 	protected function upsert_cache( $entries ) {
 		global $wpdb;
-		$t = Probclient_Local_Table_Provider::cache_table();
+		$t = Riskybuyer_Local_Table_Provider::cache_table();
 
 		foreach ( $entries as $e ) {
 			$uuid = isset( $e['uuid'] ) ? sanitize_text_field( $e['uuid'] ) : '';
@@ -209,11 +209,11 @@ class Probclient_Remote_Sync {
 			$name  = isset( $e['name'] ) ? $e['name'] : ( isset( $e['name_raw'] ) ? $e['name_raw'] : ( isset( $e['name_norm'] ) ? $e['name_norm'] : '' ) );
 			$row   = array(
 				'uuid'        => $uuid,
-				'phone_norm'  => Probclient_Blacklist::normalize_phone( $phone ),
+				'phone_norm'  => Riskybuyer_Blacklist::normalize_phone( $phone ),
 				'phone_raw'   => sanitize_text_field( (string) $phone ),
-				'name_norm'   => Probclient_Blacklist::normalize_name( $name ),
+				'name_norm'   => Riskybuyer_Blacklist::normalize_name( $name ),
 				'name_raw'    => sanitize_text_field( (string) $name ),
-				'reason_code' => Probclient_Blacklist::valid_reason( isset( $e['reason'] ) ? $e['reason'] : ( isset( $e['reason_code'] ) ? $e['reason_code'] : 'other' ) ),
+				'reason_code' => Riskybuyer_Blacklist::valid_reason( isset( $e['reason'] ) ? $e['reason'] : ( isset( $e['reason_code'] ) ? $e['reason_code'] : 'other' ) ),
 				'note'        => isset( $e['note'] ) ? wp_strip_all_tags( $e['note'] ) : '',
 				'source_site' => isset( $e['source_site'] ) ? sanitize_text_field( $e['source_site'] ) : '',
 				'status'      => isset( $e['status'] ) ? sanitize_key( $e['status'] ) : 'active',
@@ -238,7 +238,7 @@ class Probclient_Remote_Sync {
 	 */
 	public function cached_active() {
 		global $wpdb;
-		$t = Probclient_Local_Table_Provider::cache_table();
+		$t = Riskybuyer_Local_Table_Provider::cache_table();
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results( "SELECT * FROM {$t} WHERE status = 'active' ORDER BY updated_at DESC LIMIT 5000", ARRAY_A );
 		// phpcs:enable
@@ -247,19 +247,19 @@ class Probclient_Remote_Sync {
 
 	public function cache_count() {
 		global $wpdb;
-		$t = Probclient_Local_Table_Provider::cache_table();
+		$t = Riskybuyer_Local_Table_Provider::cache_table();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		return (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$t} WHERE status = 'active'" );
 	}
 
 	public function clear_cache() {
 		global $wpdb;
-		$t = Probclient_Local_Table_Provider::cache_table();
+		$t = Riskybuyer_Local_Table_Provider::cache_table();
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$wpdb->query( "DELETE FROM {$t}" );
-		$st           = Probclient_Settings::state();
+		$st           = Riskybuyer_Settings::state();
 		$st['cached'] = 0;
-		Probclient_Settings::set_state( $st );
+		Riskybuyer_Settings::set_state( $st );
 	}
 
 	/**
@@ -269,14 +269,14 @@ class Probclient_Remote_Sync {
 	 * @return int|WP_Error
 	 */
 	public function push_all() {
-		if ( ! Probclient_Settings::is_sync_enabled() ) {
-			return new WP_Error( 'probclient_sync_off', __( 'Sync is disabled.', 'problem-client' ) );
+		if ( ! Riskybuyer_Settings::is_sync_enabled() ) {
+			return new WP_Error( 'riskybuyer_sync_off', __( 'Sync is disabled.', 'risky-buyer' ) );
 		}
-		if ( '' === Probclient_Settings::api_key() ) {
-			return new WP_Error( 'probclient_no_key', __( 'An API key is required to write to the server.', 'problem-client' ) );
+		if ( '' === Riskybuyer_Settings::api_key() ) {
+			return new WP_Error( 'riskybuyer_no_key', __( 'An API key is required to write to the server.', 'risky-buyer' ) );
 		}
 
-		$local = Probclient_Blacklist::instance()->all( array( 'status' => 'active' ) );
+		$local = Riskybuyer_Blacklist::instance()->all( array( 'status' => 'active' ) );
 		if ( empty( $local ) ) {
 			return 0;
 		}
@@ -296,7 +296,7 @@ class Probclient_Remote_Sync {
 		}
 
 		$res = wp_remote_post(
-			Probclient_Settings::server_url() . '/entries',
+			Riskybuyer_Settings::server_url() . '/entries',
 			array(
 				'timeout' => 20,
 				'headers' => array_merge( $this->headers(), array( 'Content-Type' => 'application/json' ) ),
@@ -308,7 +308,7 @@ class Probclient_Remote_Sync {
 		}
 		$code = (int) wp_remote_retrieve_response_code( $res );
 		if ( $code < 200 || $code >= 300 ) {
-			return new WP_Error( 'probclient_http', 'HTTP ' . $code . ' ' . wp_remote_retrieve_body( $res ) );
+			return new WP_Error( 'riskybuyer_http', 'HTTP ' . $code . ' ' . wp_remote_retrieve_body( $res ) );
 		}
 		return count( $payload );
 	}

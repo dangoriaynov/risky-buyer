@@ -5,22 +5,22 @@
  * The rest of the plugin uses this service and never the provider directly,
  * so permission checks and normalization live in one place.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Blacklist {
+class Riskybuyer_Blacklist {
 
-	/** @var Probclient_Storage_Provider */
+	/** @var Riskybuyer_Storage_Provider */
 	protected $provider;
 
 	/** @var array|null Cached active index. */
 	protected $idx = null;
 
-	/** @var Probclient_Blacklist|null */
+	/** @var Riskybuyer_Blacklist|null */
 	protected static $instance = null;
 
 	public static function instance() {
@@ -31,13 +31,13 @@ class Probclient_Blacklist {
 	}
 
 	public function __construct() {
-		$provider = new Probclient_Local_Table_Provider();
+		$provider = new Riskybuyer_Local_Table_Provider();
 		/**
 		 * Swap the storage backend (e.g. a future central/remote provider).
 		 *
-		 * @param Probclient_Storage_Provider $provider Default local provider.
+		 * @param Riskybuyer_Storage_Provider $provider Default local provider.
 		 */
-		$this->provider = apply_filters( 'probclient_storage_provider', $provider );
+		$this->provider = apply_filters( 'riskybuyer_storage_provider', $provider );
 	}
 
 	public function provider() {
@@ -51,19 +51,19 @@ class Probclient_Blacklist {
 	public static function reasons() {
 		return array(
 			'uncollected' => array(
-				'label' => __( 'Uncollected shipment', 'problem-client' ),
+				'label' => __( 'Uncollected shipment', 'risky-buyer' ),
 				'color' => '#e08a00',
 			),
 			'fake'        => array(
-				'label' => __( 'Fake order', 'problem-client' ),
+				'label' => __( 'Fake order', 'risky-buyer' ),
 				'color' => '#d63638',
 			),
 			'abusive'     => array(
-				'label' => __( 'Problematic / abusive', 'problem-client' ),
+				'label' => __( 'Problematic / abusive', 'risky-buyer' ),
 				'color' => '#9b1c1c',
 			),
 			'other'       => array(
-				'label' => __( 'Other', 'problem-client' ),
+				'label' => __( 'Other', 'risky-buyer' ),
 				'color' => '#6b7280',
 			),
 		);
@@ -121,7 +121,7 @@ class Probclient_Blacklist {
 
 	public function add_entry( $data ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'probclient_forbidden', __( 'You do not have permission to add.', 'problem-client' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'risky-buyer' ) );
 		}
 
 		$phone_raw  = isset( $data['phone'] ) ? trim( (string) $data['phone'] ) : '';
@@ -130,7 +130,7 @@ class Probclient_Blacklist {
 		$name_norm  = self::normalize_name( $name_raw );
 
 		if ( '' === $phone_norm && '' === $name_norm ) {
-			return new WP_Error( 'probclient_empty', __( 'A valid phone or name is required.', 'problem-client' ) );
+			return new WP_Error( 'riskybuyer_empty', __( 'A valid phone or name is required.', 'risky-buyer' ) );
 		}
 
 		$user  = wp_get_current_user();
@@ -157,7 +157,7 @@ class Probclient_Blacklist {
 
 	public function update_entry( $uuid, $changes ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'probclient_forbidden', __( 'Only an administrator can edit.', 'problem-client' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'Only an administrator can edit.', 'risky-buyer' ) );
 		}
 
 		$allowed = array();
@@ -188,7 +188,7 @@ class Probclient_Blacklist {
 
 	public function delete_entry( $uuid ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'probclient_forbidden', __( 'Only an administrator can delete.', 'problem-client' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'Only an administrator can delete.', 'risky-buyer' ) );
 		}
 		$this->idx = null;
 		return $this->provider->delete( $uuid );
@@ -215,10 +215,10 @@ class Probclient_Blacklist {
 	public function active_for_match() {
 		$local = $this->provider->all( array( 'status' => 'active' ) );
 
-		if ( ! class_exists( 'Probclient_Settings' ) || ! Probclient_Settings::is_sync_enabled() ) {
+		if ( ! class_exists( 'Riskybuyer_Settings' ) || ! Riskybuyer_Settings::is_sync_enabled() ) {
 			return $local;
 		}
-		$remote = Probclient_Remote_Sync::instance()->cached_active();
+		$remote = Riskybuyer_Remote_Sync::instance()->cached_active();
 		if ( empty( $remote ) ) {
 			return $local;
 		}
@@ -415,7 +415,7 @@ class Probclient_Blacklist {
 	 */
 	public function bulk_add( $text, $reason, $note ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'probclient_forbidden', __( 'You do not have permission to add.', 'problem-client' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'risky-buyer' ) );
 		}
 		$reason = self::valid_reason( $reason );
 		$note   = wp_strip_all_tags( (string) $note );

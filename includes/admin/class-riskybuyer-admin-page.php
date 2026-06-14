@@ -2,16 +2,16 @@
 /**
  * Admin management page with tabs: Check / List / Add.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Admin_Page {
+class Riskybuyer_Admin_Page {
 
-	const SLUG = 'problem-client';
+	const SLUG = 'risky-buyer';
 
 	protected static $instance = null;
 
@@ -31,8 +31,8 @@ class Probclient_Admin_Page {
 	public function menu() {
 		add_submenu_page(
 			'woocommerce',
-			__( 'Problem clients', 'problem-client' ),
-			__( 'Problem clients', 'problem-client' ),
+			__( 'Risky buyers', 'risky-buyer' ),
+			__( 'Risky buyers', 'risky-buyer' ),
 			'edit_shop_orders',
 			self::SLUG,
 			array( $this, 'render_page' )
@@ -89,13 +89,13 @@ class Probclient_Admin_Page {
 	 * Handle add/update/delete/bulk POSTs, then redirect with a notice.
 	 */
 	public function handle_actions() {
-		if ( ! isset( $_POST['probclient_action'] ) ) {
+		if ( ! isset( $_POST['riskybuyer_action'] ) ) {
 			return;
 		}
-		check_admin_referer( 'probclient_admin' );
+		check_admin_referer( 'riskybuyer_admin' );
 
-		$bl     = Probclient_Blacklist::instance();
-		$action = sanitize_key( wp_unslash( $_POST['probclient_action'] ) );
+		$bl     = Riskybuyer_Blacklist::instance();
+		$action = sanitize_key( wp_unslash( $_POST['riskybuyer_action'] ) );
 		$notice = '';
 		$type   = 'success';
 		$tab    = 'list';
@@ -107,7 +107,7 @@ class Probclient_Admin_Page {
 				$type   = 'error';
 				$tab    = 'add';
 			} else {
-				$notice = __( 'Client added to the list.', 'problem-client' );
+				$notice = __( 'Client added to the list.', 'risky-buyer' );
 			}
 		} elseif ( 'bulk_add' === $action ) {
 			$text   = isset( $_POST['bulk'] ) ? sanitize_textarea_field( wp_unslash( $_POST['bulk'] ) ) : '';
@@ -120,7 +120,7 @@ class Probclient_Admin_Page {
 				$tab    = 'add';
 			} else {
 				/* translators: 1: added count, 2: skipped count, 3: invalid count */
-				$notice = sprintf( __( 'Added: %1$d · skipped (already in list): %2$d · invalid: %3$d', 'problem-client' ), $res['added'], $res['skipped'], $res['invalid'] );
+				$notice = sprintf( __( 'Added: %1$d · skipped (already in list): %2$d · invalid: %3$d', 'risky-buyer' ), $res['added'], $res['skipped'], $res['invalid'] );
 				$tab    = 'add';
 			}
 		} elseif ( 'update' === $action ) {
@@ -130,7 +130,7 @@ class Probclient_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = __( 'Entry updated.', 'problem-client' );
+				$notice = __( 'Entry updated.', 'risky-buyer' );
 			}
 		} elseif ( 'delete' === $action ) {
 			$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
@@ -139,63 +139,63 @@ class Probclient_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = __( 'Entry removed.', 'problem-client' );
+				$notice = __( 'Entry removed.', 'risky-buyer' );
 			}
 		} elseif ( 'save_settings' === $action ) {
 			$tab = 'settings';
 			if ( ! $bl->can_manage() ) {
-				$notice = __( 'Only an administrator can change settings.', 'problem-client' );
+				$notice = __( 'Only an administrator can change settings.', 'risky-buyer' );
 				$type   = 'error';
 			} else {
-				Probclient_Settings::update(
+				Riskybuyer_Settings::update(
 					array(
 						'sync_enabled' => isset( $_POST['sync_enabled'] ) ? 1 : 0,
 						'server_url'   => isset( $_POST['server_url'] ) ? wp_unslash( $_POST['server_url'] ) : '',
 						'api_key'      => isset( $_POST['api_key'] ) ? wp_unslash( $_POST['api_key'] ) : '',
 					)
 				);
-				Probclient_Remote_Sync::instance()->maybe_schedule();
-				$notice = __( 'Settings saved.', 'problem-client' );
+				Riskybuyer_Remote_Sync::instance()->maybe_schedule();
+				$notice = __( 'Settings saved.', 'risky-buyer' );
 			}
 		} elseif ( 'sync_now' === $action ) {
 			$tab = 'settings';
 			if ( ! $bl->can_manage() ) {
-				$notice = __( 'Only an administrator can change settings.', 'problem-client' );
+				$notice = __( 'Only an administrator can change settings.', 'risky-buyer' );
 				$type   = 'error';
 			} else {
-				$ok = Probclient_Remote_Sync::instance()->pull();
-				$st = Probclient_Settings::state();
+				$ok = Riskybuyer_Remote_Sync::instance()->pull();
+				$st = Riskybuyer_Settings::state();
 				if ( $ok ) {
 					/* translators: %d: number of cached entries */
-					$notice = sprintf( __( 'Sync done: %d entries cached.', 'problem-client' ), (int) $st['cached'] );
+					$notice = sprintf( __( 'Sync done: %d entries cached.', 'risky-buyer' ), (int) $st['cached'] );
 				} else {
 					$type = 'error';
 					/* translators: %s: error message */
-					$notice = sprintf( __( 'Sync error: %s', 'problem-client' ), $st['last_error'] );
+					$notice = sprintf( __( 'Sync error: %s', 'risky-buyer' ), $st['last_error'] );
 				}
 			}
 		} elseif ( 'push_all' === $action ) {
 			$tab = 'settings';
 			if ( ! $bl->can_manage() ) {
-				$notice = __( 'Only an administrator can change settings.', 'problem-client' );
+				$notice = __( 'Only an administrator can change settings.', 'risky-buyer' );
 				$type   = 'error';
 			} else {
-				$r = Probclient_Remote_Sync::instance()->push_all();
+				$r = Riskybuyer_Remote_Sync::instance()->push_all();
 				if ( is_wp_error( $r ) ) {
 					$type = 'error';
 					/* translators: %s: error message */
-					$notice = sprintf( __( 'Push error: %s', 'problem-client' ), $r->get_error_message() );
+					$notice = sprintf( __( 'Push error: %s', 'risky-buyer' ), $r->get_error_message() );
 				} else {
 					/* translators: %d: number of entries pushed */
-					$notice = sprintf( __( 'Pushed %d entries to the server.', 'problem-client' ), (int) $r );
+					$notice = sprintf( __( 'Pushed %d entries to the server.', 'risky-buyer' ), (int) $r );
 				}
 			}
 		}
 
 		$url = add_query_arg(
 			array(
-				'probclient_notice' => rawurlencode( $notice ),
-				'probclient_type'   => $type,
+				'riskybuyer_notice' => rawurlencode( $notice ),
+				'riskybuyer_type'   => $type,
 			),
 			$this->base_url( $tab )
 		);
@@ -216,7 +216,7 @@ class Probclient_Admin_Page {
 		if ( ! current_user_can( 'edit_shop_orders' ) ) {
 			return;
 		}
-		$bl = Probclient_Blacklist::instance();
+		$bl = Riskybuyer_Blacklist::instance();
 
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'check'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! in_array( $tab, array( 'check', 'list', 'add', 'settings' ), true ) ) {
@@ -227,24 +227,24 @@ class Probclient_Admin_Page {
 			$tab = 'add';
 		}
 
-		echo '<div class="wrap pc-wrap">';
-		echo '<h1>' . esc_html__( 'Problem clients', 'problem-client' ) . '</h1>';
+		echo '<div class="wrap rb-wrap">';
+		echo '<h1>' . esc_html__( 'Risky buyers', 'risky-buyer' ) . '</h1>';
 
 		// Notice.
-		if ( isset( $_GET['probclient_notice'] ) && '' !== $_GET['probclient_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$msg   = sanitize_text_field( wp_unslash( $_GET['probclient_notice'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$ntype = ( isset( $_GET['probclient_type'] ) && 'error' === $_GET['probclient_type'] ) ? 'error' : 'success'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['riskybuyer_notice'] ) && '' !== $_GET['riskybuyer_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$msg   = sanitize_text_field( wp_unslash( $_GET['riskybuyer_notice'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$ntype = ( isset( $_GET['riskybuyer_type'] ) && 'error' === $_GET['riskybuyer_type'] ) ? 'error' : 'success'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			echo '<div class="notice notice-' . esc_attr( $ntype ) . ' is-dismissible"><p>' . esc_html( $msg ) . '</p></div>';
 		}
 
 		// Tabs.
 		$tabs = array(
-			'check' => __( 'Check', 'problem-client' ),
-			'list'  => __( 'List', 'problem-client' ),
-			'add'   => __( 'Add', 'problem-client' ),
+			'check' => __( 'Check', 'risky-buyer' ),
+			'list'  => __( 'List', 'risky-buyer' ),
+			'add'   => __( 'Add', 'risky-buyer' ),
 		);
 		if ( $bl->can_manage() ) {
-			$tabs['settings'] = __( 'Settings', 'problem-client' );
+			$tabs['settings'] = __( 'Settings', 'risky-buyer' );
 		}
 		echo '<h2 class="nav-tab-wrapper">';
 		foreach ( $tabs as $key => $label ) {
@@ -275,55 +275,55 @@ class Probclient_Admin_Page {
 		$cname  = isset( $_GET['cname'] ) ? sanitize_text_field( wp_unslash( $_GET['cname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$cop    = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		echo '<p class="description">' . esc_html__( 'Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first.', 'problem-client' ) . '</p>';
-		echo '<form method="get" class="pc-check-form">';
+		echo '<p class="description">' . esc_html__( 'Enter a phone and/or name (e.g. when a client calls) to check whether they are in the list. Partial matches are shown too, newest first.', 'risky-buyer' ) . '</p>';
+		echo '<form method="get" class="rb-check-form">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
 		echo '<input type="hidden" name="tab" value="check">';
-		echo '<input type="text" name="cphone" value="' . esc_attr( $cphone ) . '" placeholder="' . esc_attr__( 'Phone', 'problem-client' ) . '"> ';
-		echo '<input type="text" name="cname" value="' . esc_attr( $cname ) . '" placeholder="' . esc_attr__( 'Name', 'problem-client' ) . '"> ';
-		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'problem-client' ) . '">';
-		echo '<option value="AND"' . selected( $cop, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'problem-client' ) . '</option>';
-		echo '<option value="OR"' . selected( $cop, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'problem-client' ) . '</option>';
+		echo '<input type="text" name="cphone" value="' . esc_attr( $cphone ) . '" placeholder="' . esc_attr__( 'Phone', 'risky-buyer' ) . '"> ';
+		echo '<input type="text" name="cname" value="' . esc_attr( $cname ) . '" placeholder="' . esc_attr__( 'Name', 'risky-buyer' ) . '"> ';
+		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'risky-buyer' ) . '">';
+		echo '<option value="AND"' . selected( $cop, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
+		echo '<option value="OR"' . selected( $cop, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
 		echo '</select> ';
-		submit_button( __( 'Look up', 'problem-client' ), 'primary', '', false );
+		submit_button( __( 'Look up', 'risky-buyer' ), 'primary', '', false );
 		echo '</form>';
 
 		if ( '' === $cphone && '' === $cname ) {
 			return;
 		}
 
-		$exact = $bl->match( Probclient_Blacklist::normalize_phone( $cphone ), Probclient_Blacklist::normalize_name( $cname ) );
+		$exact = $bl->match( Riskybuyer_Blacklist::normalize_phone( $cphone ), Riskybuyer_Blacklist::normalize_name( $cname ) );
 
 		if ( $exact ) {
-			echo '<div class="pc-result pc-result-yes">';
-			echo '<h2>⛔ ' . esc_html__( 'YES — this client is in the list', 'problem-client' ) . '</h2>';
+			echo '<div class="rb-result rb-result-yes">';
+			echo '<h2>⛔ ' . esc_html__( 'YES — this client is in the list', 'risky-buyer' ) . '</h2>';
 			$this->render_entry_card( $exact );
 			echo '</div>';
 		} else {
-			echo '<div class="pc-result pc-result-no"><h2>✓ ' . esc_html__( 'No exact match', 'problem-client' ) . '</h2>';
-			echo '<p>' . esc_html__( 'Not found by exact phone/name. Check the possible matches below.', 'problem-client' ) . '</p></div>';
+			echo '<div class="rb-result rb-result-no"><h2>✓ ' . esc_html__( 'No exact match', 'risky-buyer' ) . '</h2>';
+			echo '<p>' . esc_html__( 'Not found by exact phone/name. Check the possible matches below.', 'risky-buyer' ) . '</p></div>';
 		}
 
 		$possible = $bl->possible_matches( $cphone, $cname, $exact ? $exact['uuid'] : '', $cop );
 		if ( ! empty( $possible ) ) {
-			echo '<h3>' . esc_html__( 'Possible matches (for manual verification)', 'problem-client' ) . '</h3>';
+			echo '<h3>' . esc_html__( 'Possible matches (for manual verification)', 'risky-buyer' ) . '</h3>';
 			$this->render_entries_table( $possible, false );
 		}
 	}
 
 	protected function render_entry_card( $e ) {
-		$color = Probclient_Blacklist::reason_color( $e['reason_code'] );
-		$label = Probclient_Blacklist::reason_label( $e['reason_code'] );
+		$color = Riskybuyer_Blacklist::reason_color( $e['reason_code'] );
+		$label = Riskybuyer_Blacklist::reason_label( $e['reason_code'] );
 		$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
-		echo '<table class="pc-card">';
-		echo '<tr><th>' . esc_html__( 'Name', 'problem-client' ) . '</th><td>' . esc_html( $e['name_raw'] ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Phone', 'problem-client' ) . '</th><td>' . esc_html( $e['phone_raw'] ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Reason', 'problem-client' ) . '</th><td><span class="pc-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td></tr>';
+		echo '<table class="rb-card">';
+		echo '<tr><th>' . esc_html__( 'Name', 'risky-buyer' ) . '</th><td>' . esc_html( $e['name_raw'] ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Phone', 'risky-buyer' ) . '</th><td>' . esc_html( $e['phone_raw'] ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Reason', 'risky-buyer' ) . '</th><td><span class="rb-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td></tr>';
 		if ( ! empty( $e['note'] ) ) {
-			echo '<tr><th>' . esc_html__( 'Note', 'problem-client' ) . '</th><td>' . esc_html( $e['note'] ) . '</td></tr>';
+			echo '<tr><th>' . esc_html__( 'Note', 'risky-buyer' ) . '</th><td>' . esc_html( $e['note'] ) . '</td></tr>';
 		}
-		echo '<tr><th>' . esc_html__( 'Source', 'problem-client' ) . '</th><td>' . esc_html( $e['source_site'] ) . '</td></tr>';
-		echo '<tr><th>' . esc_html__( 'Added by', 'problem-client' ) . '</th><td>' . esc_html( $e['created_by_name'] ) . ( $date ? ' · ' . esc_html( $date ) : '' ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Source', 'risky-buyer' ) . '</th><td>' . esc_html( $e['source_site'] ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Added by', 'risky-buyer' ) . '</th><td>' . esc_html( $e['created_by_name'] ) . ( $date ? ' · ' . esc_html( $date ) : '' ) . '</td></tr>';
 		echo '</table>';
 	}
 
@@ -345,50 +345,50 @@ class Probclient_Admin_Page {
 	}
 
 	protected function render_form( $edit_entry, $can_manage ) {
-		$reasons = Probclient_Blacklist::reasons();
+		$reasons = Riskybuyer_Blacklist::reasons();
 		$is_edit = ( $edit_entry && $can_manage );
-		echo '<h2>' . ( $is_edit ? esc_html__( 'Edit entry', 'problem-client' ) : esc_html__( 'Add one client', 'problem-client' ) ) . '</h2>';
-		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
-		wp_nonce_field( 'probclient_admin' );
-		echo '<input type="hidden" name="probclient_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
+		echo '<h2>' . ( $is_edit ? esc_html__( 'Edit entry', 'risky-buyer' ) : esc_html__( 'Add one client', 'risky-buyer' ) ) . '</h2>';
+		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
+		wp_nonce_field( 'riskybuyer_admin' );
+		echo '<input type="hidden" name="riskybuyer_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
 		if ( $is_edit ) {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
 		}
 		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label>' . esc_html__( 'Name', 'problem-client' ) . '</label></th><td><input type="text" name="name" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Phone', 'problem-client' ) . '</label></th><td><input type="text" name="phone" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Reason', 'problem-client' ) . '</label></th><td><select name="reason">';
+		echo '<tr><th><label>' . esc_html__( 'Name', 'risky-buyer' ) . '</label></th><td><input type="text" name="name" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Phone', 'risky-buyer' ) . '</label></th><td><input type="text" name="phone" class="regular-text" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '</label></th><td><select name="reason">';
 		$cur = $is_edit ? $edit_entry['reason_code'] : 'other';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( $cur, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
 		echo '</select></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Note', 'problem-client' ) . '</label></th><td><textarea name="note" rows="2" class="large-text">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Note', 'risky-buyer' ) . '</label></th><td><textarea name="note" rows="2" class="large-text">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></td></tr>';
 		echo '</tbody></table>';
-		submit_button( $is_edit ? __( 'Save changes', 'problem-client' ) : __( 'Add client', 'problem-client' ) );
+		submit_button( $is_edit ? __( 'Save changes', 'risky-buyer' ) : __( 'Add client', 'risky-buyer' ) );
 		if ( $is_edit ) {
-			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">' . esc_html__( 'Cancel', 'problem-client' ) . '</a>';
+			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">' . esc_html__( 'Cancel', 'risky-buyer' ) . '</a>';
 		}
 		echo '</form>';
 	}
 
 	protected function render_bulk_form() {
-		$reasons = Probclient_Blacklist::reasons();
-		echo '<hr><h2>' . esc_html__( 'Bulk add', 'problem-client' ) . '</h2>';
-		echo '<p class="description">' . esc_html__( 'One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped.', 'problem-client' ) . '</p>';
-		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="pc-form">';
-		wp_nonce_field( 'probclient_admin' );
-		echo '<input type="hidden" name="probclient_action" value="bulk_add">';
+		$reasons = Riskybuyer_Blacklist::reasons();
+		echo '<hr><h2>' . esc_html__( 'Bulk add', 'risky-buyer' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'One client per line. Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note apply to the whole list. Existing entries (by phone or name) are skipped.', 'risky-buyer' ) . '</p>';
+		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
+		wp_nonce_field( 'riskybuyer_admin' );
+		echo '<input type="hidden" name="riskybuyer_action" value="bulk_add">';
 		echo '<p><textarea name="bulk" rows="8" class="large-text code" placeholder="0888123456, Ivan Ivanov&#10;0877000111&#10;Maria Petrova"></textarea></p>';
 		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label>' . esc_html__( 'Reason', 'problem-client' ) . '</label></th><td><select name="reason">';
+		echo '<tr><th><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '</label></th><td><select name="reason">';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( 'other', $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
 		echo '</select></td></tr>';
-		echo '<tr><th><label>' . esc_html__( 'Note', 'problem-client' ) . '</label></th><td><textarea name="note" rows="2" class="large-text"></textarea></td></tr>';
+		echo '<tr><th><label>' . esc_html__( 'Note', 'risky-buyer' ) . '</label></th><td><textarea name="note" rows="2" class="large-text"></textarea></td></tr>';
 		echo '</tbody></table>';
-		submit_button( __( 'Add in bulk', 'problem-client' ) );
+		submit_button( __( 'Add in bulk', 'risky-buyer' ) );
 		echo '</form>';
 	}
 
@@ -397,28 +397,28 @@ class Probclient_Admin_Page {
 	/* --------------------------------------------------------------------- */
 
 	protected function render_list_tab( $bl ) {
-		$reasons = Probclient_Blacklist::reasons();
+		$reasons = Riskybuyer_Blacklist::reasons();
 		$fname   = isset( $_GET['fname'] ) ? sanitize_text_field( wp_unslash( $_GET['fname'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$fphone  = isset( $_GET['fphone'] ) ? sanitize_text_field( wp_unslash( $_GET['fphone'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$freason = isset( $_GET['reason'] ) ? sanitize_text_field( wp_unslash( $_GET['reason'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$op      = ( isset( $_GET['op'] ) && 'OR' === strtoupper( sanitize_text_field( wp_unslash( $_GET['op'] ) ) ) ) ? 'OR' : 'AND'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		// Filters: phone / name (LIKE) combined by AND (default) or OR, plus reason.
-		echo '<form method="get" class="pc-filters">';
+		echo '<form method="get" class="rb-filters">';
 		echo '<input type="hidden" name="page" value="' . esc_attr( self::SLUG ) . '">';
 		echo '<input type="hidden" name="tab" value="list">';
-		echo '<input type="search" name="fphone" value="' . esc_attr( $fphone ) . '" placeholder="' . esc_attr__( 'Phone', 'problem-client' ) . '"> ';
-		echo '<input type="search" name="fname" value="' . esc_attr( $fname ) . '" placeholder="' . esc_attr__( 'Name', 'problem-client' ) . '"> ';
-		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'problem-client' ) . '">';
-		echo '<option value="AND"' . selected( $op, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'problem-client' ) . '</option>';
-		echo '<option value="OR"' . selected( $op, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'problem-client' ) . '</option>';
+		echo '<input type="search" name="fphone" value="' . esc_attr( $fphone ) . '" placeholder="' . esc_attr__( 'Phone', 'risky-buyer' ) . '"> ';
+		echo '<input type="search" name="fname" value="' . esc_attr( $fname ) . '" placeholder="' . esc_attr__( 'Name', 'risky-buyer' ) . '"> ';
+		echo '<select name="op" title="' . esc_attr__( 'Combine criteria', 'risky-buyer' ) . '">';
+		echo '<option value="AND"' . selected( $op, 'AND', false ) . '>' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
+		echo '<option value="OR"' . selected( $op, 'OR', false ) . '>' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
 		echo '</select> ';
-		echo '<select name="reason"><option value="">' . esc_html__( 'All reasons', 'problem-client' ) . '</option>';
+		echo '<select name="reason"><option value="">' . esc_html__( 'All reasons', 'risky-buyer' ) . '</option>';
 		foreach ( $reasons as $code => $r ) {
 			echo '<option value="' . esc_attr( $code ) . '"' . selected( $freason, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
 		}
 		echo '</select> ';
-		submit_button( __( 'Filter', 'problem-client' ), 'secondary', '', false );
+		submit_button( __( 'Filter', 'risky-buyer' ), 'secondary', '', false );
 		echo '</form>';
 
 		$entries = $bl->all(
@@ -439,34 +439,34 @@ class Probclient_Admin_Page {
 
 	protected function render_settings_tab( $bl ) {
 		if ( ! $bl->can_manage() ) {
-			echo '<p><em>' . esc_html__( 'Only an administrator can change settings.', 'problem-client' ) . '</em></p>';
+			echo '<p><em>' . esc_html__( 'Only an administrator can change settings.', 'risky-buyer' ) . '</em></p>';
 			return;
 		}
-		$s       = Probclient_Settings::get();
-		$state   = Probclient_Settings::state();
-		$last    = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'problem-client' );
+		$s       = Riskybuyer_Settings::get();
+		$state   = Riskybuyer_Settings::state();
+		$last    = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'risky-buyer' );
 		$enabled = ! empty( $s['sync_enabled'] );
 
-		echo '<div class="pc-settings">';
-		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'problem-client' ) . '</h2>';
-		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'problem-client' ) . '</p>';
-		echo '<p class="description">' . esc_html__( 'Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain.', 'problem-client' ) . '</p>';
+		echo '<div class="rb-settings">';
+		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'risky-buyer' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'risky-buyer' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain.', 'risky-buyer' ) . '</p>';
 
 		// Settings save automatically (no page reload, no Save button).
-		echo '<p><label><input type="checkbox" id="pc-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'problem-client' ) . '</strong></label> <span id="pc-save-status" class="description"></span></p>';
+		echo '<p><label><input type="checkbox" id="rb-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'risky-buyer' ) . '</strong></label> <span id="rb-save-status" class="description"></span></p>';
 
-		echo '<div id="pc-sync-fields"' . ( $enabled ? '' : ' style="display:none"' ) . '>';
+		echo '<div id="rb-sync-fields"' . ( $enabled ? '' : ' style="display:none"' ) . '>';
 		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label for="pc-server-url">' . esc_html__( 'Server URL', 'problem-client' ) . '</label></th><td><input type="url" id="pc-server-url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '"></td></tr>';
-		echo '<tr><th><label for="pc-api-key">' . esc_html__( 'API key', 'problem-client' ) . '</label></th><td><input type="text" id="pc-api-key" class="regular-text" value="' . esc_attr( $s['api_key'] ) . '"> <span id="pc-key-status" class="description"></span><p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'problem-client' ) . '</p></td></tr>';
+		echo '<tr><th><label for="rb-server-url">' . esc_html__( 'Server URL', 'risky-buyer' ) . '</label></th><td><input type="url" id="rb-server-url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '"></td></tr>';
+		echo '<tr><th><label for="rb-api-key">' . esc_html__( 'API key', 'risky-buyer' ) . '</label></th><td><input type="text" id="rb-api-key" class="regular-text" value="' . esc_attr( $s['api_key'] ) . '"> <span id="rb-key-status" class="description"></span><p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'risky-buyer' ) . '</p></td></tr>';
 		echo '</tbody></table>';
 
-		echo '<p><button type="button" class="button" id="pc-sync-now">' . esc_html__( 'Sync now', 'problem-client' ) . '</button> ';
-		echo '<button type="button" class="button" id="pc-push" style="display:none">' . esc_html__( 'Push my list to the server', 'problem-client' ) . '</button></p>';
+		echo '<p><button type="button" class="button" id="rb-sync-now">' . esc_html__( 'Sync now', 'risky-buyer' ) . '</button> ';
+		echo '<button type="button" class="button" id="rb-push" style="display:none">' . esc_html__( 'Push my list to the server', 'risky-buyer' ) . '</button></p>';
 
-		echo '<p id="pc-sync-state">' . esc_html__( 'Last sync:', 'problem-client' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Cached entries:', 'problem-client' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
+		echo '<p id="rb-sync-state">' . esc_html__( 'Last sync:', 'risky-buyer' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Cached entries:', 'risky-buyer' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
 		if ( ! empty( $state['last_error'] ) ) {
-			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'problem-client' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
+			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'risky-buyer' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
 		}
 		echo '</div></div>';
 	}
@@ -478,31 +478,31 @@ class Probclient_Admin_Page {
 	 * @param bool  $with_actions Show actions column.
 	 */
 	protected function render_entries_table( $entries, $with_actions ) {
-		echo '<table class="wp-list-table widefat fixed striped pc-table"><thead><tr>';
-		echo '<th>' . esc_html__( 'Name', 'problem-client' ) . '</th>';
-		echo '<th>' . esc_html__( 'Phone', 'problem-client' ) . '</th>';
-		echo '<th>' . esc_html__( 'Reason', 'problem-client' ) . '</th>';
-		echo '<th>' . esc_html__( 'Note', 'problem-client' ) . '</th>';
-		echo '<th>' . esc_html__( 'Source', 'problem-client' ) . '</th>';
-		echo '<th>' . esc_html__( 'Added by', 'problem-client' ) . '</th>';
-		echo '<th>' . esc_html__( 'Date', 'problem-client' ) . '</th>';
+		echo '<table class="wp-list-table widefat fixed striped rb-table"><thead><tr>';
+		echo '<th>' . esc_html__( 'Name', 'risky-buyer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Phone', 'risky-buyer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Reason', 'risky-buyer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Note', 'risky-buyer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Source', 'risky-buyer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Added by', 'risky-buyer' ) . '</th>';
+		echo '<th>' . esc_html__( 'Date', 'risky-buyer' ) . '</th>';
 		if ( $with_actions ) {
-			echo '<th>' . esc_html__( 'Actions', 'problem-client' ) . '</th>';
+			echo '<th>' . esc_html__( 'Actions', 'risky-buyer' ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';
 
 		$cols = $with_actions ? 8 : 7;
 		if ( empty( $entries ) ) {
-			echo '<tr><td colspan="' . (int) $cols . '">' . esc_html__( 'No entries.', 'problem-client' ) . '</td></tr>';
+			echo '<tr><td colspan="' . (int) $cols . '">' . esc_html__( 'No entries.', 'risky-buyer' ) . '</td></tr>';
 		} else {
 			foreach ( $entries as $e ) {
-				$color = Probclient_Blacklist::reason_color( $e['reason_code'] );
-				$label = Probclient_Blacklist::reason_label( $e['reason_code'] );
+				$color = Riskybuyer_Blacklist::reason_color( $e['reason_code'] );
+				$label = Riskybuyer_Blacklist::reason_label( $e['reason_code'] );
 				$date  = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
 				echo '<tr>';
 				echo '<td>' . esc_html( $e['name_raw'] ) . '</td>';
 				echo '<td>' . esc_html( $e['phone_raw'] ) . '</td>';
-				echo '<td><span class="pc-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td>';
+				echo '<td><span class="rb-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td>';
 				echo '<td>' . esc_html( (string) $e['note'] ) . '</td>';
 				echo '<td>' . esc_html( $e['source_site'] ) . '</td>';
 				echo '<td>' . esc_html( $e['created_by_name'] ) . '</td>';
@@ -517,12 +517,12 @@ class Probclient_Admin_Page {
 						),
 						admin_url( 'admin.php' )
 					);
-					echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'problem-client' ) . '</a> ';
-					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( __( 'Remove this entry?', 'problem-client' ) ) . '\');">';
-					wp_nonce_field( 'probclient_admin' );
-					echo '<input type="hidden" name="probclient_action" value="delete">';
+					echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'risky-buyer' ) . '</a> ';
+					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( __( 'Remove this entry?', 'risky-buyer' ) ) . '\');">';
+					wp_nonce_field( 'riskybuyer_admin' );
+					echo '<input type="hidden" name="riskybuyer_action" value="delete">';
 					echo '<input type="hidden" name="uuid" value="' . esc_attr( $e['uuid'] ) . '">';
-					echo '<button type="submit" class="button button-small button-link-delete">' . esc_html__( 'Delete', 'problem-client' ) . '</button>';
+					echo '<button type="submit" class="button button-small button-link-delete">' . esc_html__( 'Delete', 'risky-buyer' ) . '</button>';
 					echo '</form>';
 					echo '</td>';
 				}

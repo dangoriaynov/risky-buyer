@@ -1,8 +1,8 @@
 <?php
 /**
- * Uninstall — remove the plugin's table and options.
+ * Uninstall — remove the plugin's tables and options.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
@@ -11,8 +11,15 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 
 global $wpdb;
 
-$table = $wpdb->prefix . 'probclient_blacklist';
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-$wpdb->query( "DROP TABLE IF EXISTS {$table}" );
+$riskybuyer_tables = array(
+	$wpdb->prefix . 'riskybuyer_blacklist',
+	$wpdb->prefix . 'riskybuyer_remote_cache',
+);
+foreach ( $riskybuyer_tables as $riskybuyer_table ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared
+	$wpdb->query( "DROP TABLE IF EXISTS {$riskybuyer_table}" );
+}
 
-delete_option( 'probclient_db_version' );
+delete_option( 'riskybuyer_db_version' );
+delete_option( 'riskybuyer_settings' );
+delete_option( 'riskybuyer_sync_state' );

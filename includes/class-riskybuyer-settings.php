@@ -5,17 +5,17 @@
  * Sync is OFF by default (opt-in) — required for WordPress.org compliance:
  * the plugin must not contact an external server without explicit consent.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Settings {
+class Riskybuyer_Settings {
 
-	const OPTION = 'probclient_settings';
-	const STATE  = 'probclient_sync_state';
+	const OPTION = 'riskybuyer_settings';
+	const STATE  = 'riskybuyer_sync_state';
 
 	public static function defaults() {
 		return array(

@@ -5,14 +5,14 @@
  * Visual language is intentionally different from any "duplicate" marker:
  * a warning badge + a left colour bar (no full-row outline).
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Orders_List {
+class Riskybuyer_Orders_List {
 
 	protected static $instance = null;
 
@@ -46,21 +46,21 @@ class Probclient_Orders_List {
 	}
 
 	public function render() {
-		$map = Probclient_Order_Matcher::build_marked_map();
+		$map = Riskybuyer_Order_Matcher::build_marked_map();
 		if ( empty( $map ) ) {
 			return;
 		}
 		?>
-		<style id="pc-orders-list-css">
-			.wp-list-table tbody tr.pc-flag > *:first-child { box-shadow: inset 5px 0 0 0 var(--pc-bd); }
-			.wp-list-table tbody tr.pc-flag td,
-			.wp-list-table tbody tr.pc-flag th { background-color: var(--pc-bg) !important; }
-			.pc-badge { display: inline-block; margin-top: 5px; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; line-height: 1.7; color: #fff; white-space: nowrap; }
+		<style id="rb-orders-list-css">
+			.wp-list-table tbody tr.rb-flag > *:first-child { box-shadow: inset 5px 0 0 0 var(--rb-bd); }
+			.wp-list-table tbody tr.rb-flag td,
+			.wp-list-table tbody tr.rb-flag th { background-color: var(--rb-bg) !important; }
+			.rb-badge { display: inline-block; margin-top: 5px; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; line-height: 1.7; color: #fff; white-space: nowrap; }
 		</style>
-		<script id="pc-orders-list-js">
+		<script id="rb-orders-list-js">
 		( function () {
 			var MAP = <?php echo wp_json_encode( $map ); ?>;
-			var PC_LABEL = <?php echo wp_json_encode( __( 'Problem client', 'problem-client' ) ); ?>;
+			var RB_LABEL = <?php echo wp_json_encode( __( 'Risky buyer', 'risky-buyer' ) ); ?>;
 
 			function rgba( hex, a ) {
 				var h = hex.replace( '#', '' );
@@ -70,23 +70,23 @@ class Probclient_Orders_List {
 			function run() {
 				var rows = document.querySelectorAll( '.wp-list-table tbody tr' );
 				Array.prototype.forEach.call( rows, function ( tr ) {
-					if ( tr.getAttribute( 'data-pc' ) ) { return; }
+					if ( tr.getAttribute( 'data-rb' ) ) { return; }
 					var cb = tr.querySelector( '.check-column input[type=checkbox]' );
 					if ( ! cb || ! cb.value ) { return; }
 					var info = MAP[ String( cb.value ) ];
 					if ( ! info ) { return; }
 
-					tr.setAttribute( 'data-pc', '1' );
-					tr.classList.add( 'pc-flag' );
-					tr.style.setProperty( '--pc-bd', info.color );
-					tr.style.setProperty( '--pc-bg', rgba( info.color, 0.08 ) );
+					tr.setAttribute( 'data-rb', '1' );
+					tr.classList.add( 'rb-flag' );
+					tr.style.setProperty( '--rb-bd', info.color );
+					tr.style.setProperty( '--rb-bg', rgba( info.color, 0.08 ) );
 
 					var cell = tr.querySelector( 'td.column-order_number, td.order_number' ) || tr.querySelectorAll( 'td' )[0];
 					if ( cell ) {
 						var b = document.createElement( 'span' );
-						b.className = 'pc-badge';
+						b.className = 'rb-badge';
 						b.style.background = info.color;
-						b.textContent = '⚠ ' + PC_LABEL + ' · ' + info.label;
+						b.textContent = '⚠ ' + RB_LABEL + ' · ' + info.label;
 						if ( info.note ) { b.title = info.note; }
 						cell.appendChild( document.createElement( 'br' ) );
 						cell.appendChild( b );

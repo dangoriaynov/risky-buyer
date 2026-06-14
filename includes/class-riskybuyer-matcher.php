@@ -5,14 +5,14 @@
  * Reads minimal order fields (id, phone, name) for the current status filter —
  * capped — so marking is consistent across pagination.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Order_Matcher {
+class Riskybuyer_Order_Matcher {
 
 	/**
 	 * Build map: order_id => [ uuid, reason, label, color, note ].
@@ -25,7 +25,7 @@ class Probclient_Order_Matcher {
 			return array();
 		}
 
-		$bl  = Probclient_Blacklist::instance();
+		$bl  = Riskybuyer_Blacklist::instance();
 		$map = array();
 		foreach ( $orders as $id => $o ) {
 			$entry = $bl->match( $o['phone'], $o['name'] );
@@ -33,8 +33,8 @@ class Probclient_Order_Matcher {
 				$map[ (string) $id ] = array(
 					'uuid'   => $entry['uuid'],
 					'reason' => $entry['reason_code'],
-					'label'  => Probclient_Blacklist::reason_label( $entry['reason_code'] ),
-					'color'  => Probclient_Blacklist::reason_color( $entry['reason_code'] ),
+					'label'  => Riskybuyer_Blacklist::reason_label( $entry['reason_code'] ),
+					'color'  => Riskybuyer_Blacklist::reason_color( $entry['reason_code'] ),
 					'note'   => isset( $entry['note'] ) ? $entry['note'] : '',
 				);
 			}
@@ -50,7 +50,7 @@ class Probclient_Order_Matcher {
 	protected static function fetch_orders() {
 		global $wpdb;
 
-		$limit = (int) apply_filters( 'probclient_orders_scan_limit', 1500 );
+		$limit = (int) apply_filters( 'riskybuyer_orders_scan_limit', 1500 );
 
 		$status = '';
 		if ( isset( $_GET['status'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -83,7 +83,7 @@ class Probclient_Order_Matcher {
 			}
 			$args[] = $limit;
 
-			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery
+			// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery
 			$sql = $wpdb->prepare(
 				"SELECT o.id,
 				        ba.first_name b_first, ba.last_name b_last, ba.phone b_phone,
@@ -129,12 +129,12 @@ class Probclient_Order_Matcher {
 				if ( ! $id ) {
 					continue;
 				}
-				$name = Probclient_Blacklist::normalize_name( trim( ( $r['b_first'] ?? '' ) . ' ' . ( $r['b_last'] ?? '' ) ) );
+				$name = Riskybuyer_Blacklist::normalize_name( trim( ( $r['b_first'] ?? '' ) . ' ' . ( $r['b_last'] ?? '' ) ) );
 				if ( '' === $name ) {
-					$name = Probclient_Blacklist::normalize_name( trim( ( $r['s_first'] ?? '' ) . ' ' . ( $r['s_last'] ?? '' ) ) );
+					$name = Riskybuyer_Blacklist::normalize_name( trim( ( $r['s_first'] ?? '' ) . ' ' . ( $r['s_last'] ?? '' ) ) );
 				}
 				$out[ $id ] = array(
-					'phone' => Probclient_Blacklist::normalize_phone( $r['b_phone'] ?? '' ),
+					'phone' => Riskybuyer_Blacklist::normalize_phone( $r['b_phone'] ?? '' ),
 					'name'  => $name,
 				);
 			}

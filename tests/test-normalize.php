@@ -3,7 +3,7 @@
  * Standalone tests for the pure normalization logic (no WordPress needed).
  * Run: php tests/test-normalize.php
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 define( 'ABSPATH', __DIR__ );
@@ -15,7 +15,7 @@ if ( ! function_exists( '__' ) ) {
 	}
 }
 
-require __DIR__ . '/../includes/class-pc-blacklist.php';
+require __DIR__ . '/../includes/class-riskybuyer-blacklist.php';
 
 $failed = 0;
 $passed = 0;
@@ -32,22 +32,22 @@ function check( $label, $got, $want ) {
 }
 
 // Phone: same person with different prefixes must collapse to the same key.
-check( 'phone 0-prefixed',   Probclient_Blacklist::normalize_phone( '0876362452' ),        '876362452' );
-check( 'phone +359 spaced',  Probclient_Blacklist::normalize_phone( '+359 876 362 452' ),  '876362452' );
-check( 'phone parens/dash',  Probclient_Blacklist::normalize_phone( '(0876) 362-452' ),    '876362452' );
-check( 'phone too short',    Probclient_Blacklist::normalize_phone( '12345' ),             '' );
-check( 'phone empty',        Probclient_Blacklist::normalize_phone( '' ),                  '' );
+check( 'phone 0-prefixed',   Riskybuyer_Blacklist::normalize_phone( '0876362452' ),        '876362452' );
+check( 'phone +359 spaced',  Riskybuyer_Blacklist::normalize_phone( '+359 876 362 452' ),  '876362452' );
+check( 'phone parens/dash',  Riskybuyer_Blacklist::normalize_phone( '(0876) 362-452' ),    '876362452' );
+check( 'phone too short',    Riskybuyer_Blacklist::normalize_phone( '12345' ),             '' );
+check( 'phone empty',        Riskybuyer_Blacklist::normalize_phone( '' ),                  '' );
 
 // Name: case/punctuation/whitespace insensitive (Cyrillic).
-check( 'name basic',         Probclient_Blacklist::normalize_name( 'Наталия Артемиева' ),  'наталия артемиева' );
-check( 'name messy',         Probclient_Blacklist::normalize_name( '  ИВАН  ИВАНОВ! ' ),   'иван иванов' );
-check( 'name latin',         Probclient_Blacklist::normalize_name( 'Tsvetan Petrov' ),     'tsvetan petrov' );
-check( 'name too short',     Probclient_Blacklist::normalize_name( 'Ab' ),                 '' );
-check( 'name empty',         Probclient_Blacklist::normalize_name( '   ' ),                '' );
+check( 'name basic',         Riskybuyer_Blacklist::normalize_name( 'Наталия Артемиева' ),  'наталия артемиева' );
+check( 'name messy',         Riskybuyer_Blacklist::normalize_name( '  ИВАН  ИВАНОВ! ' ),   'иван иванов' );
+check( 'name latin',         Riskybuyer_Blacklist::normalize_name( 'Tsvetan Petrov' ),     'tsvetan petrov' );
+check( 'name too short',     Riskybuyer_Blacklist::normalize_name( 'Ab' ),                 '' );
+check( 'name empty',         Riskybuyer_Blacklist::normalize_name( '   ' ),                '' );
 
 // Reasons.
-check( 'reason valid',       Probclient_Blacklist::valid_reason( 'fake' ),                 'fake' );
-check( 'reason invalid',     Probclient_Blacklist::valid_reason( 'whatever' ),             'other' );
+check( 'reason valid',       Riskybuyer_Blacklist::valid_reason( 'fake' ),                 'fake' );
+check( 'reason invalid',     Riskybuyer_Blacklist::valid_reason( 'whatever' ),             'other' );
 
 echo "\n{$passed} passed, {$failed} failed\n";
 exit( $failed > 0 ? 1 : 0 );

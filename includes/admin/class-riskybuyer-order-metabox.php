@@ -3,14 +3,14 @@
  * Order edit screen: shows a warning if the client is blacklisted and a
  * "mark client" form otherwise.
  *
- * @package ProblemClient
+ * @package RiskyBuyer
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class Probclient_Order_Metabox {
+class Riskybuyer_Order_Metabox {
 
 	protected static $instance = null;
 
@@ -36,8 +36,8 @@ class Probclient_Order_Metabox {
 		}
 		foreach ( array_unique( $screens ) as $screen ) {
 			add_meta_box(
-				'probclient_metabox',
-				'⚠ ' . __( 'Problem client', 'problem-client' ),
+				'riskybuyer_metabox',
+				'⚠ ' . __( 'Risky buyer', 'risky-buyer' ),
 				array( $this, 'render_box' ),
 				$screen,
 				'side',
@@ -82,21 +82,21 @@ class Probclient_Order_Metabox {
 		if ( ! $order ) {
 			return;
 		}
-		$entry = Probclient_Blacklist::instance()->match_order( $order );
+		$entry = Riskybuyer_Blacklist::instance()->match_order( $order );
 		if ( ! $entry ) {
 			return;
 		}
 
-		$color = Probclient_Blacklist::reason_color( $entry['reason_code'] );
-		$label = Probclient_Blacklist::reason_label( $entry['reason_code'] );
+		$color = Riskybuyer_Blacklist::reason_color( $entry['reason_code'] );
+		$label = Riskybuyer_Blacklist::reason_label( $entry['reason_code'] );
 		echo '<div class="notice" style="border-left:5px solid ' . esc_attr( $color ) . ';background:#fff6f6;">';
-		echo '<p style="font-size:14px;margin:.6em 0;"><strong style="color:' . esc_attr( $color ) . ';">⛔ ' . esc_html__( 'Problem client', 'problem-client' ) . ' — ' . esc_html( $label ) . '</strong>';
+		echo '<p style="font-size:14px;margin:.6em 0;"><strong style="color:' . esc_attr( $color ) . ';">⛔ ' . esc_html__( 'Risky buyer', 'risky-buyer' ) . ' — ' . esc_html( $label ) . '</strong>';
 		if ( ! empty( $entry['note'] ) ) {
 			echo ' · ' . esc_html( $entry['note'] );
 		}
 		$by = ! empty( $entry['created_by_name'] ) ? $entry['created_by_name'] : ( ! empty( $entry['source_site'] ) ? $entry['source_site'] : '' );
 		if ( $by ) {
-			echo ' <span style="color:#666;">(' . esc_html__( 'Added by', 'problem-client' ) . ' ' . esc_html( $by ) . ')</span>';
+			echo ' <span style="color:#666;">(' . esc_html__( 'Added by', 'risky-buyer' ) . ' ' . esc_html( $by ) . ')</span>';
 		}
 		echo '</p></div>';
 	}
@@ -115,23 +115,23 @@ class Probclient_Order_Metabox {
 			return;
 		}
 
-		$bl    = Probclient_Blacklist::instance();
+		$bl    = Riskybuyer_Blacklist::instance();
 		$entry = $bl->match_order( $order );
 
-		echo '<div class="pc-metabox" data-order-id="' . esc_attr( $order->get_id() ) . '">';
+		echo '<div class="rb-metabox" data-order-id="' . esc_attr( $order->get_id() ) . '">';
 
 		if ( $entry ) {
-			$color = Probclient_Blacklist::reason_color( $entry['reason_code'] );
-			$label = Probclient_Blacklist::reason_label( $entry['reason_code'] );
-			echo '<div class="pc-warn" style="border-left:4px solid ' . esc_attr( $color ) . ';">';
+			$color = Riskybuyer_Blacklist::reason_color( $entry['reason_code'] );
+			$label = Riskybuyer_Blacklist::reason_label( $entry['reason_code'] );
+			echo '<div class="rb-warn" style="border-left:4px solid ' . esc_attr( $color ) . ';">';
 			echo '<strong style="color:' . esc_attr( $color ) . ';">' . esc_html( $label ) . '</strong>';
 			if ( ! empty( $entry['note'] ) ) {
-				echo '<p class="pc-note">' . esc_html( $entry['note'] ) . '</p>';
+				echo '<p class="rb-note">' . esc_html( $entry['note'] ) . '</p>';
 			}
 			$by   = ! empty( $entry['created_by_name'] ) ? $entry['created_by_name'] : '—';
 			$src  = ! empty( $entry['source_site'] ) ? $entry['source_site'] : '';
 			$date = ! empty( $entry['created_at'] ) ? mysql2date( 'd.m.Y', $entry['created_at'] ) : '';
-			echo '<p class="pc-meta">' . esc_html__( 'Added by:', 'problem-client' ) . ' ' . esc_html( $by );
+			echo '<p class="rb-meta">' . esc_html__( 'Added by:', 'risky-buyer' ) . ' ' . esc_html( $by );
 			if ( $date ) {
 				echo ' · ' . esc_html( $date );
 			}
@@ -141,22 +141,22 @@ class Probclient_Order_Metabox {
 			echo '</p>';
 
 			if ( $bl->can_manage() ) {
-				echo '<button type="button" class="button pc-unmark-btn" data-uuid="' . esc_attr( $entry['uuid'] ) . '">' . esc_html__( 'Remove from list', 'problem-client' ) . '</button>';
+				echo '<button type="button" class="button rb-unmark-btn" data-uuid="' . esc_attr( $entry['uuid'] ) . '">' . esc_html__( 'Remove from list', 'risky-buyer' ) . '</button>';
 			} else {
-				echo '<p class="pc-meta"><em>' . esc_html__( 'Only an administrator can remove.', 'problem-client' ) . '</em></p>';
+				echo '<p class="rb-meta"><em>' . esc_html__( 'Only an administrator can remove.', 'risky-buyer' ) . '</em></p>';
 			}
 			echo '</div>';
 		} elseif ( $bl->can_add() ) {
-			echo '<p>' . esc_html__( 'Mark this client as problematic (by name and phone from the order).', 'problem-client' ) . '</p>';
-			echo '<p><label>' . esc_html__( 'Reason', 'problem-client' ) . '<br><select class="pc-reason widefat">';
-			foreach ( Probclient_Blacklist::reasons() as $code => $r ) {
+			echo '<p>' . esc_html__( 'Mark this client as problematic (by name and phone from the order).', 'risky-buyer' ) . '</p>';
+			echo '<p><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '<br><select class="rb-reason widefat">';
+			foreach ( Riskybuyer_Blacklist::reasons() as $code => $r ) {
 				echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $r['label'] ) . '</option>';
 			}
 			echo '</select></label></p>';
-			echo '<p><label>' . esc_html__( 'Note (optional)', 'problem-client' ) . '<br><textarea class="pc-note-input widefat" rows="2"></textarea></label></p>';
-			echo '<button type="button" class="button button-primary pc-mark-btn">' . esc_html__( 'Mark client', 'problem-client' ) . '</button>';
+			echo '<p><label>' . esc_html__( 'Note (optional)', 'risky-buyer' ) . '<br><textarea class="rb-note-input widefat" rows="2"></textarea></label></p>';
+			echo '<button type="button" class="button button-primary rb-mark-btn">' . esc_html__( 'Mark client', 'risky-buyer' ) . '</button>';
 		} else {
-			echo '<p><em>' . esc_html__( 'You do not have permission to mark clients.', 'problem-client' ) . '</em></p>';
+			echo '<p><em>' . esc_html__( 'You do not have permission to mark clients.', 'risky-buyer' ) . '</em></p>';
 		}
 
 		echo '</div>';
