@@ -13,14 +13,14 @@
   body{margin:0;background:var(--ink);color:var(--text);font:400 17px/1.7 var(--body);-webkit-font-smoothing:antialiased}
   body::after{content:"";position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.04;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
   a{color:var(--accent);text-decoration:none}
-  .wrap{max-width:760px;margin:0 auto;padding:0 26px}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
   header{position:sticky;top:0;z-index:30;backdrop-filter:saturate(150%) blur(12px);background:rgba(10,11,15,.6);border-bottom:1px solid var(--line)}
-  .bar{display:flex;align-items:center;height:66px;gap:14px}
-  .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:18px}.brand svg{width:28px;height:28px}.sp{flex:1}
+  .bar{display:flex;align-items:center;height:68px;gap:14px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:19px}.brand svg{width:28px;height:28px}.sp{flex:1}
   .langs{display:flex;gap:2px;border:1px solid var(--line);border-radius:999px;padding:3px}
   .langs button{all:unset;cursor:pointer;font:700 12px/1 var(--body);color:var(--muted);padding:7px 12px;border-radius:999px;transition:.25s}
   .langs button.active{background:var(--red);color:#fff}.langs button:hover{color:#fff}
-  .doc{padding:46px 0 80px}
+  .doc{max-width:760px;padding:46px 0 80px}
   .back{color:var(--muted);font-size:14px}
   h1{font-family:var(--disp);font-weight:700;font-size:clamp(30px,5vw,46px);letter-spacing:-.02em;margin:14px 0 6px}
   .intro{color:var(--muted);margin:0 0 10px}
@@ -38,13 +38,13 @@
   <span class="langs" id="langs"><button data-lang="bg">BG</button><button data-lang="ua">UA</button><button data-lang="en">EN</button></span>
 </div></header>
 
-<div class="wrap doc">
+<div class="wrap"><div class="doc">
   <p><a class="back" href="/">← <span id="home"></span></a></p>
   <h1 id="title"></h1>
   <p class="intro" id="intro"></p>
   <div id="content"></div>
   <p class="upd" id="updated"></p>
-</div>
+</div></div>
 
 <footer><div class="wrap frow"><span>© RiskyBuyer</span><span class="sp"></span><a href="/" id="lhome"></a><a href="/privacy" id="lprivacy"></a></div></footer>
 
