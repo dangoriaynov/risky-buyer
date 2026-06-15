@@ -66,6 +66,54 @@
 	border-top: 1px solid #e3e3e6;
 }
 
+/* Add tab — customer autocomplete. */
+.rb-wrap .rb-cust-box {
+	position: relative;
+	display: block;
+}
+.rb-wrap .rb-cust-search input[type="search"] {
+	width: 100%;
+	box-sizing: border-box;
+}
+.rb-wrap .rb-cust-results {
+	display: none;
+	position: absolute;
+	z-index: 30;
+	left: 0;
+	right: 0;
+	top: 100%;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+	margin-top: 3px;
+	max-height: 300px;
+	overflow-y: auto;
+}
+.rb-wrap .rb-cust-item {
+	display: block;
+	width: 100%;
+	text-align: left;
+	border: 0;
+	border-bottom: 1px solid #f0f0f1;
+	background: transparent;
+	padding: 9px 12px;
+	cursor: pointer;
+	font-size: 13px;
+}
+.rb-wrap .rb-cust-item:last-child {
+	border-bottom: 0;
+}
+.rb-wrap .rb-cust-item:hover {
+	background: #f0f6fc;
+	color: #2271b1;
+}
+.rb-wrap .rb-cust-empty {
+	padding: 9px 12px;
+	color: #777;
+	font-style: italic;
+}
+
 /* Live filter bar (List tab). */
 .rb-wrap .rb-filters {
 	display: flex;

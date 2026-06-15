@@ -301,3 +301,53 @@
 	}
 	$( 'select.rb-reason-color' ).each( colorize ).on( 'change', colorize );
 } )( jQuery );
+
+/* Add tab — autocomplete customers from existing orders. */
+( function ( $ ) {
+	'use strict';
+	var $q = $( '#rb-cust-q' );
+	if ( ! $q.length ) {
+		return;
+	}
+	var $results = $( '#rb-cust-results' );
+	var emptyText = $results.attr( 'data-empty' ) || '';
+	var timer;
+
+	function render( items ) {
+		$results.empty();
+		if ( ! items || ! items.length ) {
+			$results.append( $( '<div class="rb-cust-empty"></div>' ).text( emptyText ) ).show();
+			return;
+		}
+		$.each( items, function ( i, it ) {
+			$( '<button type="button" class="rb-cust-item"></button>' )
+				.text( it.label )
+				.data( 'name', it.name )
+				.data( 'phone', it.phone )
+				.appendTo( $results );
+		} );
+		$results.show();
+	}
+
+	function search() {
+		var q = $.trim( $q.val() || '' );
+		if ( q.length < 2 ) { $results.hide().empty(); return; }
+		$.post( RiskyBuyerData.ajax_url, { action: 'riskybuyer_search_customers', nonce: RiskyBuyerData.nonce, q: q } )
+			.done( function ( r ) { if ( r && r.success && r.data ) { render( r.data.results ); } } );
+	}
+
+	$q.on( 'input', function () { clearTimeout( timer ); timer = setTimeout( search, 300 ); } );
+	$q.on( 'focus', function () { if ( $results.children().length ) { $results.show(); } } );
+
+	$results.on( 'click', '.rb-cust-item', function () {
+		$( '#rb-name' ).val( $( this ).data( 'name' ) || '' );
+		$( '#rb-phone' ).val( $( this ).data( 'phone' ) || '' );
+		$results.hide().empty();
+		$q.val( '' );
+		$( '#rb-reason' ).focus();
+	} );
+
+	$( document ).on( 'click', function ( e ) {
+		if ( ! $( e.target ).closest( '.rb-cust-search' ).length ) { $results.hide(); }
+	} );
+} )( jQuery );

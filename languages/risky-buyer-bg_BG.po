@@ -319,3 +319,15 @@ msgstr "Нови при последната синхронизация:"
 
 msgid "Sync done: %1$d new (%2$d total downloaded)."
 msgstr "Синхронизацията завърши: %1$d нови (%2$d общо изтеглени)."
+
+msgid "Find a customer from your orders"
+msgstr "Намери клиент от поръчките"
+
+msgid "Type a name or phone…"
+msgstr "Въведи име или телефон…"
+
+msgid "Pick someone who already ordered to fill in the name and phone below."
+msgstr "Изберете клиент, който вече е поръчвал, за да попълните името и телефона по-долу."
+
+msgid "No matching customers."
+msgstr "Няма съвпадащи клиенти."

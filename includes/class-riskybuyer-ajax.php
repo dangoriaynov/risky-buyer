@@ -27,6 +27,98 @@ class Riskybuyer_Ajax {
 		add_action( 'wp_ajax_riskybuyer_validate_key', array( $this, 'validate_key' ) );
 		add_action( 'wp_ajax_riskybuyer_sync_now', array( $this, 'sync_now' ) );
 		add_action( 'wp_ajax_riskybuyer_push', array( $this, 'push' ) );
+		add_action( 'wp_ajax_riskybuyer_search_customers', array( $this, 'search_customers' ) );
+	}
+
+	/**
+	 * Autocomplete: find existing shop customers (from orders) by name or phone.
+	 */
+	public function search_customers() {
+		check_ajax_referer( 'riskybuyer_ajax', 'nonce' );
+		if ( ! Riskybuyer_Blacklist::instance()->can_add() ) {
+			wp_send_json_error( array( 'message' => __( 'You do not have permission.', 'risky-buyer' ) ), 403 );
+		}
+		$q = isset( $_POST['q'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['q'] ) ) ) : '';
+		if ( mb_strlen( $q ) < 2 ) {
+			wp_send_json_success( array( 'results' => array() ) );
+		}
+		wp_send_json_success( array( 'results' => $this->search_order_customers( $q ) ) );
+	}
+
+	/**
+	 * Distinct billing customers from orders matching $q (name or phone).
+	 *
+	 * @param string $q Search term.
+	 * @return array<int,array{name:string,phone:string,label:string}>
+	 */
+	protected function search_order_customers( $q ) {
+		global $wpdb;
+		$like   = '%' . $wpdb->esc_like( $q ) . '%';
+		$digits = preg_replace( '/\D+/', '', $q );
+		$plike  = '' !== $digits ? '%' . $wpdb->esc_like( $digits ) . '%' : $like;
+		$hpos   = class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' )
+			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
+		if ( $hpos ) {
+			$addr = $wpdb->prefix . 'wc_order_addresses';
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT first_name, last_name, phone, MAX(order_id) AS oid
+					FROM {$addr}
+					WHERE address_type = 'billing'
+					AND ( CONCAT_WS(' ', first_name, last_name) LIKE %s
+						OR REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'+','') LIKE %s )
+					GROUP BY first_name, last_name, phone
+					ORDER BY oid DESC
+					LIMIT 10",
+					$like,
+					$plike
+				),
+				ARRAY_A
+			);
+		} else {
+			$rows = $wpdb->get_results(
+				$wpdb->prepare(
+					"SELECT
+						MAX(CASE WHEN meta_key = '_billing_first_name' THEN meta_value END) AS first_name,
+						MAX(CASE WHEN meta_key = '_billing_last_name' THEN meta_value END) AS last_name,
+						MAX(CASE WHEN meta_key = '_billing_phone' THEN meta_value END) AS phone,
+						post_id AS oid
+					FROM {$wpdb->postmeta}
+					WHERE meta_key IN ('_billing_first_name', '_billing_last_name', '_billing_phone')
+					GROUP BY post_id
+					HAVING ( CONCAT_WS(' ', first_name, last_name) LIKE %s OR phone LIKE %s )
+					ORDER BY oid DESC
+					LIMIT 10",
+					$like,
+					$plike
+				),
+				ARRAY_A
+			);
+		}
+		// phpcs:enable
+
+		$out  = array();
+		$seen = array();
+		foreach ( (array) $rows as $r ) {
+			$name  = trim( (string) $r['first_name'] . ' ' . (string) $r['last_name'] );
+			$phone = trim( (string) $r['phone'] );
+			if ( '' === $name && '' === $phone ) {
+				continue;
+			}
+			$dedup = mb_strtolower( $name ) . '|' . preg_replace( '/\D+/', '', $phone );
+			if ( isset( $seen[ $dedup ] ) ) {
+				continue;
+			}
+			$seen[ $dedup ] = true;
+			$out[]          = array(
+				'name'  => $name,
+				'phone' => $phone,
+				'label' => trim( $name . ( '' !== $phone ? ' · ' . $phone : '' ) ),
+			);
+		}
+		return $out;
 	}
 
 	/**

@@ -470,3 +470,15 @@ msgstr ""
 
 msgid "Sync done: %1$d new (%2$d total downloaded)."
 msgstr ""
+
+msgid "Find a customer from your orders"
+msgstr ""
+
+msgid "Type a name or phone…"
+msgstr ""
+
+msgid "Pick someone who already ordered to fill in the name and phone below."
+msgstr ""
+
+msgid "No matching customers."
+msgstr ""

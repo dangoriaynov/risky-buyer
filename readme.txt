@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.4
+Stable tag: 0.6.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,9 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.5 =
+* Add tab: search existing shop customers (by name or phone, pulled from your orders) and pick one to fill in the name and phone instantly.
 
 = 0.6.4 =
 * Settings: the API key locks (grey, read-only) once validated for this site, with a red x to clear it; it is checked once (on entry/load), not continuously.

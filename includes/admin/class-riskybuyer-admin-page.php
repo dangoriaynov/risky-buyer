@@ -308,6 +308,13 @@ class Riskybuyer_Admin_Page {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
 		}
 
+		if ( ! $is_edit ) {
+			echo '<p class="rb-field rb-cust-search"><label for="rb-cust-q">' . esc_html__( 'Find a customer from your orders', 'risky-buyer' ) . '</label>';
+			echo '<span class="rb-cust-box"><input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'risky-buyer' ) . '">';
+			echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'risky-buyer' ) . '"></div></span>';
+			echo '<span class="description">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'risky-buyer' ) . '</span></p>';
+		}
+
 		echo '<p class="rb-field"><label for="rb-name">' . esc_html__( 'Name', 'risky-buyer' ) . '</label>';
 		echo '<input type="text" id="rb-name" name="name" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></p>';
 
