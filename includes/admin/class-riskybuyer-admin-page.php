@@ -99,17 +99,22 @@ class Riskybuyer_Admin_Page {
 		$notice = '';
 		$type   = 'success';
 		$tab    = 'list';
+		$open   = '';
 
 		if ( 'add' === $action ) {
-			$res = $bl->add_entry( $this->posted_entry() );
+			$tab  = 'add';
+			$open = 'single';
+			$res  = $bl->add_entry( $this->posted_entry() );
 			if ( is_wp_error( $res ) ) {
 				$notice = $res->get_error_message();
 				$type   = 'error';
-				$tab    = 'add';
 			} else {
 				$notice = __( 'Client added to the list.', 'risky-buyer' );
+				$this->remember_reason( $res['reason_code'] );
 			}
 		} elseif ( 'bulk_add' === $action ) {
+			$tab    = 'add';
+			$open   = 'bulk';
 			$text   = isset( $_POST['bulk'] ) ? sanitize_textarea_field( wp_unslash( $_POST['bulk'] ) ) : '';
 			$reason = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : 'other';
 			$note   = isset( $_POST['note'] ) ? sanitize_textarea_field( wp_unslash( $_POST['note'] ) ) : '';
@@ -117,11 +122,10 @@ class Riskybuyer_Admin_Page {
 			if ( is_wp_error( $res ) ) {
 				$notice = $res->get_error_message();
 				$type   = 'error';
-				$tab    = 'add';
 			} else {
 				/* translators: 1: added count, 2: skipped count, 3: invalid count */
 				$notice = sprintf( __( 'Added: %1$d · skipped (already in list): %2$d · invalid: %3$d', 'risky-buyer' ), $res['added'], $res['skipped'], $res['invalid'] );
-				$tab    = 'add';
+				$this->remember_reason( $reason );
 			}
 		} elseif ( 'update' === $action ) {
 			$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
@@ -192,15 +196,28 @@ class Riskybuyer_Admin_Page {
 			}
 		}
 
-		$url = add_query_arg(
-			array(
-				'riskybuyer_notice' => rawurlencode( $notice ),
-				'riskybuyer_type'   => $type,
-			),
-			$this->base_url( $tab )
+		$args = array(
+			'riskybuyer_notice' => rawurlencode( $notice ),
+			'riskybuyer_type'   => $type,
 		);
-		wp_safe_redirect( $url );
+		if ( '' !== $open ) {
+			$args['rb_open'] = $open;
+		}
+		wp_safe_redirect( add_query_arg( $args, $this->base_url( $tab ) ) );
 		exit;
+	}
+
+	/**
+	 * Remember the last reason this user picked, to pre-select it next time.
+	 *
+	 * @param string $code Reason code.
+	 */
+	protected function remember_reason( $code ) {
+		$code    = sanitize_key( $code );
+		$reasons = Riskybuyer_Blacklist::reasons();
+		if ( isset( $reasons[ $code ] ) ) {
+			update_user_meta( get_current_user_id(), 'riskybuyer_last_reason', $code );
+		}
 	}
 
 	protected function posted_entry() {
@@ -277,15 +294,45 @@ class Riskybuyer_Admin_Page {
 			$edit_entry = $bl->get( sanitize_text_field( wp_unslash( $_GET['edit'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		}
 
-		if ( ! $edit_entry ) {
-			$this->render_customer_search();
+		// Editing: just the prefilled form.
+		if ( $edit_entry ) {
+			$this->render_form( $edit_entry, $bl->can_manage() );
+			return;
 		}
 
-		$this->render_form( $edit_entry, $bl->can_manage() );
+		$this->render_customer_search();
 
-		if ( ! $edit_entry ) {
-			$this->render_bulk_form();
+		// Which form to keep open (after a submit we re-open the one just used).
+		$open = isset( $_GET['rb_open'] ) ? sanitize_key( wp_unslash( $_GET['rb_open'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
+
+		echo '<div class="rb-add-toggles">';
+		echo '<button type="button" class="button rb-toggle" data-target="rb-single-wrap"><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>' . esc_html__( 'Add one client', 'risky-buyer' ) . '</button>';
+		echo '<button type="button" class="button rb-toggle" data-target="rb-bulk-wrap"><span class="dashicons dashicons-list-view" aria-hidden="true"></span>' . esc_html__( 'Bulk add', 'risky-buyer' ) . '</button>';
+		echo '</div>';
+
+		echo '<div id="rb-single-wrap" class="rb-collapse"' . ( 'single' === $open ? '' : ' style="display:none"' ) . '>';
+		$this->render_form( null, $bl->can_manage() );
+		echo '</div>';
+
+		echo '<div id="rb-bulk-wrap" class="rb-collapse"' . ( 'bulk' === $open ? '' : ' style="display:none"' ) . '>';
+		$this->render_bulk_form();
+		echo '</div>';
+	}
+
+	/**
+	 * Reason pre-selected on the Add forms: the last reason this user picked,
+	 * otherwise the first (top) reason in the list.
+	 *
+	 * @return string
+	 */
+	protected function default_reason() {
+		$reasons = Riskybuyer_Blacklist::reasons();
+		$last    = (string) get_user_meta( get_current_user_id(), 'riskybuyer_last_reason', true );
+		if ( $last && isset( $reasons[ $last ] ) ) {
+			return $last;
 		}
+		$keys = array_keys( $reasons );
+		return $keys ? $keys[0] : 'other';
 	}
 
 	/**
@@ -294,12 +341,13 @@ class Riskybuyer_Admin_Page {
 	 */
 	protected function render_customer_search() {
 		echo '<div class="rb-form rb-cust-search">';
-		echo '<p class="rb-field" style="margin:0">';
 		echo '<label for="rb-cust-q">' . esc_html__( 'Find a customer from your orders', 'risky-buyer' ) . '</label>';
-		echo '<span class="rb-cust-box"><input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'risky-buyer' ) . '">';
-		echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'risky-buyer' ) . '"></div></span>';
-		echo '<span class="description">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'risky-buyer' ) . '</span>';
-		echo '</p></div>';
+		echo '<div class="rb-cust-box">';
+		echo '<input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'risky-buyer' ) . '">';
+		echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'risky-buyer' ) . '"></div>';
+		echo '</div>';
+		echo '<p class="description rb-cust-hint">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'risky-buyer' ) . '</p>';
+		echo '</div>';
 	}
 
 	/**
@@ -318,7 +366,9 @@ class Riskybuyer_Admin_Page {
 
 	protected function render_form( $edit_entry, $can_manage ) {
 		$is_edit = ( $edit_entry && $can_manage );
-		echo '<h2>' . ( $is_edit ? esc_html__( 'Edit entry', 'risky-buyer' ) : esc_html__( 'Add one client', 'risky-buyer' ) ) . '</h2>';
+		if ( $is_edit ) {
+			echo '<h2>' . esc_html__( 'Edit entry', 'risky-buyer' ) . '</h2>';
+		}
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
 		wp_nonce_field( 'riskybuyer_admin' );
 		echo '<input type="hidden" name="riskybuyer_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
@@ -334,7 +384,7 @@ class Riskybuyer_Admin_Page {
 
 		echo '<p class="rb-field"><label for="rb-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
 		echo '<select id="rb-reason" name="reason" class="rb-reason-color">';
-		$this->reason_options( $is_edit ? $edit_entry['reason_code'] : 'other' );
+		$this->reason_options( $is_edit ? $edit_entry['reason_code'] : $this->default_reason() );
 		echo '</select></p>';
 
 		echo '<p class="rb-field"><label for="rb-note">' . esc_html__( 'Note', 'risky-buyer' ) . '</label>';
@@ -350,7 +400,6 @@ class Riskybuyer_Admin_Page {
 	}
 
 	protected function render_bulk_form() {
-		echo '<h2 class="rb-bulk-title">' . esc_html__( 'Bulk add', 'risky-buyer' ) . '</h2>';
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
 		wp_nonce_field( 'riskybuyer_admin' );
 		echo '<input type="hidden" name="riskybuyer_action" value="bulk_add">';
@@ -361,7 +410,7 @@ class Riskybuyer_Admin_Page {
 
 		echo '<p class="rb-field"><label for="rb-bulk-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
 		echo '<select id="rb-bulk-reason" name="reason" class="rb-reason-color">';
-		$this->reason_options( 'other' );
+		$this->reason_options( $this->default_reason() );
 		echo '</select></p>';
 
 		echo '<p class="rb-field"><label for="rb-bulk-note">' . esc_html__( 'Note', 'risky-buyer' ) . '</label>';

@@ -329,11 +329,21 @@
 		$results.show();
 	}
 
+	function loading() {
+		$results.html( '<div class="rb-cust-loading"><span class="spinner is-active"></span>' + ( RiskyBuyerData.i18n.checking || '…' ) + '</div>' ).show();
+	}
+	function showError() {
+		$results.html( '<div class="rb-cust-error">' + ( RiskyBuyerData.i18n.error || 'Error' ) + '</div>' ).show();
+	}
 	function search() {
 		var q = $.trim( $q.val() || '' );
 		if ( q.length < 2 ) { $results.hide().empty(); return; }
+		loading();
 		$.post( RiskyBuyerData.ajax_url, { action: 'riskybuyer_search_customers', nonce: RiskyBuyerData.nonce, q: q } )
-			.done( function ( r ) { if ( r && r.success && r.data ) { render( r.data.results ); } } );
+			.done( function ( r ) {
+				if ( r && r.success && r.data ) { render( r.data.results ); } else { showError(); }
+			} )
+			.fail( showError );
 	}
 
 	$q.on( 'input', function () { clearTimeout( timer ); timer = setTimeout( search, 300 ); } );
@@ -347,10 +357,43 @@
 		$( '#rb-phone' ).val( $( this ).data( 'phone' ) || '' );
 		$results.hide().empty();
 		$q.val( '' );
-		$( '#rb-reason' ).focus();
+		// Reveal the single-add form so the filled-in fields are visible.
+		var $w = $( '#rb-single-wrap' );
+		if ( $w.length ) {
+			$w.show();
+			$( '.rb-toggle[data-target="rb-single-wrap"]' ).addClass( 'rb-toggle-active' );
+			$w[ 0 ].scrollIntoView( { behavior: 'smooth', block: 'nearest' } );
+		}
+		$( '#rb-reason' ).trigger( 'focus' );
 	} );
 
 	$( document ).on( 'click', function ( e ) {
 		if ( ! $( e.target ).closest( '.rb-cust-search' ).length ) { $results.hide(); }
+	} );
+} )( jQuery );
+
+/* Add tab — reveal single/bulk forms on demand (kept open after submitting). */
+( function ( $ ) {
+	'use strict';
+	var $toggles = $( '.rb-toggle' );
+	if ( ! $toggles.length ) {
+		return;
+	}
+	$toggles.on( 'click', function () {
+		var $btn = $( this );
+		var $w = $( '#' + $btn.data( 'target' ) );
+		var show = $w.is( ':hidden' );
+		$w.toggle( show );
+		$btn.toggleClass( 'rb-toggle-active', show );
+		if ( show ) {
+			$w.find( 'input, textarea' ).first().trigger( 'focus' );
+			$w[ 0 ].scrollIntoView( { behavior: 'smooth', block: 'nearest' } );
+		}
+	} );
+	// Mark the toggle active for any form the server rendered open (after a submit).
+	$( '.rb-collapse' ).each( function () {
+		if ( $( this ).is( ':visible' ) ) {
+			$toggles.filter( '[data-target="' + this.id + '"]' ).addClass( 'rb-toggle-active' );
+		}
 	} );
 } )( jQuery );

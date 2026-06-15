@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.6
+Stable tag: 0.6.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,11 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.7 =
+* Fixed: the customer search dropdown now appears (its results box was nested in a <p>, which browsers auto-close before block elements, breaking positioning). Added a loading spinner and an error state.
+* Add tab: the single and bulk forms are now behind "Add one client" / "Bulk add" buttons; clicking reveals the fields, which stay open (empty) after each add so you can keep adding until you reload.
+* Add tab: reason defaults to the top option and remembers your last-used reason for the next entry.
 
 = 0.6.6 =
 * Add tab: the customer search now sits above the form (outside it), so pressing Enter searches instead of submitting an empty entry; Enter also triggers the search immediately.

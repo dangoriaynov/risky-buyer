@@ -113,6 +113,49 @@
 	color: #777;
 	font-style: italic;
 }
+.rb-wrap .rb-cust-search > label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 5px;
+}
+.rb-wrap .rb-cust-hint {
+	margin: 6px 0 0;
+}
+.rb-wrap .rb-cust-loading {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 9px 12px;
+	color: #555;
+}
+.rb-wrap .rb-cust-loading .spinner {
+	float: none;
+	margin: 0;
+}
+.rb-wrap .rb-cust-error {
+	padding: 9px 12px;
+	color: #b32d2e;
+}
+
+/* Add tab — reveal-on-click form toggles. */
+.rb-wrap .rb-add-toggles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 16px 0;
+}
+.rb-wrap .rb-toggle .dashicons {
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	vertical-align: text-bottom;
+	margin-right: 2px;
+}
+.rb-wrap .rb-toggle.rb-toggle-active {
+	background: #2271b1;
+	border-color: #2271b1;
+	color: #fff;
+}
 
 /* Live filter bar (List tab). */
 .rb-wrap .rb-filters {
