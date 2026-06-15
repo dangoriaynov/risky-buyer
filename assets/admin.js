@@ -122,11 +122,16 @@
 					lock();
 					$push.toggle( r.data.scope === 'write' );
 					if ( afterValid ) { afterValid(); }
+				} else if ( r && r.data && 'unreachable' === r.data.reason ) {
+					// Server down/unreachable — the key itself was not rejected, so keep it as-is.
+					$keyStatus.css( 'color', '#996800' ).text( '⚠ ' + ( RiskyBuyerData.i18n.server_unreachable || 'Server unreachable' ) );
 				} else {
 					showInvalid();
 				}
 			} )
-			.fail( showInvalid );
+			.fail( function () {
+				$keyStatus.css( 'color', '#996800' ).text( '⚠ ' + ( RiskyBuyerData.i18n.server_unreachable || 'Server unreachable' ) );
+			} );
 	}
 
 	$en.on( 'change', function () {
@@ -173,6 +178,7 @@
 					if ( ok && r.data ) {
 						if ( typeof r.data.cached !== 'undefined' ) { $( '#rb-cached-count' ).text( r.data.cached ); }
 						if ( typeof r.data.added !== 'undefined' ) { $( '#rb-added-count' ).text( r.data.added ); }
+						if ( r.data.last ) { $( '#rb-last-sync' ).text( r.data.last ); }
 					}
 				} )
 				.fail( function () { $msg.css( 'color', '#b32d2e' ).text( RiskyBuyerData.i18n.error ); } )

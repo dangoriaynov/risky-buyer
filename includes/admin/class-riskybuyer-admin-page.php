@@ -465,13 +465,22 @@ class Riskybuyer_Admin_Page {
 		$sync_label = __( 'Sync now', 'risky-buyer' );
 		$push_label = __( 'Push my list to the server', 'risky-buyer' );
 		$clear_lbl  = __( 'Clear key', 'risky-buyer' );
+		$sent_text  = __( 'Data sent to the server: phone, name, reason, note, and your site domain.', 'risky-buyer' );
 
 		echo '<div class="rb-settings">';
 		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'risky-buyer' ) . '</h2>';
 		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'risky-buyer' ) . '</p>';
 
 		// Settings save automatically (no page reload, no Save button).
-		echo '<p><label><input type="checkbox" id="rb-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'risky-buyer' ) . '</strong></label> <span id="rb-save-status" class="description"></span></p>';
+		$status_html = esc_html__( 'Last update from the shared list:', 'risky-buyer' ) . ' <strong id="rb-last-sync">' . esc_html( $last ) . '</strong><br>'
+			. esc_html__( 'Phone numbers downloaded:', 'risky-buyer' ) . ' <strong id="rb-cached-count">' . (int) $state['cached'] . '</strong><br>'
+			. esc_html__( 'New in last sync:', 'risky-buyer' ) . ' <strong id="rb-added-count">' . (int) $state['last_added'] . '</strong>';
+		$status_aria = wp_strip_all_tags( str_replace( '<br>', ' · ', $status_html ) );
+
+		echo '<p class="rb-enable-row"><label><input type="checkbox" id="rb-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'risky-buyer' ) . '</strong></label>';
+		echo '<span class="rb-info" tabindex="0" role="img" aria-label="' . esc_attr( $sent_text ) . '"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span class="rb-tip">' . esc_html( $sent_text ) . '</span></span>';
+		echo '<span class="rb-info" tabindex="0" role="img" aria-label="' . esc_attr( $status_aria ) . '"><span class="dashicons dashicons-editor-help" aria-hidden="true"></span><span class="rb-tip">' . wp_kses( $status_html, array( 'strong' => array( 'id' => array() ), 'br' => array() ) ) . '</span></span>';
+		echo ' <span id="rb-save-status" class="description"></span></p>';
 
 		echo '<div id="rb-sync-fields"' . ( $enabled ? '' : ' style="display:none"' ) . '>';
 		echo '<table class="form-table"><tbody>';
@@ -493,13 +502,9 @@ class Riskybuyer_Admin_Page {
 		echo '<p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'risky-buyer' ) . '</p></td></tr>';
 		echo '</tbody></table>';
 
-		echo '<p id="rb-sync-state">' . esc_html__( 'Last update from the shared list:', 'risky-buyer' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ';
-		echo esc_html__( 'Phone numbers downloaded:', 'risky-buyer' ) . ' <strong id="rb-cached-count">' . (int) $state['cached'] . '</strong> &nbsp; ';
-		echo esc_html__( 'New in last sync:', 'risky-buyer' ) . ' <strong id="rb-added-count">' . (int) $state['last_added'] . '</strong></p>';
 		if ( ! empty( $state['last_error'] ) ) {
 			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'risky-buyer' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
 		}
-		echo '<p class="description rb-sent-note">' . esc_html__( 'Data sent to the server: phone, name, reason, note, and your site domain.', 'risky-buyer' ) . '</p>';
 		echo '</div></div>';
 	}
 

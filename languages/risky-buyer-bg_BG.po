@@ -331,3 +331,9 @@ msgstr "Изберете клиент, който вече е поръчвал, 
 
 msgid "No matching customers."
 msgstr "Няма съвпадащи клиенти."
+
+msgid "Invalid key"
+msgstr "Невалиден ключ"
+
+msgid "Server unreachable — the key was not checked."
+msgstr "Сървърът е недостъпен — ключът не е проверен."

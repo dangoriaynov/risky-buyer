@@ -97,8 +97,9 @@ class Riskybuyer_Remote_Sync {
 		$key        = ( null !== $key ) ? trim( (string) $key ) : Riskybuyer_Settings::api_key();
 		if ( '' === $server_url || '' === $key ) {
 			return array(
-				'valid' => false,
-				'error' => 'missing',
+				'valid'  => false,
+				'reason' => 'missing',
+				'error'  => 'missing',
 			);
 		}
 		$res = wp_remote_get(
@@ -113,15 +114,18 @@ class Riskybuyer_Remote_Sync {
 		);
 		if ( is_wp_error( $res ) ) {
 			return array(
-				'valid' => false,
-				'error' => $res->get_error_message(),
+				'valid'  => false,
+				'reason' => 'unreachable',
+				'error'  => $res->get_error_message(),
 			);
 		}
 		$code = (int) wp_remote_retrieve_response_code( $res );
 		if ( 200 !== $code ) {
+			// 401/403 = the server rejected the key; anything else = server-side trouble.
 			return array(
-				'valid' => false,
-				'error' => 'HTTP ' . $code,
+				'valid'  => false,
+				'reason' => ( 401 === $code || 403 === $code ) ? 'invalid' : 'unreachable',
+				'error'  => 'HTTP ' . $code,
 			);
 		}
 		$body = json_decode( wp_remote_retrieve_body( $res ), true );

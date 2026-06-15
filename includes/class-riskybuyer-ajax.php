@@ -197,6 +197,7 @@ class Riskybuyer_Ajax {
 					'message' => sprintf( __( 'Sync done: %1$d new (%2$d total downloaded).', 'risky-buyer' ), (int) $st['last_added'], (int) $st['cached'] ),
 					'cached'  => (int) $st['cached'],
 					'added'   => (int) $st['last_added'],
+					'last'    => $st['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $st['last_sync'] ) : '',
 				)
 			);
 		}

@@ -482,3 +482,9 @@ msgstr ""
 
 msgid "No matching customers."
 msgstr ""
+
+msgid "Invalid key"
+msgstr ""
+
+msgid "Server unreachable — the key was not checked."
+msgstr ""

@@ -82,7 +82,8 @@ class Riskybuyer_Plugin {
 					'saving'         => __( 'Saving…', 'risky-buyer' ),
 					'saved'          => __( 'Saved', 'risky-buyer' ),
 					'checking'       => __( 'Checking…', 'risky-buyer' ),
-					'key_invalid'    => __( 'Invalid or unreachable key', 'risky-buyer' ),
+					'key_invalid'    => __( 'Invalid key', 'risky-buyer' ),
+					'server_unreachable' => __( 'Server unreachable — the key was not checked.', 'risky-buyer' ),
 				),
 			)
 		);
