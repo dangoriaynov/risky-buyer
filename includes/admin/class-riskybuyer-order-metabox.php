@@ -98,7 +98,81 @@ class Riskybuyer_Order_Metabox {
 		if ( $by ) {
 			echo ' <span style="color:#666;">(' . esc_html__( 'Added by', 'risky-buyer' ) . ' ' . esc_html( $by ) . ')</span>';
 		}
-		echo '</p></div>';
+		echo '</p>';
+		$this->render_related_orders( $order, $order_id );
+		echo '</div>';
+	}
+
+	/**
+	 * List links to this buyer's other orders on this site (by phone, excluding the
+	 * order currently open).
+	 *
+	 * @param WC_Order $order      Current order.
+	 * @param int      $current_id Current order id (excluded).
+	 */
+	protected function render_related_orders( $order, $current_id ) {
+		$phone9 = Riskybuyer_Blacklist::normalize_phone( $order->get_billing_phone() );
+		if ( '' === $phone9 ) {
+			return;
+		}
+		$links = array();
+		foreach ( $this->find_orders_by_phone( $phone9, (int) $current_id ) as $oid ) {
+			$o = wc_get_order( $oid );
+			if ( ! $o ) {
+				continue;
+			}
+			$links[] = '<a href="' . esc_url( $o->get_edit_order_url() ) . '">#' . esc_html( $o->get_order_number() ) . '</a>';
+			if ( count( $links ) >= 12 ) {
+				break;
+			}
+		}
+		if ( empty( $links ) ) {
+			return;
+		}
+		echo '<p style="margin:.2em 0 .6em;color:#444;">' . esc_html__( 'Other orders from this buyer:', 'risky-buyer' ) . ' ';
+		echo wp_kses_post( implode( ', ', $links ) );
+		echo '</p>';
+	}
+
+	/**
+	 * Order ids on this site whose billing phone matches (last 9 digits).
+	 *
+	 * @param string $phone9     Normalized phone (last 9 digits).
+	 * @param int    $current_id Order id to exclude.
+	 * @return int[]
+	 */
+	protected function find_orders_by_phone( $phone9, $current_id ) {
+		global $wpdb;
+		$like = '%' . $wpdb->esc_like( $phone9 );
+		$hpos = class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' )
+			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
+
+		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
+		if ( $hpos ) {
+			$addr = $wpdb->prefix . 'wc_order_addresses';
+			$ord  = $wpdb->prefix . 'wc_orders';
+			$sql  = $wpdb->prepare(
+				"SELECT a.order_id FROM {$addr} a INNER JOIN {$ord} o ON o.id = a.order_id
+				WHERE a.address_type = 'billing' AND o.type = 'shop_order' AND a.order_id <> %d
+				AND REPLACE(REPLACE(REPLACE(REPLACE(a.phone,' ',''),'-',''),'(',''),')','') LIKE %s
+				ORDER BY a.order_id DESC LIMIT 20",
+				$current_id,
+				$like
+			);
+		} else {
+			$sql = $wpdb->prepare(
+				"SELECT post_id FROM {$wpdb->postmeta}
+				WHERE meta_key = '_billing_phone' AND post_id <> %d
+				AND REPLACE(REPLACE(REPLACE(REPLACE(meta_value,' ',''),'-',''),'(',''),')','') LIKE %s
+				ORDER BY post_id DESC LIMIT 20",
+				$current_id,
+				$like
+			);
+		}
+		$ids = $wpdb->get_col( $sql );
+		// phpcs:enable
+
+		return array_map( 'absint', (array) $ids );
 	}
 
 	/**

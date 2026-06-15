@@ -96,12 +96,40 @@
 }
 .rb-wrap .rb-table td {
 	vertical-align: middle;
+	text-align: center;
+}
+.rb-wrap .rb-table .rb-icon {
+	padding: 2px 8px;
+	vertical-align: middle;
+}
+.rb-wrap .rb-table .rb-icon .dashicons {
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 1.4;
 }
 .rb-wrap .button-link-delete {
 	color: #b32d2e;
 }
+/* Color-coded reason <select> (closed box reflects the chosen reason). */
+.rb-wrap select.rb-has-color {
+	color: #fff;
+	border-color: rgba(0, 0, 0, .15);
+	font-weight: 600;
+}
 
 /* Settings tab */
+.rb-wrap .rb-settings {
+	max-width: 720px;
+}
+.rb-wrap .rb-settings .description {
+	max-width: 680px;
+}
+.rb-wrap .rb-settings .rb-sent-note {
+	margin-top: 16px;
+	padding-top: 12px;
+	border-top: 1px solid #ededf0;
+}
 .rb-settings #rb-key-status,
 .rb-settings #rb-save-status {
 	font-weight: 600;

@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.2
+Stable tag: 0.6.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,12 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.3 =
+* Phone numbers are normalized on save to international +CC form (00 -> +, national leading 0 -> country code; default +359, filterable).
+* Order banner now links to the buyer's other orders on this site (excluding the one open).
+* List: centered cell values; Edit/Delete shown as icons; reason filter and reason dropdowns color-coded to match the list.
+* Settings: clearer wording for the sync status; the "data sent" note moved under the sync panel; constrained width.
 
 = 0.6.2 =
 * Admin: removed the redundant Check tab — the List tab now filters instantly in the browser (phone/name with AND/OR + reason, no reload).

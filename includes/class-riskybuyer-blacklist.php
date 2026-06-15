@@ -95,6 +95,51 @@ class Riskybuyer_Blacklist {
 		return substr( $digits, -9 );
 	}
 
+	/**
+	 * Default country calling code used to canonicalize national numbers.
+	 * Filterable so non-Bulgarian sites can change it.
+	 *
+	 * @return string Digits only, e.g. "359".
+	 */
+	public static function default_country_code() {
+		return preg_replace( '/\D+/', '', (string) apply_filters( 'riskybuyer_default_country_code', '359' ) );
+	}
+
+	/**
+	 * Canonical, human-readable phone for storage/display: always in
+	 * international "+CC…" form. Rules:
+	 *   - "00" international prefix  → "+"               (0035988… → +35988…)
+	 *   - already "+…"              → kept
+	 *   - leading national trunk 0  → "+" + country code (0888… → +359888…)
+	 *   - 10+ digits, no prefix     → assumed to already include a country code
+	 *   - shorter bare number       → "+" + country code prepended
+	 *
+	 * @param string $s Raw phone input.
+	 * @return string Canonical phone, or '' when empty.
+	 */
+	public static function canonical_phone( $s ) {
+		$s      = trim( (string) $s );
+		$digits = preg_replace( '/\D+/', '', $s );
+		if ( '' === $digits ) {
+			return '';
+		}
+		$cc = self::default_country_code();
+
+		if ( '00' === substr( $digits, 0, 2 ) ) {
+			return '+' . substr( $digits, 2 );
+		}
+		if ( '+' === substr( $s, 0, 1 ) ) {
+			return '+' . $digits;
+		}
+		if ( '0' === substr( $digits, 0, 1 ) ) {
+			return '+' . $cc . substr( $digits, 1 );
+		}
+		if ( strlen( $digits ) > 9 ) {
+			return '+' . $digits;
+		}
+		return '+' . $cc . $digits;
+	}
+
 	public static function normalize_name( $s ) {
 		$s = (string) $s;
 		$s = function_exists( 'mb_strtolower' ) ? mb_strtolower( $s, 'UTF-8' ) : strtolower( $s );
@@ -124,7 +169,7 @@ class Riskybuyer_Blacklist {
 			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'risky-buyer' ) );
 		}
 
-		$phone_raw  = isset( $data['phone'] ) ? trim( (string) $data['phone'] ) : '';
+		$phone_raw  = self::canonical_phone( isset( $data['phone'] ) ? $data['phone'] : '' );
 		$name_raw   = isset( $data['name'] ) ? trim( (string) $data['name'] ) : '';
 		$phone_norm = self::normalize_phone( $phone_raw );
 		$name_norm  = self::normalize_name( $name_raw );
@@ -172,7 +217,7 @@ class Riskybuyer_Blacklist {
 			$allowed['name_norm'] = self::normalize_name( $changes['name'] );
 		}
 		if ( isset( $changes['phone'] ) ) {
-			$allowed['phone_raw']  = trim( (string) $changes['phone'] );
+			$allowed['phone_raw']  = self::canonical_phone( $changes['phone'] );
 			$allowed['phone_norm'] = self::normalize_phone( $changes['phone'] );
 		}
 		if ( empty( $allowed ) ) {

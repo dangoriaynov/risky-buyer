@@ -291,7 +291,10 @@ class Riskybuyer_Admin_Page {
 	 */
 	protected function reason_options( $current = 'other' ) {
 		foreach ( Riskybuyer_Blacklist::reasons() as $code => $r ) {
-			echo '<option value="' . esc_attr( $code ) . '"' . selected( $current, $code, false ) . '>' . esc_html( $r['label'] ) . '</option>';
+			echo '<option value="' . esc_attr( $code ) . '" data-color="' . esc_attr( $r['color'] ) . '"'
+				. selected( $current, $code, false )
+				. ' style="background-color:' . esc_attr( $r['color'] ) . ';color:#fff">'
+				. esc_html( $r['label'] ) . '</option>';
 		}
 	}
 
@@ -312,7 +315,7 @@ class Riskybuyer_Admin_Page {
 		echo '<input type="text" id="rb-phone" name="phone" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></p>';
 
 		echo '<p class="rb-field"><label for="rb-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
-		echo '<select id="rb-reason" name="reason">';
+		echo '<select id="rb-reason" name="reason" class="rb-reason-color">';
 		$this->reason_options( $is_edit ? $edit_entry['reason_code'] : 'other' );
 		echo '</select></p>';
 
@@ -339,7 +342,7 @@ class Riskybuyer_Admin_Page {
 		echo '<span class="description">' . esc_html__( 'Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note below apply to the whole list. Existing entries (by phone or name) are skipped.', 'risky-buyer' ) . '</span></p>';
 
 		echo '<p class="rb-field"><label for="rb-bulk-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
-		echo '<select id="rb-bulk-reason" name="reason">';
+		echo '<select id="rb-bulk-reason" name="reason" class="rb-reason-color">';
 		$this->reason_options( 'other' );
 		echo '</select></p>';
 
@@ -357,7 +360,6 @@ class Riskybuyer_Admin_Page {
 	/* --------------------------------------------------------------------- */
 
 	protected function render_list_tab( $bl ) {
-		$reasons = Riskybuyer_Blacklist::reasons();
 		$entries = $bl->all( array( 'status' => 'active' ) );
 
 		// Instant in-browser filter (all rows are rendered; JS hides non-matching ones).
@@ -368,10 +370,8 @@ class Riskybuyer_Admin_Page {
 		echo '<option value="AND">' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
 		echo '<option value="OR">' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
 		echo '</select>';
-		echo '<select id="rb-freason"><option value="">' . esc_html__( 'All reasons', 'risky-buyer' ) . '</option>';
-		foreach ( $reasons as $code => $r ) {
-			echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $r['label'] ) . '</option>';
-		}
+		echo '<select id="rb-freason" class="rb-reason-color"><option value="" data-color="">' . esc_html__( 'All reasons', 'risky-buyer' ) . '</option>';
+		$this->reason_options( '' );
 		echo '</select>';
 		echo '<button type="button" class="button-link" id="rb-clear">' . esc_html__( 'Clear', 'risky-buyer' ) . '</button>';
 		echo '<span class="rb-count description">' . esc_html__( 'Showing', 'risky-buyer' ) . ' <span id="rb-count"></span></span>';
@@ -397,7 +397,6 @@ class Riskybuyer_Admin_Page {
 		echo '<div class="rb-settings">';
 		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'risky-buyer' ) . '</h2>';
 		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'risky-buyer' ) . '</p>';
-		echo '<p class="description">' . esc_html__( 'Data sent to the server (only if you have a write key): phone, name, reason, note, and your site domain.', 'risky-buyer' ) . '</p>';
 
 		// Settings save automatically (no page reload, no Save button).
 		echo '<p><label><input type="checkbox" id="rb-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'risky-buyer' ) . '</strong></label> <span id="rb-save-status" class="description"></span></p>';
@@ -411,10 +410,11 @@ class Riskybuyer_Admin_Page {
 		echo '<p><button type="button" class="button" id="rb-sync-now">' . esc_html__( 'Sync now', 'risky-buyer' ) . '</button> ';
 		echo '<button type="button" class="button" id="rb-push" style="display:none">' . esc_html__( 'Push my list to the server', 'risky-buyer' ) . '</button></p>';
 
-		echo '<p id="rb-sync-state">' . esc_html__( 'Last sync:', 'risky-buyer' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Cached entries:', 'risky-buyer' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
+		echo '<p id="rb-sync-state">' . esc_html__( 'Last update from the shared list:', 'risky-buyer' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Phone numbers downloaded:', 'risky-buyer' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
 		if ( ! empty( $state['last_error'] ) ) {
 			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'risky-buyer' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
 		}
+		echo '<p class="description rb-sent-note">' . esc_html__( 'Data sent to the server: phone, name, reason, note, and your site domain.', 'risky-buyer' ) . '</p>';
 		echo '</div></div>';
 	}
 
@@ -466,12 +466,14 @@ class Riskybuyer_Admin_Page {
 						),
 						admin_url( 'admin.php' )
 					);
-					echo '<a class="button button-small" href="' . esc_url( $edit_url ) . '">' . esc_html__( 'Edit', 'risky-buyer' ) . '</a> ';
+					$edit_label = __( 'Edit', 'risky-buyer' );
+					$del_label  = __( 'Delete', 'risky-buyer' );
+					echo '<a class="button button-small rb-icon" href="' . esc_url( $edit_url ) . '" title="' . esc_attr( $edit_label ) . '" aria-label="' . esc_attr( $edit_label ) . '"><span class="dashicons dashicons-edit" aria-hidden="true"></span></a> ';
 					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( __( 'Remove this entry?', 'risky-buyer' ) ) . '\');">';
 					wp_nonce_field( 'riskybuyer_admin' );
 					echo '<input type="hidden" name="riskybuyer_action" value="delete">';
 					echo '<input type="hidden" name="uuid" value="' . esc_attr( $e['uuid'] ) . '">';
-					echo '<button type="submit" class="button button-small button-link-delete">' . esc_html__( 'Delete', 'risky-buyer' ) . '</button>';
+					echo '<button type="submit" class="button button-small button-link-delete rb-icon" title="' . esc_attr( $del_label ) . '" aria-label="' . esc_attr( $del_label ) . '"><span class="dashicons dashicons-trash" aria-hidden="true"></span></button>';
 					echo '</form>';
 					echo '</td>';
 				}

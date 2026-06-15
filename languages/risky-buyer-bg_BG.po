@@ -298,3 +298,15 @@ msgstr "Изчисти"
 
 msgid "No matches for the current filter."
 msgstr "Няма съвпадения за текущия филтър."
+
+msgid "Last update from the shared list:"
+msgstr "Последно обновяване от общия списък:"
+
+msgid "Phone numbers downloaded:"
+msgstr "Изтеглени телефони:"
+
+msgid "Data sent to the server: phone, name, reason, note, and your site domain."
+msgstr "Данни, изпращани към сървъра: телефон, име, причина, бележка и домейна на сайта ви."
+
+msgid "Other orders from this buyer:"
+msgstr "Други поръчки от този клиент:"

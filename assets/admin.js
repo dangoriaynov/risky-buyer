@@ -183,9 +183,21 @@
 		$phone.val( '' );
 		$name.val( '' );
 		$op.val( 'AND' );
-		$reason.val( '' );
+		$reason.val( '' ).trigger( 'change' );
 		apply();
 	} );
 
 	apply();
+} )( jQuery );
+
+/* Color the closed reason <select> box to match the chosen reason's color. */
+( function ( $ ) {
+	'use strict';
+	function colorize() {
+		var $s = $( this );
+		var color = $s.find( 'option:selected' ).attr( 'data-color' ) || '';
+		$s[ 0 ].style.backgroundColor = color;
+		$s.toggleClass( 'rb-has-color', !! color );
+	}
+	$( 'select.rb-reason-color' ).each( colorize ).on( 'change', colorize );
 } )( jQuery );

@@ -449,3 +449,15 @@ msgstr ""
 
 msgid "No matches for the current filter."
 msgstr ""
+
+msgid "Last update from the shared list:"
+msgstr ""
+
+msgid "Phone numbers downloaded:"
+msgstr ""
+
+msgid "Data sent to the server: phone, name, reason, note, and your site domain."
+msgstr ""
+
+msgid "Other orders from this buyer:"
+msgstr ""
