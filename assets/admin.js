@@ -337,6 +337,9 @@
 	}
 
 	$q.on( 'input', function () { clearTimeout( timer ); timer = setTimeout( search, 300 ); } );
+	$q.on( 'keydown', function ( e ) {
+		if ( 'Enter' === e.key || 13 === e.keyCode ) { e.preventDefault(); clearTimeout( timer ); search(); }
+	} );
 	$q.on( 'focus', function () { if ( $results.children().length ) { $results.show(); } } );
 
 	$results.on( 'click', '.rb-cust-item', function () {

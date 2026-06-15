@@ -277,11 +277,29 @@ class Riskybuyer_Admin_Page {
 			$edit_entry = $bl->get( sanitize_text_field( wp_unslash( $_GET['edit'] ) ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 		}
 
+		if ( ! $edit_entry ) {
+			$this->render_customer_search();
+		}
+
 		$this->render_form( $edit_entry, $bl->can_manage() );
 
 		if ( ! $edit_entry ) {
 			$this->render_bulk_form();
 		}
+	}
+
+	/**
+	 * Search box (outside the add form, so Enter can't submit it) to pull a
+	 * customer from existing orders and prefill the name + phone fields.
+	 */
+	protected function render_customer_search() {
+		echo '<div class="rb-form rb-cust-search">';
+		echo '<p class="rb-field" style="margin:0">';
+		echo '<label for="rb-cust-q">' . esc_html__( 'Find a customer from your orders', 'risky-buyer' ) . '</label>';
+		echo '<span class="rb-cust-box"><input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'risky-buyer' ) . '">';
+		echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'risky-buyer' ) . '"></div></span>';
+		echo '<span class="description">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'risky-buyer' ) . '</span>';
+		echo '</p></div>';
 	}
 
 	/**
@@ -306,13 +324,6 @@ class Riskybuyer_Admin_Page {
 		echo '<input type="hidden" name="riskybuyer_action" value="' . ( $is_edit ? 'update' : 'add' ) . '">';
 		if ( $is_edit ) {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
-		}
-
-		if ( ! $is_edit ) {
-			echo '<p class="rb-field rb-cust-search"><label for="rb-cust-q">' . esc_html__( 'Find a customer from your orders', 'risky-buyer' ) . '</label>';
-			echo '<span class="rb-cust-box"><input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'risky-buyer' ) . '">';
-			echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'risky-buyer' ) . '"></div></span>';
-			echo '<span class="description">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'risky-buyer' ) . '</span></p>';
 		}
 
 		echo '<p class="rb-field"><label for="rb-name">' . esc_html__( 'Name', 'risky-buyer' ) . '</label>';
