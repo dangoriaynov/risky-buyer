@@ -178,15 +178,17 @@ class Riskybuyer_Remote_Sync {
 		} elseif ( is_array( $body ) ) {
 			$entries = $body;
 		}
-		$this->upsert_cache( $entries );
+		$counts = $this->upsert_cache( $entries );
 
-		$st              = Riskybuyer_Settings::state();
-		$st['last_sync'] = time();
+		$st               = Riskybuyer_Settings::state();
+		$st['last_sync']  = time();
 		$st['last_error'] = '';
 		if ( ! empty( $body['now'] ) ) {
 			$st['last_since'] = $body['now'];
 		}
-		$st['cached'] = $this->cache_count();
+		$st['cached']        = $this->cache_count();
+		$st['last_added']    = (int) $counts['inserted'];
+		$st['last_updated']  = (int) $counts['updated'];
 		Riskybuyer_Settings::set_state( $st );
 		return true;
 	}
@@ -195,10 +197,13 @@ class Riskybuyer_Remote_Sync {
 	 * Upsert server entries into the cache table (by uuid).
 	 *
 	 * @param array $entries Server entries.
+	 * @return array{inserted:int,updated:int} Counts of new vs. updated rows.
 	 */
 	protected function upsert_cache( $entries ) {
 		global $wpdb;
-		$t = Riskybuyer_Local_Table_Provider::cache_table();
+		$t        = Riskybuyer_Local_Table_Provider::cache_table();
+		$inserted = 0;
+		$updated  = 0;
 
 		foreach ( $entries as $e ) {
 			$uuid = isset( $e['uuid'] ) ? sanitize_text_field( $e['uuid'] ) : '';
@@ -224,11 +229,18 @@ class Riskybuyer_Remote_Sync {
 			$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$t} WHERE uuid = %s", $uuid ) );
 			if ( $exists ) {
 				$wpdb->update( $t, $row, array( 'uuid' => $uuid ) );
+				++$updated;
 			} else {
 				$wpdb->insert( $t, $row );
+				++$inserted;
 			}
 			// phpcs:enable
 		}
+
+		return array(
+			'inserted' => $inserted,
+			'updated'  => $updated,
+		);
 	}
 
 	/**

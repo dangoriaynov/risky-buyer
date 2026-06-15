@@ -393,6 +393,11 @@ class Riskybuyer_Admin_Page {
 		$state   = Riskybuyer_Settings::state();
 		$last    = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'risky-buyer' );
 		$enabled = ! empty( $s['sync_enabled'] );
+		$has_key = '' !== $s['api_key'];
+
+		$sync_label = __( 'Sync now', 'risky-buyer' );
+		$push_label = __( 'Push my list to the server', 'risky-buyer' );
+		$clear_lbl  = __( 'Clear key', 'risky-buyer' );
 
 		echo '<div class="rb-settings">';
 		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'risky-buyer' ) . '</h2>';
@@ -403,14 +408,27 @@ class Riskybuyer_Admin_Page {
 
 		echo '<div id="rb-sync-fields"' . ( $enabled ? '' : ' style="display:none"' ) . '>';
 		echo '<table class="form-table"><tbody>';
-		echo '<tr><th><label for="rb-server-url">' . esc_html__( 'Server URL', 'risky-buyer' ) . '</label></th><td><input type="url" id="rb-server-url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '"></td></tr>';
-		echo '<tr><th><label for="rb-api-key">' . esc_html__( 'API key', 'risky-buyer' ) . '</label></th><td><input type="text" id="rb-api-key" class="regular-text" value="' . esc_attr( $s['api_key'] ) . '"> <span id="rb-key-status" class="description"></span><p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'risky-buyer' ) . '</p></td></tr>';
+
+		// Server URL with inline action icons (sync = read, push = write/key only).
+		echo '<tr><th><label for="rb-server-url">' . esc_html__( 'Server URL', 'risky-buyer' ) . '</label></th><td>';
+		echo '<span class="rb-url-row">';
+		echo '<input type="url" id="rb-server-url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '">';
+		echo '<button type="button" id="rb-sync-now" class="button rb-iconbtn rb-iconbtn-sync" title="' . esc_attr( $sync_label ) . '" aria-label="' . esc_attr( $sync_label ) . '"><span class="dashicons dashicons-update" aria-hidden="true"></span></button>';
+		echo '<button type="button" id="rb-push" class="button rb-iconbtn rb-iconbtn-push" title="' . esc_attr( $push_label ) . '" aria-label="' . esc_attr( $push_label ) . '" style="display:none"><span class="dashicons dashicons-upload" aria-hidden="true"></span></button>';
+		echo '</span> <span id="rb-sync-msg" class="description"></span>';
+		echo '</td></tr>';
+
+		// API key — locked (grey, read-only) once a key is set; red ✕ clears it.
+		echo '<tr><th><label for="rb-api-key">' . esc_html__( 'API key', 'risky-buyer' ) . '</label></th><td>';
+		echo '<span class="rb-key-wrap"><input type="text" id="rb-api-key" class="regular-text' . ( $has_key ? ' rb-locked' : '' ) . '" value="' . esc_attr( $s['api_key'] ) . '"' . ( $has_key ? ' readonly' : '' ) . '>';
+		echo '<button type="button" id="rb-key-clear" class="rb-key-clear" title="' . esc_attr( $clear_lbl ) . '" aria-label="' . esc_attr( $clear_lbl ) . '"' . ( $has_key ? '' : ' style="display:none"' ) . '>✕</button></span> ';
+		echo '<span id="rb-key-status" class="description"></span>';
+		echo '<p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'risky-buyer' ) . '</p></td></tr>';
 		echo '</tbody></table>';
 
-		echo '<p><button type="button" class="button" id="rb-sync-now">' . esc_html__( 'Sync now', 'risky-buyer' ) . '</button> ';
-		echo '<button type="button" class="button" id="rb-push" style="display:none">' . esc_html__( 'Push my list to the server', 'risky-buyer' ) . '</button></p>';
-
-		echo '<p id="rb-sync-state">' . esc_html__( 'Last update from the shared list:', 'risky-buyer' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ' . esc_html__( 'Phone numbers downloaded:', 'risky-buyer' ) . ' <strong>' . (int) $state['cached'] . '</strong></p>';
+		echo '<p id="rb-sync-state">' . esc_html__( 'Last update from the shared list:', 'risky-buyer' ) . ' <strong>' . esc_html( $last ) . '</strong> &nbsp; ';
+		echo esc_html__( 'Phone numbers downloaded:', 'risky-buyer' ) . ' <strong id="rb-cached-count">' . (int) $state['cached'] . '</strong> &nbsp; ';
+		echo esc_html__( 'New in last sync:', 'risky-buyer' ) . ' <strong id="rb-added-count">' . (int) $state['last_added'] . '</strong></p>';
 		if ( ! empty( $state['last_error'] ) ) {
 			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'risky-buyer' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
 		}
@@ -424,15 +442,25 @@ class Riskybuyer_Admin_Page {
 	 * @param array $entries      Entries.
 	 * @param bool  $with_actions Show actions column.
 	 */
+	/**
+	 * A sortable column header (click to sort client-side).
+	 *
+	 * @param string $label Header label.
+	 * @param string $key   Sort key.
+	 */
+	protected function sortable_th( $label, $key ) {
+		echo '<th class="rb-sortable" data-sort="' . esc_attr( $key ) . '"><span class="rb-th-label">' . esc_html( $label ) . '</span><span class="rb-sort-ind" aria-hidden="true"></span></th>';
+	}
+
 	protected function render_entries_table( $entries, $with_actions ) {
 		echo '<table id="rb-list" class="wp-list-table widefat fixed striped rb-table"><thead><tr>';
-		echo '<th>' . esc_html__( 'Name', 'risky-buyer' ) . '</th>';
-		echo '<th>' . esc_html__( 'Phone', 'risky-buyer' ) . '</th>';
-		echo '<th>' . esc_html__( 'Reason', 'risky-buyer' ) . '</th>';
-		echo '<th>' . esc_html__( 'Note', 'risky-buyer' ) . '</th>';
-		echo '<th>' . esc_html__( 'Source', 'risky-buyer' ) . '</th>';
-		echo '<th>' . esc_html__( 'Added by', 'risky-buyer' ) . '</th>';
-		echo '<th>' . esc_html__( 'Date', 'risky-buyer' ) . '</th>';
+		$this->sortable_th( __( 'Name', 'risky-buyer' ), 'name' );
+		$this->sortable_th( __( 'Phone', 'risky-buyer' ), 'phone' );
+		$this->sortable_th( __( 'Reason', 'risky-buyer' ), 'reason' );
+		$this->sortable_th( __( 'Note', 'risky-buyer' ), 'note' );
+		$this->sortable_th( __( 'Source', 'risky-buyer' ), 'source' );
+		$this->sortable_th( __( 'Added by', 'risky-buyer' ), 'addedby' );
+		$this->sortable_th( __( 'Date', 'risky-buyer' ), 'date' );
 		if ( $with_actions ) {
 			echo '<th>' . esc_html__( 'Actions', 'risky-buyer' ) . '</th>';
 		}
@@ -448,7 +476,7 @@ class Riskybuyer_Admin_Page {
 				$date   = ! empty( $e['created_at'] ) ? mysql2date( 'd.m.Y H:i', $e['created_at'] ) : '';
 				$dname  = function_exists( 'mb_strtolower' ) ? mb_strtolower( (string) $e['name_raw'], 'UTF-8' ) : strtolower( (string) $e['name_raw'] );
 				$dphone = preg_replace( '/\D+/', '', (string) $e['phone_raw'] );
-				echo '<tr class="rb-row" data-name="' . esc_attr( $dname ) . '" data-phone="' . esc_attr( $dphone ) . '" data-reason="' . esc_attr( $e['reason_code'] ) . '">';
+				echo '<tr class="rb-row" data-name="' . esc_attr( $dname ) . '" data-phone="' . esc_attr( $dphone ) . '" data-reason="' . esc_attr( $e['reason_code'] ) . '" data-ts="' . esc_attr( (string) $e['created_at'] ) . '">';
 				echo '<td>' . esc_html( $e['name_raw'] ) . '</td>';
 				echo '<td>' . esc_html( $e['phone_raw'] ) . '</td>';
 				echo '<td><span class="rb-pill" style="background:' . esc_attr( $color ) . '">' . esc_html( $label ) . '</span></td>';

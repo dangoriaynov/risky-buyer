@@ -461,3 +461,12 @@ msgstr ""
 
 msgid "Other orders from this buyer:"
 msgstr ""
+
+msgid "Clear key"
+msgstr ""
+
+msgid "New in last sync:"
+msgstr ""
+
+msgid "Sync done: %1$d new (%2$d total downloaded)."
+msgstr ""

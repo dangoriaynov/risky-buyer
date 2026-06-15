@@ -310,3 +310,12 @@ msgstr "Данни, изпращани към сървъра: телефон, и
 
 msgid "Other orders from this buyer:"
 msgstr "Други поръчки от този клиент:"
+
+msgid "Clear key"
+msgstr "Изчисти ключа"
+
+msgid "New in last sync:"
+msgstr "Нови при последната синхронизация:"
+
+msgid "Sync done: %1$d new (%2$d total downloaded)."
+msgstr "Синхронизацията завърши: %1$d нови (%2$d общо изтеглени)."

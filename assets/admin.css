@@ -111,6 +111,27 @@
 .rb-wrap .button-link-delete {
 	color: #b32d2e;
 }
+/* Sortable column headers. */
+.rb-wrap .rb-table th.rb-sortable {
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+.rb-wrap .rb-table th.rb-sortable:hover {
+	color: #2271b1;
+}
+.rb-wrap .rb-table th.rb-sortable .rb-sort-ind {
+	display: inline-block;
+	width: 1em;
+	color: #2271b1;
+	font-size: 11px;
+}
+.rb-wrap .rb-table th.rb-sort-asc .rb-sort-ind::after {
+	content: "▲";
+}
+.rb-wrap .rb-table th.rb-sort-desc .rb-sort-ind::after {
+	content: "▼";
+}
 /* Color-coded reason <select> (closed box reflects the chosen reason). */
 .rb-wrap select.rb-has-color {
 	color: #fff;
@@ -136,4 +157,69 @@
 }
 .rb-settings .form-table th {
 	width: 140px;
+}
+
+/* Server URL row with inline action icons. */
+.rb-settings .rb-url-row {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	vertical-align: middle;
+}
+.rb-settings .rb-iconbtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 30px;
+	padding: 0;
+}
+.rb-settings .rb-iconbtn .dashicons {
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	line-height: 1;
+}
+.rb-settings .rb-iconbtn-sync {
+	color: #2271b1;
+	border-color: #2271b1;
+}
+.rb-settings .rb-iconbtn-sync:hover {
+	background: #2271b1;
+	color: #fff;
+}
+.rb-settings .rb-iconbtn-push {
+	color: #1a7a3c;
+	border-color: #1a7a3c;
+}
+.rb-settings .rb-iconbtn-push:hover {
+	background: #1a7a3c;
+	color: #fff;
+}
+
+/* API key: locked (grey) when valid + red ✕ to clear. */
+.rb-settings .rb-key-wrap {
+	display: inline-flex;
+	align-items: center;
+	vertical-align: middle;
+}
+.rb-settings #rb-api-key.rb-locked {
+	background: #f0f0f1;
+	color: #50575e;
+	border-color: #dcdcde;
+}
+.rb-settings .rb-key-clear {
+	border: 0;
+	background: transparent;
+	color: #b32d2e;
+	cursor: pointer;
+	font-size: 15px;
+	line-height: 1;
+	padding: 4px 8px;
+}
+.rb-settings .rb-key-clear:hover {
+	color: #8a1f1f;
+}
+#rb-sync-msg {
+	font-weight: 600;
 }

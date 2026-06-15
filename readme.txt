@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.3
+Stable tag: 0.6.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,12 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.4 =
+* Settings: the API key locks (grey, read-only) once validated for this site, with a red x to clear it; it is checked once (on entry/load), not continuously.
+* Settings: Sync now / Push are color-coded icon buttons next to the server URL; Push appears only with a valid write key; both save settings first.
+* Sync status now shows how many entries are new in the last sync, not just the total downloaded.
+* List: click any column header to sort (default: date, newest first).
 
 = 0.6.3 =
 * Phone numbers are normalized on save to international +CC form (00 -> +, national leading 0 -> country code; default +359, filterable).

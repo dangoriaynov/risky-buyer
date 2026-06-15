@@ -61,10 +61,12 @@ class Riskybuyer_Settings {
 
 	public static function state() {
 		$d = array(
-			'last_sync'  => 0,
-			'last_since' => '',
-			'cached'     => 0,
-			'last_error' => '',
+			'last_sync'    => 0,
+			'last_since'   => '',
+			'cached'       => 0,
+			'last_added'   => 0,
+			'last_updated' => 0,
+			'last_error'   => '',
 		);
 		$s = get_option( self::STATE, array() );
 		return wp_parse_args( is_array( $s ) ? $s : array(), $d );

@@ -64,8 +64,14 @@ class Riskybuyer_Ajax {
 		$ok = Riskybuyer_Remote_Sync::instance()->pull();
 		$st = Riskybuyer_Settings::state();
 		if ( $ok ) {
-			/* translators: %d: number of cached entries */
-			wp_send_json_success( array( 'message' => sprintf( __( 'Sync done: %d entries cached.', 'risky-buyer' ), (int) $st['cached'] ) ) );
+			wp_send_json_success(
+				array(
+					/* translators: 1: new entries this sync, 2: total downloaded */
+					'message' => sprintf( __( 'Sync done: %1$d new (%2$d total downloaded).', 'risky-buyer' ), (int) $st['last_added'], (int) $st['cached'] ),
+					'cached'  => (int) $st['cached'],
+					'added'   => (int) $st['last_added'],
+				)
+			);
 		}
 		/* translators: %s: error message */
 		wp_send_json_error( array( 'message' => sprintf( __( 'Sync error: %s', 'risky-buyer' ), $st['last_error'] ) ) );

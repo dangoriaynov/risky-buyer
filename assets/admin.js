@@ -56,13 +56,20 @@
 	} );
 } )( jQuery );
 
-/* Settings tab — auto-save (no reload), key validation, sync/push. */
+/* Settings tab — validate-once key (locks when valid), clear, sync/push icons. */
 ( function ( $ ) {
 	'use strict';
 	var $en = $( '#rb-sync-enabled' );
 	if ( ! $en.length ) {
 		return;
 	}
+
+	var $url = $( '#rb-server-url' );
+	var $key = $( '#rb-api-key' );
+	var $clear = $( '#rb-key-clear' );
+	var $keyStatus = $( '#rb-key-status' );
+	var $push = $( '#rb-push' );
+	var $msg = $( '#rb-sync-msg' );
 
 	function post( action, data ) {
 		data = data || {};
@@ -74,57 +81,109 @@
 	function gather() {
 		return {
 			sync_enabled: $en.is( ':checked' ) ? 1 : 0,
-			server_url: $( '#rb-server-url' ).val() || '',
-			api_key: $( '#rb-api-key' ).val() || ''
+			server_url: $url.val() || '',
+			api_key: $key.val() || ''
 		};
 	}
 
-	function save( cb ) {
-		$( '#rb-save-status' ).text( RiskyBuyerData.i18n.saving );
-		post( 'riskybuyer_save_settings', gather() ).done( function () {
-			$( '#rb-save-status' ).text( RiskyBuyerData.i18n.saved );
-			setTimeout( function () { $( '#rb-save-status' ).text( '' ); }, 1500 );
-			if ( cb ) { cb(); }
-		} ).fail( function () { $( '#rb-save-status' ).text( RiskyBuyerData.i18n.error ); } );
+	function save() {
+		$( '#rb-save-status' ).css( 'color', '' ).text( RiskyBuyerData.i18n.saving );
+		return post( 'riskybuyer_save_settings', gather() )
+			.done( function () {
+				$( '#rb-save-status' ).css( 'color', '#1a7a3c' ).text( RiskyBuyerData.i18n.saved );
+				setTimeout( function () { $( '#rb-save-status' ).text( '' ); }, 1800 );
+			} )
+			.fail( function () { $( '#rb-save-status' ).css( 'color', '#b32d2e' ).text( RiskyBuyerData.i18n.error ); } );
 	}
 
-	function validate() {
-		$( '#rb-push' ).hide();
-		var key = $( '#rb-api-key' ).val();
-		if ( ! $en.is( ':checked' ) || ! key ) { $( '#rb-key-status' ).text( '' ); return; }
-		$( '#rb-key-status' ).css( 'color', '' ).text( RiskyBuyerData.i18n.checking );
-		post( 'riskybuyer_validate_key', { server_url: $( '#rb-server-url' ).val(), api_key: key } )
+	function lock() { $key.prop( 'readonly', true ).addClass( 'rb-locked' ); $clear.show(); }
+	function unlock() { $key.prop( 'readonly', false ).removeClass( 'rb-locked' ); $push.hide(); }
+
+	function showInvalid() {
+		$keyStatus.css( 'color', '#b32d2e' ).text( '✗ ' + RiskyBuyerData.i18n.key_invalid );
+		unlock();
+	}
+
+	// Validate the key once (no continuous checking). On success: save + lock + reveal write actions.
+	function validate( afterValid ) {
+		var key = $key.val();
+		if ( ! $en.is( ':checked' ) || ! key ) {
+			$keyStatus.text( '' );
+			$push.hide();
+			$clear.toggle( !! key );
+			return;
+		}
+		$clear.show();
+		$keyStatus.css( 'color', '' ).text( RiskyBuyerData.i18n.checking );
+		post( 'riskybuyer_validate_key', { server_url: $url.val(), api_key: key } )
 			.done( function ( r ) {
 				if ( r && r.success && r.data && r.data.valid ) {
-					$( '#rb-key-status' ).css( 'color', '#1a7a3c' ).text( '✓ ' + ( r.data.domain || '' ) + ' (' + r.data.scope + ')' );
-					if ( r.data.scope === 'write' ) { $( '#rb-push' ).show(); }
+					$keyStatus.css( 'color', '#1a7a3c' ).text( '✓ ' + ( r.data.domain || '' ) + ' (' + r.data.scope + ')' );
+					lock();
+					$push.toggle( r.data.scope === 'write' );
+					if ( afterValid ) { afterValid(); }
 				} else {
-					$( '#rb-key-status' ).css( 'color', '#b32d2e' ).text( '✗ ' + RiskyBuyerData.i18n.key_invalid );
+					showInvalid();
 				}
 			} )
-			.fail( function () { $( '#rb-key-status' ).css( 'color', '#b32d2e' ).text( '✗ ' + RiskyBuyerData.i18n.key_invalid ); } );
+			.fail( showInvalid );
 	}
 
-	$en.on( 'change', function () { $( '#rb-sync-fields' ).toggle( $en.is( ':checked' ) ); save( validate ); } );
-	$( '#rb-server-url, #rb-api-key' ).on( 'change', function () { save( validate ); } );
-
-	$( document ).on( 'click', '#rb-sync-now', function () {
-		var $b = $( this ).prop( 'disabled', true );
-		post( 'riskybuyer_sync_now', {} ).done( function ( r ) {
-			window.alert( ( r && r.data && r.data.message ) || RiskyBuyerData.i18n.error );
-			location.reload();
-		} ).fail( function () { window.alert( RiskyBuyerData.i18n.error ); $b.prop( 'disabled', false ); } );
+	$en.on( 'change', function () {
+		$( '#rb-sync-fields' ).toggle( $en.is( ':checked' ) );
+		save();
+		if ( $en.is( ':checked' ) ) { validate(); } else { $push.hide(); }
 	} );
 
-	$( document ).on( 'click', '#rb-push', function () {
-		var $b = $( this ).prop( 'disabled', true );
-		post( 'riskybuyer_push', {} ).done( function ( r ) {
-			window.alert( ( r && r.data && r.data.message ) || RiskyBuyerData.i18n.error );
-			$b.prop( 'disabled', false );
-		} ).fail( function () { window.alert( RiskyBuyerData.i18n.error ); $b.prop( 'disabled', false ); } );
+	$url.on( 'change', function () {
+		save();
+		if ( $key.val() ) { unlock(); validate(); }
 	} );
 
-	if ( $en.is( ':checked' ) && $( '#rb-api-key' ).val() ) { validate(); }
+	// Validate only when the user finishes editing the key (blur/change), never per keystroke.
+	$key.on( 'change', function () {
+		if ( ! $key.val() ) {
+			$keyStatus.text( '' );
+			$push.hide();
+			$clear.hide();
+			save();
+			return;
+		}
+		validate( save );
+	} );
+
+	// Red ✕ — clear the key and disable key-only actions.
+	$clear.on( 'click', function () {
+		$key.val( '' ).prop( 'readonly', false ).removeClass( 'rb-locked' ).focus();
+		$keyStatus.text( '' );
+		$push.hide();
+		$clear.hide();
+		save();
+	} );
+
+	// Sync/Push always persist current settings first, then act (avoids using a stale key).
+	function runAfterSave( action, $btn ) {
+		$btn.prop( 'disabled', true );
+		$msg.css( 'color', '' ).text( RiskyBuyerData.i18n.saving );
+		save().always( function () {
+			post( action, {} )
+				.done( function ( r ) {
+					var ok = r && r.success;
+					$msg.css( 'color', ok ? '#1a7a3c' : '#b32d2e' ).text( ( r && r.data && r.data.message ) || RiskyBuyerData.i18n.error );
+					if ( ok && r.data ) {
+						if ( typeof r.data.cached !== 'undefined' ) { $( '#rb-cached-count' ).text( r.data.cached ); }
+						if ( typeof r.data.added !== 'undefined' ) { $( '#rb-added-count' ).text( r.data.added ); }
+					}
+				} )
+				.fail( function () { $msg.css( 'color', '#b32d2e' ).text( RiskyBuyerData.i18n.error ); } )
+				.always( function () { $btn.prop( 'disabled', false ); } );
+		} );
+	}
+	$( document ).on( 'click', '#rb-sync-now', function () { runAfterSave( 'riskybuyer_sync_now', $( this ) ); } );
+	$( document ).on( 'click', '#rb-push', function () { runAfterSave( 'riskybuyer_push', $( this ) ); } );
+
+	// On load: validate a saved key once (locks if valid, unlocks if not).
+	if ( $en.is( ':checked' ) && $key.val() ) { validate(); } else { $clear.toggle( !! $key.val() ); }
 } )( jQuery );
 
 /* List tab — instant in-browser filtering (no reload, no AJAX). */
@@ -186,6 +245,47 @@
 		$reason.val( '' ).trigger( 'change' );
 		apply();
 	} );
+
+	// Click-to-sort column headers (default: date, newest first).
+	var $headers = $table.find( 'thead th.rb-sortable' );
+	var $tbody = $table.find( 'tbody' );
+	var sortKey = 'date';
+	var sortDir = 'desc';
+
+	function cellValue( row, key, idx ) {
+		if ( 'date' === key ) { return row.getAttribute( 'data-ts' ) || ''; }
+		if ( 'phone' === key ) { return digits( row.getAttribute( 'data-phone' ) || '' ); }
+		if ( 'name' === key ) { return row.getAttribute( 'data-name' ) || ''; }
+		if ( 'reason' === key ) { return row.getAttribute( 'data-reason' ) || ''; }
+		var cell = row.children[ idx ];
+		return cell ? cell.textContent.trim().toLowerCase() : '';
+	}
+
+	function doSort( key, idx, dir ) {
+		var rows = $rows.get();
+		rows.sort( function ( a, b ) {
+			var va = cellValue( a, key, idx );
+			var vb = cellValue( b, key, idx );
+			if ( va === vb ) { return 0; }
+			var r = va > vb ? 1 : -1;
+			return 'asc' === dir ? r : -r;
+		} );
+		rows.forEach( function ( r ) { $tbody[ 0 ].appendChild( r ); } );
+		if ( $nomatch.length ) { $tbody[ 0 ].appendChild( $nomatch[ 0 ] ); }
+		$headers.removeClass( 'rb-sort-asc rb-sort-desc' );
+		$headers.filter( '[data-sort="' + key + '"]' ).addClass( 'asc' === dir ? 'rb-sort-asc' : 'rb-sort-desc' );
+	}
+
+	$headers.on( 'click', function () {
+		var key = this.getAttribute( 'data-sort' );
+		var idx = $( this ).index();
+		sortDir = ( sortKey === key && 'asc' === sortDir ) ? 'desc' : 'asc';
+		sortKey = key;
+		doSort( key, idx, sortDir );
+	} );
+
+	// Reflect the default order (rows arrive newest-first from the server).
+	$headers.filter( '[data-sort="date"]' ).addClass( 'rb-sort-desc' );
 
 	apply();
 } )( jQuery );
