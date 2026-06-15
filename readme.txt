@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.7
+Stable tag: 0.6.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,9 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.8 =
+* Add tab: nicer "Add one client" / "Bulk add" buttons (card style, accent icons, hover lift, solid active state).
 
 = 0.6.7 =
 * Fixed: the customer search dropdown now appears (its results box was nested in a <p>, which browsers auto-close before block elements, breaking positioning). Added a loading spinner and an error state.

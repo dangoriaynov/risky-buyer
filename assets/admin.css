@@ -137,23 +137,54 @@
 	color: #b32d2e;
 }
 
-/* Add tab — reveal-on-click form toggles. */
+/* Add tab — reveal-on-click form toggles (prominent card buttons). */
 .rb-wrap .rb-add-toggles {
 	display: flex;
 	flex-wrap: wrap;
+	gap: 12px;
+	margin: 18px 0;
+}
+.rb-wrap .rb-toggle.button {
+	display: inline-flex;
+	align-items: center;
 	gap: 10px;
-	margin: 16px 0;
+	height: auto;
+	min-height: 0;
+	padding: 14px 22px;
+	font-size: 14px;
+	font-weight: 600;
+	line-height: 1.2;
+	color: #1d2327;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 10px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .04);
+	transition: border-color .15s, box-shadow .15s, transform .15s, background .15s, color .15s;
+}
+.rb-wrap .rb-toggle.button:hover,
+.rb-wrap .rb-toggle.button:focus {
+	border-color: #2271b1;
+	color: #2271b1;
+	background: #fff;
+	box-shadow: 0 4px 12px rgba(34, 113, 177, .15);
+	transform: translateY(-1px);
 }
 .rb-wrap .rb-toggle .dashicons {
-	width: 18px;
-	height: 18px;
-	font-size: 18px;
-	vertical-align: text-bottom;
-	margin-right: 2px;
+	width: 22px;
+	height: 22px;
+	font-size: 22px;
+	margin: 0;
+	color: #2271b1;
 }
-.rb-wrap .rb-toggle.rb-toggle-active {
+.rb-wrap .rb-toggle.rb-toggle-active,
+.rb-wrap .rb-toggle.rb-toggle-active:hover,
+.rb-wrap .rb-toggle.rb-toggle-active:focus {
 	background: #2271b1;
 	border-color: #2271b1;
+	color: #fff;
+	box-shadow: 0 4px 12px rgba(34, 113, 177, .25);
+}
+.rb-wrap .rb-toggle.rb-toggle-active .dashicons {
 	color: #fff;
 }
 
