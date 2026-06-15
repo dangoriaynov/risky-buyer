@@ -59,19 +59,21 @@ class Riskybuyer_Ajax {
 		$hpos   = class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil' )
 			&& \Automattic\WooCommerce\Utilities\OrderUtil::custom_orders_table_usage_is_enabled();
 
+		// Pull recent matching billing rows per order, then group in PHP.
 		// phpcs:disable PluginCheck.Security.DirectDB.UnescapedDBParameter, WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL, WordPress.DB.PreparedSQLPlaceholders
 		if ( $hpos ) {
 			$addr = $wpdb->prefix . 'wc_order_addresses';
+			$ord  = $wpdb->prefix . 'wc_orders';
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT first_name, last_name, phone, MAX(order_id) AS oid
-					FROM {$addr}
-					WHERE address_type = 'billing'
-					AND ( CONCAT_WS(' ', first_name, last_name) LIKE %s
-						OR REPLACE(REPLACE(REPLACE(phone,' ',''),'-',''),'+','') LIKE %s )
-					GROUP BY first_name, last_name, phone
-					ORDER BY oid DESC
-					LIMIT 10",
+					"SELECT a.order_id AS oid, a.first_name, a.last_name, a.phone
+					FROM {$addr} a
+					INNER JOIN {$ord} o ON o.id = a.order_id
+					WHERE a.address_type = 'billing' AND o.type = 'shop_order'
+					AND ( CONCAT_WS(' ', a.first_name, a.last_name) LIKE %s
+						OR REPLACE(REPLACE(REPLACE(a.phone,' ',''),'-',''),'+','') LIKE %s )
+					ORDER BY a.order_id DESC
+					LIMIT 80",
 					$like,
 					$plike
 				),
@@ -80,17 +82,16 @@ class Riskybuyer_Ajax {
 		} else {
 			$rows = $wpdb->get_results(
 				$wpdb->prepare(
-					"SELECT
+					"SELECT post_id AS oid,
 						MAX(CASE WHEN meta_key = '_billing_first_name' THEN meta_value END) AS first_name,
 						MAX(CASE WHEN meta_key = '_billing_last_name' THEN meta_value END) AS last_name,
-						MAX(CASE WHEN meta_key = '_billing_phone' THEN meta_value END) AS phone,
-						post_id AS oid
+						MAX(CASE WHEN meta_key = '_billing_phone' THEN meta_value END) AS phone
 					FROM {$wpdb->postmeta}
 					WHERE meta_key IN ('_billing_first_name', '_billing_last_name', '_billing_phone')
 					GROUP BY post_id
 					HAVING ( CONCAT_WS(' ', first_name, last_name) LIKE %s OR phone LIKE %s )
-					ORDER BY oid DESC
-					LIMIT 10",
+					ORDER BY post_id DESC
+					LIMIT 80",
 					$like,
 					$plike
 				),
@@ -99,23 +100,57 @@ class Riskybuyer_Ajax {
 		}
 		// phpcs:enable
 
-		$out  = array();
-		$seen = array();
+		// Group into distinct customers (by normalized phone, else normalized name);
+		// keep the most recent name and collect their order ids.
+		$groups = array();
+		$order  = array();
 		foreach ( (array) $rows as $r ) {
 			$name  = trim( (string) $r['first_name'] . ' ' . (string) $r['last_name'] );
 			$phone = trim( (string) $r['phone'] );
 			if ( '' === $name && '' === $phone ) {
 				continue;
 			}
-			$dedup = mb_strtolower( $name ) . '|' . preg_replace( '/\D+/', '', $phone );
-			if ( isset( $seen[ $dedup ] ) ) {
-				continue;
+			$pn  = Riskybuyer_Blacklist::normalize_phone( $phone );
+			$key = '' !== $pn ? 'p:' . $pn : 'n:' . mb_strtolower( $name );
+
+			if ( ! isset( $groups[ $key ] ) ) {
+				if ( count( $groups ) >= 10 ) {
+					continue;
+				}
+				$groups[ $key ] = array(
+					'name'   => $name,
+					'phone'  => $phone,
+					'orders' => array(),
+				);
+				$order[]        = $key;
 			}
-			$seen[ $dedup ] = true;
-			$out[]          = array(
-				'name'  => $name,
+			if ( count( $groups[ $key ]['orders'] ) < 8 ) {
+				$groups[ $key ]['orders'][] = (int) $r['oid'];
+			}
+		}
+
+		$out = array();
+		foreach ( $order as $key ) {
+			$g     = $groups[ $key ];
+			$phone = Riskybuyer_Blacklist::canonical_phone( $g['phone'] );
+			$nums  = array();
+			foreach ( $g['orders'] as $oid ) {
+				$o = function_exists( 'wc_get_order' ) ? wc_get_order( $oid ) : null;
+				if ( $o ) {
+					$nums[] = '#' . $o->get_order_number();
+				}
+			}
+			$label = $g['name'];
+			if ( '' !== $phone ) {
+				$label .= ' · ' . $phone;
+			}
+			if ( $nums ) {
+				$label .= ' (' . implode( ', ', $nums ) . ')';
+			}
+			$out[] = array(
+				'name'  => $g['name'],
 				'phone' => $phone,
-				'label' => trim( $name . ( '' !== $phone ? ' · ' . $phone : '' ) ),
+				'label' => $label,
 			);
 		}
 		return $out;
