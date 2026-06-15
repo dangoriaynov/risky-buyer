@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.10
+Stable tag: 0.6.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -93,6 +93,9 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 0.6.11 =
+* Add tab: fixed the icon vertical alignment on the "Add one client" / "Bulk add" buttons (dashicons now sit level with the text).
 
 = 0.6.10 =
 * Settings: the "data sent to the server" note and the sync status (last update / downloaded / new) now appear as hover tooltips behind small info / help icons next to the enable-sync checkbox, instead of permanent paragraphs.
