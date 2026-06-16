@@ -78,7 +78,8 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
 1. List tab — flagged buyers with instant phone/name search (AND/OR), reason filter and click-to-sort columns.
 2. Add tab — add one buyer or in bulk, or pick an existing customer from your orders.
 3. Settings — opt-in synchronization with the central shared list.
-4. Order screen — a flagged risky buyer (warning banner with links to their other orders) and the list badge.
+4. Order edit screen — a prominent warning banner and a side panel when the buyer is flagged.
+5. WooCommerce orders list — a warning badge on a flagged buyer's order (works across pagination; HPOS and legacy).
 
 == External services ==
 
