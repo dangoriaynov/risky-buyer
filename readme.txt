@@ -1,10 +1,10 @@
-=== RiskyBuyer ===
-Contributors: dangoriaynov
+=== Risky Buyer ===
+Contributors: winter2007d
 Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 0.6.11
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,27 +12,34 @@ Flag problematic WooCommerce customers by phone or name and automatically mark t
 
 == Description ==
 
-RiskyBuyer lets your team keep a shared list of problematic customers
-(uncollected COD shipments, fake orders, abusive behaviour, etc.) and flags
-their orders right in the WooCommerce orders list.
+Risky Buyer lets your team keep a list of problematic customers (uncollected COD
+shipments, fake orders, abusive behaviour, etc.) and flags their orders right in
+the WooCommerce orders list.
 
 Each entry is a phone and/or a name, with a reason and an optional note. When a
 customer's order matches an entry (by normalized phone OR name), the order row
 is highlighted with a warning badge — and you get a clear warning panel on the
-order edit screen.
+order edit screen, with quick links to that buyer's other orders.
 
 = Features =
 
-* **Check tab** — look up a caller by phone and/or name. Shows an exact match
-  (definitive) plus possible (partial) matches for manual verification.
+* **Searchable, sortable list** — one table of flagged buyers. Filter by phone
+  and/or name (with an AND/OR toggle) and by reason, and sort by any column —
+  all instantly in the browser.
 * **Orders list flagging** — a warning badge and colored bar on orders of
   blacklisted customers. Computed server-side, so it works across pagination.
   Supports both HPOS (the new orders screen) and the legacy screen.
-* **Order edit panel** — a warning when the customer is blacklisted, or a
-  "mark client" form otherwise.
-* **Add one or in bulk** — add a single client, or paste a list (one per line).
-* **Roles** — the team can add (capability `edit_shop_orders`); only
+* **Order edit panel** — a warning when the buyer is blacklisted (with links to
+  their other orders on your site), or a one-click "mark client" form otherwise.
+* **Add one or in bulk** — add a single buyer or paste a list (one per line). You
+  can also search your existing customers (by name or phone, taken from your
+  orders) and pick one to fill the form.
+* **Phone normalization** — numbers are stored in international "+CC" form, so the
+  same person matches across formatting differences.
+* **Roles** — anyone who can edit orders (`edit_shop_orders`) can add; only
   administrators (`manage_options`) can edit or delete.
+* **Optional shared list** — opt-in synchronization with a central service (see
+  the "External services" section), off by default.
 
 = Architecture =
 
@@ -68,11 +75,10 @@ Anyone who can edit orders (`edit_shop_orders`) can add. Only administrators
 
 == Screenshots ==
 
-1. Check tab — look up a buyer by phone and/or name (exact + possible matches).
-2. List tab — the shared blacklist with phone/name search and an AND/OR toggle.
-3. Add tab — add one buyer or paste many at once.
-4. Settings — opt-in synchronization with the central list.
-5. Order screen — a flagged risky buyer (banner + list badge).
+1. List tab — flagged buyers with instant phone/name search (AND/OR), reason filter and click-to-sort columns.
+2. Add tab — add one buyer or in bulk, or pick an existing customer from your orders.
+3. Settings — opt-in synchronization with the central shared list.
+4. Order screen — a flagged risky buyer (warning banner with links to their other orders) and the list badge.
 
 == External services ==
 
@@ -93,6 +99,9 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 1.0.0 =
+* First public release.
 
 = 0.6.11 =
 * Add tab: fixed the icon vertical alignment on the "Add one client" / "Bulk add" buttons (dashicons now sit level with the text).
