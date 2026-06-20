@@ -346,6 +346,10 @@ msgstr ""
 msgid "Mark client"
 msgstr ""
 
+#: includes/admin/class-riskybuyer-order-metabox.php:224
+msgid "Mark as problematic"
+msgstr ""
+
 #: includes/admin/class-riskybuyer-order-metabox.php:159
 msgid "You do not have permission to mark clients."
 msgstr ""
