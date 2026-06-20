@@ -4,7 +4,7 @@ Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -100,6 +100,9 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 1.0.1 =
+* Order screen: the "Risky buyer" box now shows a single "Mark as problematic" button and reveals the reason/note form only when you click it — less clutter on every order.
 
 = 1.0.0 =
 * First public release.
