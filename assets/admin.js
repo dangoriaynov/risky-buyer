@@ -32,6 +32,10 @@
 			} );
 	} );
 
+	$( document ).on( 'click', '.rb-reveal-mark', function () {
+		$( this ).hide().siblings( '.rb-mark-form' ).show().find( '.rb-reason' ).trigger( 'focus' );
+	} );
+
 	$( document ).on( 'click', '.rb-unmark-btn', function ( e ) {
 		e.preventDefault();
 		if ( ! window.confirm( RiskyBuyerData.i18n.confirm_remove ) ) {

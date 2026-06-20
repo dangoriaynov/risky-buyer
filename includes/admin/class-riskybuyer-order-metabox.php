@@ -221,6 +221,8 @@ class Riskybuyer_Order_Metabox {
 			}
 			echo '</div>';
 		} elseif ( $bl->can_add() ) {
+			echo '<button type="button" class="button button-primary rb-reveal-mark">' . esc_html__( 'Mark as problematic', 'risky-buyer' ) . '</button>';
+			echo '<div class="rb-mark-form" style="display:none;">';
 			echo '<p>' . esc_html__( 'Mark this client as problematic (by name and phone from the order).', 'risky-buyer' ) . '</p>';
 			echo '<p><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '<br><select class="rb-reason widefat">';
 			foreach ( Riskybuyer_Blacklist::reasons() as $code => $r ) {
@@ -229,6 +231,7 @@ class Riskybuyer_Order_Metabox {
 			echo '</select></label></p>';
 			echo '<p><label>' . esc_html__( 'Note (optional)', 'risky-buyer' ) . '<br><textarea class="rb-note-input widefat" rows="2"></textarea></label></p>';
 			echo '<button type="button" class="button button-primary rb-mark-btn">' . esc_html__( 'Mark client', 'risky-buyer' ) . '</button>';
+			echo '</div>';
 		} else {
 			echo '<p><em>' . esc_html__( 'You do not have permission to mark clients.', 'risky-buyer' ) . '</em></p>';
 		}
