@@ -3,7 +3,8 @@
  * Marks orders of blacklisted clients in the orders list table.
  *
  * Visual language is intentionally different from any "duplicate" marker:
- * a warning badge + a left colour bar (no full-row outline).
+ * a warning badge + a left colour bar (no full-row outline). The badge/bar
+ * styles live in assets/admin.css; the row-marking logic in assets/orders-list.js.
  *
  * @package RiskyBuyer
  */
@@ -42,67 +43,25 @@ class Riskybuyer_Orders_List {
 		if ( ! current_user_can( 'edit_shop_orders' ) ) {
 			return;
 		}
-		add_action( 'admin_footer', array( $this, 'render' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
 	}
 
-	public function render() {
+	public function enqueue() {
 		$map = Riskybuyer_Order_Matcher::build_marked_map();
 		if ( empty( $map ) ) {
 			return;
 		}
-		?>
-		<style id="rb-orders-list-css">
-			.wp-list-table tbody tr.rb-flag > *:first-child { box-shadow: inset 5px 0 0 0 var(--rb-bd); }
-			.wp-list-table tbody tr.rb-flag td,
-			.wp-list-table tbody tr.rb-flag th { background-color: var(--rb-bg) !important; }
-			.rb-badge { display: inline-block; margin-top: 5px; padding: 1px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; line-height: 1.7; color: #fff; white-space: nowrap; }
-		</style>
-		<script id="rb-orders-list-js">
-		( function () {
-			var MAP = <?php echo wp_json_encode( $map ); ?>;
-			var RB_LABEL = <?php echo wp_json_encode( __( 'Risky buyer', 'risky-buyer' ) ); ?>;
 
-			function rgba( hex, a ) {
-				var h = hex.replace( '#', '' );
-				return 'rgba(' + parseInt( h.substr( 0, 2 ), 16 ) + ',' + parseInt( h.substr( 2, 2 ), 16 ) + ',' + parseInt( h.substr( 4, 2 ), 16 ) + ',' + a + ')';
-			}
-
-			function run() {
-				var rows = document.querySelectorAll( '.wp-list-table tbody tr' );
-				Array.prototype.forEach.call( rows, function ( tr ) {
-					if ( tr.getAttribute( 'data-rb' ) ) { return; }
-					var cb = tr.querySelector( '.check-column input[type=checkbox]' );
-					if ( ! cb || ! cb.value ) { return; }
-					var info = MAP[ String( cb.value ) ];
-					if ( ! info ) { return; }
-
-					tr.setAttribute( 'data-rb', '1' );
-					tr.classList.add( 'rb-flag' );
-					tr.style.setProperty( '--rb-bd', info.color );
-					tr.style.setProperty( '--rb-bg', rgba( info.color, 0.08 ) );
-
-					var cell = tr.querySelector( 'td.column-order_number, td.order_number' ) || tr.querySelectorAll( 'td' )[0];
-					if ( cell ) {
-						var b = document.createElement( 'span' );
-						b.className = 'rb-badge';
-						b.style.background = info.color;
-						b.textContent = '⚠ ' + RB_LABEL + ' · ' + info.label;
-						if ( info.note ) { b.title = info.note; }
-						cell.appendChild( document.createElement( 'br' ) );
-						cell.appendChild( b );
-					}
-				} );
-			}
-
-			run();
-			if ( window.MutationObserver ) {
-				var tbody = document.querySelector( '.wp-list-table tbody' );
-				if ( tbody ) {
-					new MutationObserver( function () { run(); } ).observe( tbody, { childList: true } );
-				}
-			}
-		} )();
-		</script>
-		<?php
+		// Shared admin styles (which include the .rb-flag / .rb-badge rules) are
+		// already enqueued by Riskybuyer_Plugin on this screen.
+		wp_enqueue_script( 'riskybuyer-orders-list', RISKYBUYER_URL . 'assets/orders-list.js', array(), RISKYBUYER_VERSION, true );
+		wp_localize_script(
+			'riskybuyer-orders-list',
+			'RiskybuyerOrdersList',
+			array(
+				'map'   => $map,
+				'label' => __( 'Risky buyer', 'riskybuyer' ),
+			)
+		);
 	}
 }

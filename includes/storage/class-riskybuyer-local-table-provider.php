@@ -262,7 +262,7 @@ class Riskybuyer_Local_Table_Provider implements Riskybuyer_Storage_Provider {
 		$ok = $wpdb->insert( self::table(), $data );
 		// phpcs:enable
 		if ( ! $ok ) {
-			return new WP_Error( 'riskybuyer_db', __( 'Database write error.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_db', __( 'Database write error.', 'riskybuyer' ) );
 		}
 		$entry['id'] = (int) $wpdb->insert_id;
 		return $entry;

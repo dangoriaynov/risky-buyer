@@ -36,7 +36,7 @@ class Riskybuyer_Ajax {
 	public function search_customers() {
 		check_ajax_referer( 'riskybuyer_ajax', 'nonce' );
 		if ( ! Riskybuyer_Blacklist::instance()->can_add() ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission.', 'risky-buyer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission.', 'riskybuyer' ) ), 403 );
 		}
 		$q = isset( $_POST['q'] ) ? trim( sanitize_text_field( wp_unslash( $_POST['q'] ) ) ) : '';
 		if ( mb_strlen( $q ) < 2 ) {
@@ -162,7 +162,7 @@ class Riskybuyer_Ajax {
 	protected function guard_manage() {
 		check_ajax_referer( 'riskybuyer_ajax', 'nonce' );
 		if ( ! Riskybuyer_Blacklist::instance()->can_manage() ) {
-			wp_send_json_error( array( 'message' => __( 'Only an administrator can change settings.', 'risky-buyer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'Only an administrator can change settings.', 'riskybuyer' ) ), 403 );
 		}
 	}
 
@@ -194,7 +194,7 @@ class Riskybuyer_Ajax {
 			wp_send_json_success(
 				array(
 					/* translators: 1: new entries this sync, 2: total downloaded */
-					'message' => sprintf( __( 'Sync done: %1$d new (%2$d total downloaded).', 'risky-buyer' ), (int) $st['last_added'], (int) $st['cached'] ),
+					'message' => sprintf( __( 'Sync done: %1$d new (%2$d total downloaded).', 'riskybuyer' ), (int) $st['last_added'], (int) $st['cached'] ),
 					'cached'  => (int) $st['cached'],
 					'added'   => (int) $st['last_added'],
 					'last'    => $st['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $st['last_sync'] ) : '',
@@ -202,7 +202,7 @@ class Riskybuyer_Ajax {
 			);
 		}
 		/* translators: %s: error message */
-		wp_send_json_error( array( 'message' => sprintf( __( 'Sync error: %s', 'risky-buyer' ), $st['last_error'] ) ) );
+		wp_send_json_error( array( 'message' => sprintf( __( 'Sync error: %s', 'riskybuyer' ), $st['last_error'] ) ) );
 	}
 
 	public function push() {
@@ -210,10 +210,10 @@ class Riskybuyer_Ajax {
 		$r = Riskybuyer_Remote_Sync::instance()->push_all();
 		if ( is_wp_error( $r ) ) {
 			/* translators: %s: error message */
-			wp_send_json_error( array( 'message' => sprintf( __( 'Push error: %s', 'risky-buyer' ), $r->get_error_message() ) ) );
+			wp_send_json_error( array( 'message' => sprintf( __( 'Push error: %s', 'riskybuyer' ), $r->get_error_message() ) ) );
 		}
 		/* translators: %d: number of entries pushed */
-		wp_send_json_success( array( 'message' => sprintf( __( 'Pushed %d entries to the server.', 'risky-buyer' ), (int) $r ) ) );
+		wp_send_json_success( array( 'message' => sprintf( __( 'Pushed %d entries to the server.', 'riskybuyer' ), (int) $r ) ) );
 	}
 
 	/**
@@ -224,7 +224,7 @@ class Riskybuyer_Ajax {
 
 		$bl = Riskybuyer_Blacklist::instance();
 		if ( ! $bl->can_add() ) {
-			wp_send_json_error( array( 'message' => __( 'You do not have permission.', 'risky-buyer' ) ), 403 );
+			wp_send_json_error( array( 'message' => __( 'You do not have permission.', 'riskybuyer' ) ), 403 );
 		}
 
 		$order_id = isset( $_POST['order_id'] ) ? absint( $_POST['order_id'] ) : 0;
@@ -273,7 +273,7 @@ class Riskybuyer_Ajax {
 				'note'   => $result['note'],
 				'name'   => $result['name_raw'],
 				'phone'  => $result['phone_raw'],
-				'message' => __( 'Client marked.', 'risky-buyer' ),
+				'message' => __( 'Client marked.', 'riskybuyer' ),
 			)
 		);
 	}
@@ -287,7 +287,7 @@ class Riskybuyer_Ajax {
 		$bl = Riskybuyer_Blacklist::instance();
 		$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
 		if ( '' === $uuid ) {
-			wp_send_json_error( array( 'message' => __( 'Missing identifier.', 'risky-buyer' ) ), 400 );
+			wp_send_json_error( array( 'message' => __( 'Missing identifier.', 'riskybuyer' ) ), 400 );
 		}
 
 		$result = $bl->delete_entry( $uuid );
@@ -295,6 +295,6 @@ class Riskybuyer_Ajax {
 			wp_send_json_error( array( 'message' => $result->get_error_message() ), 403 );
 		}
 
-		wp_send_json_success( array( 'message' => __( 'Marker removed.', 'risky-buyer' ) ) );
+		wp_send_json_success( array( 'message' => __( 'Marker removed.', 'riskybuyer' ) ) );
 	}
 }

@@ -399,3 +399,25 @@
 #rb-sync-msg {
 	font-weight: 600;
 }
+
+/* Orders list — risky buyer row marker (badge + left colour bar).
+   Per-row colours come from the --rb-bd / --rb-bg custom properties that
+   assets/orders-list.js sets on each flagged row. */
+.wp-list-table tbody tr.rb-flag > *:first-child {
+	box-shadow: inset 5px 0 0 0 var(--rb-bd);
+}
+.wp-list-table tbody tr.rb-flag td,
+.wp-list-table tbody tr.rb-flag th {
+	background-color: var(--rb-bg) !important;
+}
+.rb-badge {
+	display: inline-block;
+	margin-top: 5px;
+	padding: 1px 8px;
+	border-radius: 4px;
+	font-size: 11px;
+	font-weight: 700;
+	line-height: 1.7;
+	color: #fff;
+	white-space: nowrap;
+}

@@ -286,10 +286,10 @@ class Riskybuyer_Remote_Sync {
 	 */
 	public function push_all() {
 		if ( ! Riskybuyer_Settings::is_sync_enabled() ) {
-			return new WP_Error( 'riskybuyer_sync_off', __( 'Sync is disabled.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_sync_off', __( 'Sync is disabled.', 'riskybuyer' ) );
 		}
 		if ( '' === Riskybuyer_Settings::api_key() ) {
-			return new WP_Error( 'riskybuyer_no_key', __( 'An API key is required to write to the server.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_no_key', __( 'An API key is required to write to the server.', 'riskybuyer' ) );
 		}
 
 		$local = Riskybuyer_Blacklist::instance()->all( array( 'status' => 'active' ) );

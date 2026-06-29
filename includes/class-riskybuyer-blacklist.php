@@ -51,19 +51,19 @@ class Riskybuyer_Blacklist {
 	public static function reasons() {
 		return array(
 			'uncollected' => array(
-				'label' => __( 'Uncollected shipment', 'risky-buyer' ),
+				'label' => __( 'Uncollected shipment', 'riskybuyer' ),
 				'color' => '#e08a00',
 			),
 			'fake'        => array(
-				'label' => __( 'Fake order', 'risky-buyer' ),
+				'label' => __( 'Fake order', 'riskybuyer' ),
 				'color' => '#d63638',
 			),
 			'abusive'     => array(
-				'label' => __( 'Problematic / abusive', 'risky-buyer' ),
+				'label' => __( 'Problematic / abusive', 'riskybuyer' ),
 				'color' => '#9b1c1c',
 			),
 			'other'       => array(
-				'label' => __( 'Other', 'risky-buyer' ),
+				'label' => __( 'Other', 'riskybuyer' ),
 				'color' => '#6b7280',
 			),
 		);
@@ -166,7 +166,7 @@ class Riskybuyer_Blacklist {
 
 	public function add_entry( $data ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'riskybuyer' ) );
 		}
 
 		$phone_raw  = self::canonical_phone( isset( $data['phone'] ) ? $data['phone'] : '' );
@@ -175,7 +175,7 @@ class Riskybuyer_Blacklist {
 		$name_norm  = self::normalize_name( $name_raw );
 
 		if ( '' === $phone_norm && '' === $name_norm ) {
-			return new WP_Error( 'riskybuyer_empty', __( 'A valid phone or name is required.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_empty', __( 'A valid phone or name is required.', 'riskybuyer' ) );
 		}
 
 		$user  = wp_get_current_user();
@@ -202,7 +202,7 @@ class Riskybuyer_Blacklist {
 
 	public function update_entry( $uuid, $changes ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'riskybuyer_forbidden', __( 'Only an administrator can edit.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'Only an administrator can edit.', 'riskybuyer' ) );
 		}
 
 		$allowed = array();
@@ -233,7 +233,7 @@ class Riskybuyer_Blacklist {
 
 	public function delete_entry( $uuid ) {
 		if ( ! $this->can_manage() ) {
-			return new WP_Error( 'riskybuyer_forbidden', __( 'Only an administrator can delete.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'Only an administrator can delete.', 'riskybuyer' ) );
 		}
 		$this->idx = null;
 		return $this->provider->delete( $uuid );
@@ -460,7 +460,7 @@ class Riskybuyer_Blacklist {
 	 */
 	public function bulk_add( $text, $reason, $note ) {
 		if ( ! $this->can_add() ) {
-			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'risky-buyer' ) );
+			return new WP_Error( 'riskybuyer_forbidden', __( 'You do not have permission to add.', 'riskybuyer' ) );
 		}
 		$reason = self::valid_reason( $reason );
 		$note   = wp_strip_all_tags( (string) $note );

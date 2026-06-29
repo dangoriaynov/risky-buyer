@@ -1,4 +1,4 @@
-# Risky Buyer
+# RiskyBuyer – Customer Flags for WooCommerce
 
 WordPress/WooCommerce plugin that maintains a list of **problematic clients**
 (by phone and/or name, with a reason and note) and automatically flags their
@@ -10,7 +10,7 @@ Interface language: Bulgarian (the shop's audience).
 
 ## Status
 
-`v1.0.1`. The list is stored locally; central sync is optional (Settings tab).
+`v1.0.2`. The list is stored locally; central sync is optional (Settings tab).
 Releases are currently uploaded to the site **manually** (see Deploy). Not yet
 published in the WordPress.org directory.
 
@@ -41,7 +41,7 @@ published in the WordPress.org directory.
 ## Structure
 
 ```
-risky-buyer.php                              Bootstrap, constants, activation hook
+riskybuyer.php                               Bootstrap, constants, activation hook
 includes/
   class-riskybuyer-plugin.php                Wiring + shared admin assets
   class-riskybuyer-blacklist.php             Service: normalize, perms, CRUD, matching, reasons
@@ -64,8 +64,8 @@ docs/PLAN.md, docs/CENTRAL-SYNC-PLAN.md      Plans & specs
 
 ## Install (manual)
 
-1. Copy the plugin folder to `wp-content/plugins/risky-buyer/` on the site.
-2. Activate **Risky Buyer** in WP Admin → Plugins (creates the DB tables).
+1. Copy the plugin folder to `wp-content/plugins/riskybuyer/` on the site.
+2. Activate **RiskyBuyer** in WP Admin → Plugins (creates the DB tables).
    - Tables are also created/upgraded on demand on any admin request.
 3. Manage the list under **WP Admin → Проблемни клиенти**.
 
@@ -74,18 +74,20 @@ legacy orders screen.
 
 ## Build & deploy
 
-- **Build the distributable zip** (`risky-buyer.zip`, gitignored) from a clean
+- **Build the distributable zip** (`riskybuyer.zip`, gitignored) from a clean
   copy of the plugin files minus the `.distignore` exclusions
   (`server/`, `docs/`, `tests/`, `README.md`, dotfiles), packed under a
-  top-level `risky-buyer/` folder.
-- **Release:** bump the version in `risky-buyer.php` (header `Version:` and the
+  top-level `riskybuyer/` folder.
+- **Release:** bump the version in `riskybuyer.php` (header `Version:` and the
   `RISKYBUYER_VERSION` constant) and `readme.txt` (`Stable tag` + a `Changelog`
   entry), then rebuild the zip.
-- **Deploy to the live site:** rsync the built plugin folder into
-  `wp-content/plugins/risky-buyer/` and restore file ownership to the site user.
-  (Folder name and main file are unchanged across updates, so the plugin stays
-  active.) The central FastAPI service under `server/` is deployed separately —
-  see `server/README.md`.
+- **Deploy to the live site:** the slug/folder and main file became `riskybuyer`
+  in v1.0.2 (previously `risky-buyer`). On the existing install this is a one-time
+  migration: rsync the built plugin into `wp-content/plugins/riskybuyer/`, remove
+  the old `wp-content/plugins/risky-buyer/` folder, restore ownership, and
+  re-activate the plugin once (the main-file rename deactivates the old copy).
+  From v1.0.2 on the folder name and main file are stable again. The central
+  FastAPI service under `server/` is deployed separately — see `server/README.md`.
 
 ## Central sync
 

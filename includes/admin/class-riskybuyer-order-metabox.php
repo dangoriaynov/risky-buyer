@@ -37,7 +37,7 @@ class Riskybuyer_Order_Metabox {
 		foreach ( array_unique( $screens ) as $screen ) {
 			add_meta_box(
 				'riskybuyer_metabox',
-				'⚠ ' . __( 'Risky buyer', 'risky-buyer' ),
+				'⚠ ' . __( 'Risky buyer', 'riskybuyer' ),
 				array( $this, 'render_box' ),
 				$screen,
 				'side',
@@ -90,13 +90,13 @@ class Riskybuyer_Order_Metabox {
 		$color = Riskybuyer_Blacklist::reason_color( $entry['reason_code'] );
 		$label = Riskybuyer_Blacklist::reason_label( $entry['reason_code'] );
 		echo '<div class="notice" style="border-left:5px solid ' . esc_attr( $color ) . ';background:#fff6f6;">';
-		echo '<p style="font-size:14px;margin:.6em 0;"><strong style="color:' . esc_attr( $color ) . ';">⛔ ' . esc_html__( 'Risky buyer', 'risky-buyer' ) . ' — ' . esc_html( $label ) . '</strong>';
+		echo '<p style="font-size:14px;margin:.6em 0;"><strong style="color:' . esc_attr( $color ) . ';">⛔ ' . esc_html__( 'Risky buyer', 'riskybuyer' ) . ' — ' . esc_html( $label ) . '</strong>';
 		if ( ! empty( $entry['note'] ) ) {
 			echo ' · ' . esc_html( $entry['note'] );
 		}
 		$by = ! empty( $entry['created_by_name'] ) ? $entry['created_by_name'] : ( ! empty( $entry['source_site'] ) ? $entry['source_site'] : '' );
 		if ( $by ) {
-			echo ' <span style="color:#666;">(' . esc_html__( 'Added by', 'risky-buyer' ) . ' ' . esc_html( $by ) . ')</span>';
+			echo ' <span style="color:#666;">(' . esc_html__( 'Added by', 'riskybuyer' ) . ' ' . esc_html( $by ) . ')</span>';
 		}
 		echo '</p>';
 		$this->render_related_orders( $order, $order_id );
@@ -129,7 +129,7 @@ class Riskybuyer_Order_Metabox {
 		if ( empty( $links ) ) {
 			return;
 		}
-		echo '<p style="margin:.2em 0 .6em;color:#444;">' . esc_html__( 'Other orders from this buyer:', 'risky-buyer' ) . ' ';
+		echo '<p style="margin:.2em 0 .6em;color:#444;">' . esc_html__( 'Other orders from this buyer:', 'riskybuyer' ) . ' ';
 		echo wp_kses_post( implode( ', ', $links ) );
 		echo '</p>';
 	}
@@ -205,7 +205,7 @@ class Riskybuyer_Order_Metabox {
 			$by   = ! empty( $entry['created_by_name'] ) ? $entry['created_by_name'] : '—';
 			$src  = ! empty( $entry['source_site'] ) ? $entry['source_site'] : '';
 			$date = ! empty( $entry['created_at'] ) ? mysql2date( 'd.m.Y', $entry['created_at'] ) : '';
-			echo '<p class="rb-meta">' . esc_html__( 'Added by:', 'risky-buyer' ) . ' ' . esc_html( $by );
+			echo '<p class="rb-meta">' . esc_html__( 'Added by:', 'riskybuyer' ) . ' ' . esc_html( $by );
 			if ( $date ) {
 				echo ' · ' . esc_html( $date );
 			}
@@ -215,25 +215,25 @@ class Riskybuyer_Order_Metabox {
 			echo '</p>';
 
 			if ( $bl->can_manage() ) {
-				echo '<button type="button" class="button rb-unmark-btn" data-uuid="' . esc_attr( $entry['uuid'] ) . '">' . esc_html__( 'Remove from list', 'risky-buyer' ) . '</button>';
+				echo '<button type="button" class="button rb-unmark-btn" data-uuid="' . esc_attr( $entry['uuid'] ) . '">' . esc_html__( 'Remove from list', 'riskybuyer' ) . '</button>';
 			} else {
-				echo '<p class="rb-meta"><em>' . esc_html__( 'Only an administrator can remove.', 'risky-buyer' ) . '</em></p>';
+				echo '<p class="rb-meta"><em>' . esc_html__( 'Only an administrator can remove.', 'riskybuyer' ) . '</em></p>';
 			}
 			echo '</div>';
 		} elseif ( $bl->can_add() ) {
-			echo '<button type="button" class="button button-primary rb-reveal-mark">' . esc_html__( 'Mark as problematic', 'risky-buyer' ) . '</button>';
+			echo '<button type="button" class="button button-primary rb-reveal-mark">' . esc_html__( 'Mark as problematic', 'riskybuyer' ) . '</button>';
 			echo '<div class="rb-mark-form" style="display:none;">';
-			echo '<p>' . esc_html__( 'Mark this client as problematic (by name and phone from the order).', 'risky-buyer' ) . '</p>';
-			echo '<p><label>' . esc_html__( 'Reason', 'risky-buyer' ) . '<br><select class="rb-reason widefat">';
+			echo '<p>' . esc_html__( 'Mark this client as problematic (by name and phone from the order).', 'riskybuyer' ) . '</p>';
+			echo '<p><label>' . esc_html__( 'Reason', 'riskybuyer' ) . '<br><select class="rb-reason widefat">';
 			foreach ( Riskybuyer_Blacklist::reasons() as $code => $r ) {
 				echo '<option value="' . esc_attr( $code ) . '">' . esc_html( $r['label'] ) . '</option>';
 			}
 			echo '</select></label></p>';
-			echo '<p><label>' . esc_html__( 'Note (optional)', 'risky-buyer' ) . '<br><textarea class="rb-note-input widefat" rows="2"></textarea></label></p>';
-			echo '<button type="button" class="button button-primary rb-mark-btn">' . esc_html__( 'Mark client', 'risky-buyer' ) . '</button>';
+			echo '<p><label>' . esc_html__( 'Note (optional)', 'riskybuyer' ) . '<br><textarea class="rb-note-input widefat" rows="2"></textarea></label></p>';
+			echo '<button type="button" class="button button-primary rb-mark-btn">' . esc_html__( 'Mark client', 'riskybuyer' ) . '</button>';
 			echo '</div>';
 		} else {
-			echo '<p><em>' . esc_html__( 'You do not have permission to mark clients.', 'risky-buyer' ) . '</em></p>';
+			echo '<p><em>' . esc_html__( 'You do not have permission to mark clients.', 'riskybuyer' ) . '</em></p>';
 		}
 
 		echo '</div>';

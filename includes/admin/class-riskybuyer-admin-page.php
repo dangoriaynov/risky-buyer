@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Riskybuyer_Admin_Page {
 
-	const SLUG = 'risky-buyer';
+	const SLUG = 'riskybuyer';
 
 	protected static $instance = null;
 
@@ -26,13 +26,27 @@ class Riskybuyer_Admin_Page {
 		add_action( 'admin_menu', array( $this, 'menu' ) );
 		add_action( 'admin_menu', array( $this, 'reorder_menu' ), 100 );
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
+		// Uses the runtime basename so it works whatever the folder/main-file is named.
+		add_filter( 'plugin_action_links_' . plugin_basename( RISKYBUYER_FILE ), array( $this, 'action_links' ) );
+	}
+
+	/**
+	 * Add a "Settings" link to the plugin's row on the Plugins screen.
+	 *
+	 * @param string[] $links Existing action links.
+	 * @return string[]
+	 */
+	public function action_links( $links ) {
+		$link = '<a href="' . esc_url( $this->base_url( 'settings' ) ) . '">' . esc_html__( 'Settings', 'riskybuyer' ) . '</a>';
+		array_unshift( $links, $link );
+		return $links;
 	}
 
 	public function menu() {
 		add_submenu_page(
 			'woocommerce',
-			__( 'Risky buyers', 'risky-buyer' ),
-			__( 'Risky buyers', 'risky-buyer' ),
+			__( 'Risky buyers', 'riskybuyer' ),
+			__( 'Risky buyers', 'riskybuyer' ),
 			'edit_shop_orders',
 			self::SLUG,
 			array( $this, 'render_page' )
@@ -109,7 +123,7 @@ class Riskybuyer_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = __( 'Client added to the list.', 'risky-buyer' );
+				$notice = __( 'Client added to the list.', 'riskybuyer' );
 				$this->remember_reason( $res['reason_code'] );
 			}
 		} elseif ( 'bulk_add' === $action ) {
@@ -124,7 +138,7 @@ class Riskybuyer_Admin_Page {
 				$type   = 'error';
 			} else {
 				/* translators: 1: added count, 2: skipped count, 3: invalid count */
-				$notice = sprintf( __( 'Added: %1$d · skipped (already in list): %2$d · invalid: %3$d', 'risky-buyer' ), $res['added'], $res['skipped'], $res['invalid'] );
+				$notice = sprintf( __( 'Added: %1$d · skipped (already in list): %2$d · invalid: %3$d', 'riskybuyer' ), $res['added'], $res['skipped'], $res['invalid'] );
 				$this->remember_reason( $reason );
 			}
 		} elseif ( 'update' === $action ) {
@@ -134,7 +148,7 @@ class Riskybuyer_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = __( 'Entry updated.', 'risky-buyer' );
+				$notice = __( 'Entry updated.', 'riskybuyer' );
 			}
 		} elseif ( 'delete' === $action ) {
 			$uuid = isset( $_POST['uuid'] ) ? sanitize_text_field( wp_unslash( $_POST['uuid'] ) ) : '';
@@ -143,12 +157,12 @@ class Riskybuyer_Admin_Page {
 				$notice = $res->get_error_message();
 				$type   = 'error';
 			} else {
-				$notice = __( 'Entry removed.', 'risky-buyer' );
+				$notice = __( 'Entry removed.', 'riskybuyer' );
 			}
 		} elseif ( 'save_settings' === $action ) {
 			$tab = 'settings';
 			if ( ! $bl->can_manage() ) {
-				$notice = __( 'Only an administrator can change settings.', 'risky-buyer' );
+				$notice = __( 'Only an administrator can change settings.', 'riskybuyer' );
 				$type   = 'error';
 			} else {
 				Riskybuyer_Settings::update(
@@ -159,39 +173,39 @@ class Riskybuyer_Admin_Page {
 					)
 				);
 				Riskybuyer_Remote_Sync::instance()->maybe_schedule();
-				$notice = __( 'Settings saved.', 'risky-buyer' );
+				$notice = __( 'Settings saved.', 'riskybuyer' );
 			}
 		} elseif ( 'sync_now' === $action ) {
 			$tab = 'settings';
 			if ( ! $bl->can_manage() ) {
-				$notice = __( 'Only an administrator can change settings.', 'risky-buyer' );
+				$notice = __( 'Only an administrator can change settings.', 'riskybuyer' );
 				$type   = 'error';
 			} else {
 				$ok = Riskybuyer_Remote_Sync::instance()->pull();
 				$st = Riskybuyer_Settings::state();
 				if ( $ok ) {
 					/* translators: %d: number of cached entries */
-					$notice = sprintf( __( 'Sync done: %d entries cached.', 'risky-buyer' ), (int) $st['cached'] );
+					$notice = sprintf( __( 'Sync done: %d entries cached.', 'riskybuyer' ), (int) $st['cached'] );
 				} else {
 					$type = 'error';
 					/* translators: %s: error message */
-					$notice = sprintf( __( 'Sync error: %s', 'risky-buyer' ), $st['last_error'] );
+					$notice = sprintf( __( 'Sync error: %s', 'riskybuyer' ), $st['last_error'] );
 				}
 			}
 		} elseif ( 'push_all' === $action ) {
 			$tab = 'settings';
 			if ( ! $bl->can_manage() ) {
-				$notice = __( 'Only an administrator can change settings.', 'risky-buyer' );
+				$notice = __( 'Only an administrator can change settings.', 'riskybuyer' );
 				$type   = 'error';
 			} else {
 				$r = Riskybuyer_Remote_Sync::instance()->push_all();
 				if ( is_wp_error( $r ) ) {
 					$type = 'error';
 					/* translators: %s: error message */
-					$notice = sprintf( __( 'Push error: %s', 'risky-buyer' ), $r->get_error_message() );
+					$notice = sprintf( __( 'Push error: %s', 'riskybuyer' ), $r->get_error_message() );
 				} else {
 					/* translators: %d: number of entries pushed */
-					$notice = sprintf( __( 'Pushed %d entries to the server.', 'risky-buyer' ), (int) $r );
+					$notice = sprintf( __( 'Pushed %d entries to the server.', 'riskybuyer' ), (int) $r );
 				}
 			}
 		}
@@ -249,7 +263,7 @@ class Riskybuyer_Admin_Page {
 		}
 
 		echo '<div class="wrap rb-wrap">';
-		echo '<h1>' . esc_html__( 'Risky buyers', 'risky-buyer' ) . '</h1>';
+		echo '<h1>' . esc_html__( 'Risky buyers', 'riskybuyer' ) . '</h1>';
 
 		// Notice.
 		if ( isset( $_GET['riskybuyer_notice'] ) && '' !== $_GET['riskybuyer_notice'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
@@ -260,11 +274,11 @@ class Riskybuyer_Admin_Page {
 
 		// Tabs.
 		$tabs = array(
-			'list' => __( 'List', 'risky-buyer' ),
-			'add'  => __( 'Add', 'risky-buyer' ),
+			'list' => __( 'List', 'riskybuyer' ),
+			'add'  => __( 'Add', 'riskybuyer' ),
 		);
 		if ( $bl->can_manage() ) {
-			$tabs['settings'] = __( 'Settings', 'risky-buyer' );
+			$tabs['settings'] = __( 'Settings', 'riskybuyer' );
 		}
 		echo '<h2 class="nav-tab-wrapper">';
 		foreach ( $tabs as $key => $label ) {
@@ -306,8 +320,8 @@ class Riskybuyer_Admin_Page {
 		$open = isset( $_GET['rb_open'] ) ? sanitize_key( wp_unslash( $_GET['rb_open'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing
 
 		echo '<div class="rb-add-toggles">';
-		echo '<button type="button" class="button rb-toggle" data-target="rb-single-wrap"><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>' . esc_html__( 'Add one client', 'risky-buyer' ) . '</button>';
-		echo '<button type="button" class="button rb-toggle" data-target="rb-bulk-wrap"><span class="dashicons dashicons-list-view" aria-hidden="true"></span>' . esc_html__( 'Bulk add', 'risky-buyer' ) . '</button>';
+		echo '<button type="button" class="button rb-toggle" data-target="rb-single-wrap"><span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span>' . esc_html__( 'Add one client', 'riskybuyer' ) . '</button>';
+		echo '<button type="button" class="button rb-toggle" data-target="rb-bulk-wrap"><span class="dashicons dashicons-list-view" aria-hidden="true"></span>' . esc_html__( 'Bulk add', 'riskybuyer' ) . '</button>';
 		echo '</div>';
 
 		echo '<div id="rb-single-wrap" class="rb-collapse"' . ( 'single' === $open ? '' : ' style="display:none"' ) . '>';
@@ -341,12 +355,12 @@ class Riskybuyer_Admin_Page {
 	 */
 	protected function render_customer_search() {
 		echo '<div class="rb-form rb-cust-search">';
-		echo '<label for="rb-cust-q">' . esc_html__( 'Find a customer from your orders', 'risky-buyer' ) . '</label>';
+		echo '<label for="rb-cust-q">' . esc_html__( 'Find a customer from your orders', 'riskybuyer' ) . '</label>';
 		echo '<div class="rb-cust-box">';
-		echo '<input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'risky-buyer' ) . '">';
-		echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'risky-buyer' ) . '"></div>';
+		echo '<input type="search" id="rb-cust-q" autocomplete="off" placeholder="' . esc_attr__( 'Type a name or phone…', 'riskybuyer' ) . '">';
+		echo '<div id="rb-cust-results" class="rb-cust-results" data-empty="' . esc_attr__( 'No matching customers.', 'riskybuyer' ) . '"></div>';
 		echo '</div>';
-		echo '<p class="description rb-cust-hint">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'risky-buyer' ) . '</p>';
+		echo '<p class="description rb-cust-hint">' . esc_html__( 'Pick someone who already ordered to fill in the name and phone below.', 'riskybuyer' ) . '</p>';
 		echo '</div>';
 	}
 
@@ -367,7 +381,7 @@ class Riskybuyer_Admin_Page {
 	protected function render_form( $edit_entry, $can_manage ) {
 		$is_edit = ( $edit_entry && $can_manage );
 		if ( $is_edit ) {
-			echo '<h2>' . esc_html__( 'Edit entry', 'risky-buyer' ) . '</h2>';
+			echo '<h2>' . esc_html__( 'Edit entry', 'riskybuyer' ) . '</h2>';
 		}
 		echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" class="rb-form">';
 		wp_nonce_field( 'riskybuyer_admin' );
@@ -376,24 +390,24 @@ class Riskybuyer_Admin_Page {
 			echo '<input type="hidden" name="uuid" value="' . esc_attr( $edit_entry['uuid'] ) . '">';
 		}
 
-		echo '<p class="rb-field"><label for="rb-name">' . esc_html__( 'Name', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-name">' . esc_html__( 'Name', 'riskybuyer' ) . '</label>';
 		echo '<input type="text" id="rb-name" name="name" value="' . esc_attr( $is_edit ? $edit_entry['name_raw'] : '' ) . '"></p>';
 
-		echo '<p class="rb-field"><label for="rb-phone">' . esc_html__( 'Phone', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-phone">' . esc_html__( 'Phone', 'riskybuyer' ) . '</label>';
 		echo '<input type="text" id="rb-phone" name="phone" value="' . esc_attr( $is_edit ? $edit_entry['phone_raw'] : '' ) . '"></p>';
 
-		echo '<p class="rb-field"><label for="rb-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-reason">' . esc_html__( 'Reason', 'riskybuyer' ) . '</label>';
 		echo '<select id="rb-reason" name="reason" class="rb-reason-color">';
 		$this->reason_options( $is_edit ? $edit_entry['reason_code'] : $this->default_reason() );
 		echo '</select></p>';
 
-		echo '<p class="rb-field"><label for="rb-note">' . esc_html__( 'Note', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-note">' . esc_html__( 'Note', 'riskybuyer' ) . '</label>';
 		echo '<textarea id="rb-note" name="note" rows="2">' . esc_textarea( $is_edit ? (string) $edit_entry['note'] : '' ) . '</textarea></p>';
 
 		echo '<p class="rb-actions">';
-		submit_button( $is_edit ? __( 'Save changes', 'risky-buyer' ) : __( 'Add client', 'risky-buyer' ), 'primary', 'submit', false );
+		submit_button( $is_edit ? __( 'Save changes', 'riskybuyer' ) : __( 'Add client', 'riskybuyer' ), 'primary', 'submit', false );
 		if ( $is_edit ) {
-			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">' . esc_html__( 'Cancel', 'risky-buyer' ) . '</a>';
+			echo ' <a class="button" href="' . esc_url( $this->base_url( 'list' ) ) . '">' . esc_html__( 'Cancel', 'riskybuyer' ) . '</a>';
 		}
 		echo '</p>';
 		echo '</form>';
@@ -404,20 +418,20 @@ class Riskybuyer_Admin_Page {
 		wp_nonce_field( 'riskybuyer_admin' );
 		echo '<input type="hidden" name="riskybuyer_action" value="bulk_add">';
 
-		echo '<p class="rb-field"><label for="rb-bulk">' . esc_html__( 'Clients (one per line)', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-bulk">' . esc_html__( 'Clients (one per line)', 'riskybuyer' ) . '</label>';
 		echo '<textarea id="rb-bulk" name="bulk" rows="8" class="code" placeholder="0888123456, Ivan Ivanov&#10;0877000111&#10;Maria Petrova"></textarea>';
-		echo '<span class="description">' . esc_html__( 'Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note below apply to the whole list. Existing entries (by phone or name) are skipped.', 'risky-buyer' ) . '</span></p>';
+		echo '<span class="description">' . esc_html__( 'Fields separated by comma / tab / semicolon. A value with 6+ digits is treated as the phone, the rest as the name. The reason and note below apply to the whole list. Existing entries (by phone or name) are skipped.', 'riskybuyer' ) . '</span></p>';
 
-		echo '<p class="rb-field"><label for="rb-bulk-reason">' . esc_html__( 'Reason', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-bulk-reason">' . esc_html__( 'Reason', 'riskybuyer' ) . '</label>';
 		echo '<select id="rb-bulk-reason" name="reason" class="rb-reason-color">';
 		$this->reason_options( $this->default_reason() );
 		echo '</select></p>';
 
-		echo '<p class="rb-field"><label for="rb-bulk-note">' . esc_html__( 'Note', 'risky-buyer' ) . '</label>';
+		echo '<p class="rb-field"><label for="rb-bulk-note">' . esc_html__( 'Note', 'riskybuyer' ) . '</label>';
 		echo '<textarea id="rb-bulk-note" name="note" rows="2"></textarea></p>';
 
 		echo '<p class="rb-actions">';
-		submit_button( __( 'Add in bulk', 'risky-buyer' ), 'primary', 'submit', false );
+		submit_button( __( 'Add in bulk', 'riskybuyer' ), 'primary', 'submit', false );
 		echo '</p>';
 		echo '</form>';
 	}
@@ -431,17 +445,17 @@ class Riskybuyer_Admin_Page {
 
 		// Instant in-browser filter (all rows are rendered; JS hides non-matching ones).
 		echo '<div class="rb-filters" id="rb-filterbar">';
-		echo '<input type="search" id="rb-fphone" placeholder="' . esc_attr__( 'Phone', 'risky-buyer' ) . '" autocomplete="off">';
-		echo '<input type="search" id="rb-fname" placeholder="' . esc_attr__( 'Name', 'risky-buyer' ) . '" autocomplete="off">';
-		echo '<select id="rb-op" title="' . esc_attr__( 'Combine criteria', 'risky-buyer' ) . '">';
-		echo '<option value="AND">' . esc_html__( 'All (AND)', 'risky-buyer' ) . '</option>';
-		echo '<option value="OR">' . esc_html__( 'Any (OR)', 'risky-buyer' ) . '</option>';
+		echo '<input type="search" id="rb-fphone" placeholder="' . esc_attr__( 'Phone', 'riskybuyer' ) . '" autocomplete="off">';
+		echo '<input type="search" id="rb-fname" placeholder="' . esc_attr__( 'Name', 'riskybuyer' ) . '" autocomplete="off">';
+		echo '<select id="rb-op" title="' . esc_attr__( 'Combine criteria', 'riskybuyer' ) . '">';
+		echo '<option value="AND">' . esc_html__( 'All (AND)', 'riskybuyer' ) . '</option>';
+		echo '<option value="OR">' . esc_html__( 'Any (OR)', 'riskybuyer' ) . '</option>';
 		echo '</select>';
-		echo '<select id="rb-freason" class="rb-reason-color"><option value="" data-color="">' . esc_html__( 'All reasons', 'risky-buyer' ) . '</option>';
+		echo '<select id="rb-freason" class="rb-reason-color"><option value="" data-color="">' . esc_html__( 'All reasons', 'riskybuyer' ) . '</option>';
 		$this->reason_options( '' );
 		echo '</select>';
-		echo '<button type="button" class="button-link" id="rb-clear">' . esc_html__( 'Clear', 'risky-buyer' ) . '</button>';
-		echo '<span class="rb-count description">' . esc_html__( 'Showing', 'risky-buyer' ) . ' <span id="rb-count"></span></span>';
+		echo '<button type="button" class="button-link" id="rb-clear">' . esc_html__( 'Clear', 'riskybuyer' ) . '</button>';
+		echo '<span class="rb-count description">' . esc_html__( 'Showing', 'riskybuyer' ) . ' <span id="rb-count"></span></span>';
 		echo '</div>';
 
 		$this->render_entries_table( $entries, $bl->can_manage() );
@@ -453,31 +467,31 @@ class Riskybuyer_Admin_Page {
 
 	protected function render_settings_tab( $bl ) {
 		if ( ! $bl->can_manage() ) {
-			echo '<p><em>' . esc_html__( 'Only an administrator can change settings.', 'risky-buyer' ) . '</em></p>';
+			echo '<p><em>' . esc_html__( 'Only an administrator can change settings.', 'riskybuyer' ) . '</em></p>';
 			return;
 		}
 		$s       = Riskybuyer_Settings::get();
 		$state   = Riskybuyer_Settings::state();
-		$last    = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'risky-buyer' );
+		$last    = $state['last_sync'] ? date_i18n( 'd.m.Y H:i', (int) $state['last_sync'] ) : __( 'never', 'riskybuyer' );
 		$enabled = ! empty( $s['sync_enabled'] );
 		$has_key = '' !== $s['api_key'];
 
-		$sync_label = __( 'Sync now', 'risky-buyer' );
-		$push_label = __( 'Push my list to the server', 'risky-buyer' );
-		$clear_lbl  = __( 'Clear key', 'risky-buyer' );
-		$sent_text  = __( 'Data sent to the server: phone, name, reason, note, and your site domain.', 'risky-buyer' );
+		$sync_label = __( 'Sync now', 'riskybuyer' );
+		$push_label = __( 'Push my list to the server', 'riskybuyer' );
+		$clear_lbl  = __( 'Clear key', 'riskybuyer' );
+		$sent_text  = __( 'Data sent to the server: phone, name, reason, note, and your site domain.', 'riskybuyer' );
 
 		echo '<div class="rb-settings">';
-		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'risky-buyer' ) . '</h2>';
-		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'risky-buyer' ) . '</p>';
+		echo '<h2>' . esc_html__( 'Synchronization with the central server', 'riskybuyer' ) . '</h2>';
+		echo '<p class="description">' . esc_html__( 'When enabled, your checks are extended with phone numbers from the shared server (created by other sites). Your own entries always stay on your site. Disable to use the local list only.', 'riskybuyer' ) . '</p>';
 
 		// Settings save automatically (no page reload, no Save button).
-		$status_html = esc_html__( 'Last update from the shared list:', 'risky-buyer' ) . ' <strong id="rb-last-sync">' . esc_html( $last ) . '</strong><br>'
-			. esc_html__( 'Phone numbers downloaded:', 'risky-buyer' ) . ' <strong id="rb-cached-count">' . (int) $state['cached'] . '</strong><br>'
-			. esc_html__( 'New in last sync:', 'risky-buyer' ) . ' <strong id="rb-added-count">' . (int) $state['last_added'] . '</strong>';
+		$status_html = esc_html__( 'Last update from the shared list:', 'riskybuyer' ) . ' <strong id="rb-last-sync">' . esc_html( $last ) . '</strong><br>'
+			. esc_html__( 'Phone numbers downloaded:', 'riskybuyer' ) . ' <strong id="rb-cached-count">' . (int) $state['cached'] . '</strong><br>'
+			. esc_html__( 'New in last sync:', 'riskybuyer' ) . ' <strong id="rb-added-count">' . (int) $state['last_added'] . '</strong>';
 		$status_aria = wp_strip_all_tags( str_replace( '<br>', ' · ', $status_html ) );
 
-		echo '<p class="rb-enable-row"><label><input type="checkbox" id="rb-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'risky-buyer' ) . '</strong></label>';
+		echo '<p class="rb-enable-row"><label><input type="checkbox" id="rb-sync-enabled"' . checked( $enabled, true, false ) . '> <strong>' . esc_html__( 'Enable sync with the central server', 'riskybuyer' ) . '</strong></label>';
 		echo '<span class="rb-info" tabindex="0" role="img" aria-label="' . esc_attr( $sent_text ) . '"><span class="dashicons dashicons-info-outline" aria-hidden="true"></span><span class="rb-tip">' . esc_html( $sent_text ) . '</span></span>';
 		echo '<span class="rb-info" tabindex="0" role="img" aria-label="' . esc_attr( $status_aria ) . '"><span class="dashicons dashicons-editor-help" aria-hidden="true"></span><span class="rb-tip">' . wp_kses( $status_html, array( 'strong' => array( 'id' => array() ), 'br' => array() ) ) . '</span></span>';
 		echo ' <span id="rb-save-status" class="description"></span></p>';
@@ -486,7 +500,7 @@ class Riskybuyer_Admin_Page {
 		echo '<table class="form-table"><tbody>';
 
 		// Server URL with inline action icons (sync = read, push = write/key only).
-		echo '<tr><th><label for="rb-server-url">' . esc_html__( 'Server URL', 'risky-buyer' ) . '</label></th><td>';
+		echo '<tr><th><label for="rb-server-url">' . esc_html__( 'Server URL', 'riskybuyer' ) . '</label></th><td>';
 		echo '<span class="rb-url-row">';
 		echo '<input type="url" id="rb-server-url" class="regular-text" value="' . esc_attr( $s['server_url'] ) . '">';
 		echo '<button type="button" id="rb-sync-now" class="button rb-iconbtn rb-iconbtn-sync" title="' . esc_attr( $sync_label ) . '" aria-label="' . esc_attr( $sync_label ) . '"><span class="dashicons dashicons-update" aria-hidden="true"></span></button>';
@@ -495,15 +509,15 @@ class Riskybuyer_Admin_Page {
 		echo '</td></tr>';
 
 		// API key — locked (grey, read-only) once a key is set; red ✕ clears it.
-		echo '<tr><th><label for="rb-api-key">' . esc_html__( 'API key', 'risky-buyer' ) . '</label></th><td>';
+		echo '<tr><th><label for="rb-api-key">' . esc_html__( 'API key', 'riskybuyer' ) . '</label></th><td>';
 		echo '<span class="rb-key-wrap"><input type="text" id="rb-api-key" class="regular-text' . ( $has_key ? ' rb-locked' : '' ) . '" value="' . esc_attr( $s['api_key'] ) . '"' . ( $has_key ? ' readonly' : '' ) . '>';
 		echo '<button type="button" id="rb-key-clear" class="rb-key-clear" title="' . esc_attr( $clear_lbl ) . '" aria-label="' . esc_attr( $clear_lbl ) . '"' . ( $has_key ? '' : ' style="display:none"' ) . '>✕</button></span> ';
 		echo '<span id="rb-key-status" class="description"></span>';
-		echo '<p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'risky-buyer' ) . '</p></td></tr>';
+		echo '<p class="description">' . esc_html__( 'Only needed to write your entries to the server. Reading the shared list is open.', 'riskybuyer' ) . '</p></td></tr>';
 		echo '</tbody></table>';
 
 		if ( ! empty( $state['last_error'] ) ) {
-			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'risky-buyer' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
+			echo '<p style="color:#b32d2e">' . esc_html__( 'Last error:', 'riskybuyer' ) . ' ' . esc_html( $state['last_error'] ) . '</p>';
 		}
 		echo '</div></div>';
 	}
@@ -526,21 +540,21 @@ class Riskybuyer_Admin_Page {
 
 	protected function render_entries_table( $entries, $with_actions ) {
 		echo '<table id="rb-list" class="wp-list-table widefat fixed striped rb-table"><thead><tr>';
-		$this->sortable_th( __( 'Name', 'risky-buyer' ), 'name' );
-		$this->sortable_th( __( 'Phone', 'risky-buyer' ), 'phone' );
-		$this->sortable_th( __( 'Reason', 'risky-buyer' ), 'reason' );
-		$this->sortable_th( __( 'Note', 'risky-buyer' ), 'note' );
-		$this->sortable_th( __( 'Source', 'risky-buyer' ), 'source' );
-		$this->sortable_th( __( 'Added by', 'risky-buyer' ), 'addedby' );
-		$this->sortable_th( __( 'Date', 'risky-buyer' ), 'date' );
+		$this->sortable_th( __( 'Name', 'riskybuyer' ), 'name' );
+		$this->sortable_th( __( 'Phone', 'riskybuyer' ), 'phone' );
+		$this->sortable_th( __( 'Reason', 'riskybuyer' ), 'reason' );
+		$this->sortable_th( __( 'Note', 'riskybuyer' ), 'note' );
+		$this->sortable_th( __( 'Source', 'riskybuyer' ), 'source' );
+		$this->sortable_th( __( 'Added by', 'riskybuyer' ), 'addedby' );
+		$this->sortable_th( __( 'Date', 'riskybuyer' ), 'date' );
 		if ( $with_actions ) {
-			echo '<th>' . esc_html__( 'Actions', 'risky-buyer' ) . '</th>';
+			echo '<th>' . esc_html__( 'Actions', 'riskybuyer' ) . '</th>';
 		}
 		echo '</tr></thead><tbody>';
 
 		$cols = $with_actions ? 8 : 7;
 		if ( empty( $entries ) ) {
-			echo '<tr><td colspan="' . (int) $cols . '">' . esc_html__( 'No entries.', 'risky-buyer' ) . '</td></tr>';
+			echo '<tr><td colspan="' . (int) $cols . '">' . esc_html__( 'No entries.', 'riskybuyer' ) . '</td></tr>';
 		} else {
 			foreach ( $entries as $e ) {
 				$color  = Riskybuyer_Blacklist::reason_color( $e['reason_code'] );
@@ -566,10 +580,10 @@ class Riskybuyer_Admin_Page {
 						),
 						admin_url( 'admin.php' )
 					);
-					$edit_label = __( 'Edit', 'risky-buyer' );
-					$del_label  = __( 'Delete', 'risky-buyer' );
+					$edit_label = __( 'Edit', 'riskybuyer' );
+					$del_label  = __( 'Delete', 'riskybuyer' );
 					echo '<a class="button button-small rb-icon" href="' . esc_url( $edit_url ) . '" title="' . esc_attr( $edit_label ) . '" aria-label="' . esc_attr( $edit_label ) . '"><span class="dashicons dashicons-edit" aria-hidden="true"></span></a> ';
-					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( __( 'Remove this entry?', 'risky-buyer' ) ) . '\');">';
+					echo '<form method="post" action="' . esc_url( $this->base_url() ) . '" style="display:inline" onsubmit="return confirm(\'' . esc_js( __( 'Remove this entry?', 'riskybuyer' ) ) . '\');">';
 					wp_nonce_field( 'riskybuyer_admin' );
 					echo '<input type="hidden" name="riskybuyer_action" value="delete">';
 					echo '<input type="hidden" name="uuid" value="' . esc_attr( $e['uuid'] ) . '">';
@@ -579,7 +593,7 @@ class Riskybuyer_Admin_Page {
 				}
 				echo '</tr>';
 			}
-			echo '<tr class="rb-nomatch" style="display:none"><td colspan="' . (int) $cols . '">' . esc_html__( 'No matches for the current filter.', 'risky-buyer' ) . '</td></tr>';
+			echo '<tr class="rb-nomatch" style="display:none"><td colspan="' . (int) $cols . '">' . esc_html__( 'No matches for the current filter.', 'riskybuyer' ) . '</td></tr>';
 		}
 
 		echo '</tbody></table>';

@@ -1,10 +1,10 @@
-=== Risky Buyer ===
+=== RiskyBuyer – Customer Flags for WooCommerce ===
 Contributors: winter2007d
 Tags: woocommerce, orders, customers, blacklist, fraud
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.1
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,7 +12,7 @@ Flag problematic WooCommerce customers by phone or name and automatically mark t
 
 == Description ==
 
-Risky Buyer lets your team keep a list of problematic customers (uncollected COD
+RiskyBuyer lets your team keep a list of problematic customers (uncollected COD
 shipments, fake orders, abusive behaviour, etc.) and flags their orders right in
 the WooCommerce orders list.
 
@@ -49,7 +49,7 @@ so multiple sites can contribute to and read the same list.
 
 == Installation ==
 
-1. Upload the `risky-buyer` folder to `/wp-content/plugins/`, or install it
+1. Upload the `riskybuyer` folder to `/wp-content/plugins/`, or install it
    from the Plugins screen.
 2. Activate the plugin (this creates the database table).
 3. Manage the list under **WooCommerce → Risky buyers**.
@@ -100,6 +100,13 @@ The service is provided by the plugin author. Terms of Use:
 https://riskybuyer.com/terms — Privacy Policy: https://riskybuyer.com/privacy
 
 == Changelog ==
+
+= 1.0.3 =
+* Added a "Settings" link to the plugin's row on the Plugins screen.
+
+= 1.0.2 =
+* Renamed to "RiskyBuyer – Customer Flags for WooCommerce".
+* Orders-list styles and script are now loaded with the standard WordPress enqueue functions instead of inline tags.
 
 = 1.0.1 =
 * Order screen: the "Risky buyer" box now shows a single "Mark as problematic" button and reveals the reason/note form only when you click it — less clutter on every order.

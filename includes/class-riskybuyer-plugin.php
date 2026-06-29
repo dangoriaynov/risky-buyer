@@ -43,7 +43,7 @@ class Riskybuyer_Plugin {
 	 */
 	public function load_textdomain() {
 		// Loaded for the bundled bg_BG translation on self-hosted installs.
-		load_plugin_textdomain( 'risky-buyer', false, dirname( plugin_basename( RISKYBUYER_FILE ) ) . '/languages' ); // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
+		load_plugin_textdomain( 'riskybuyer', false, dirname( plugin_basename( RISKYBUYER_FILE ) ) . '/languages' ); // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound
 	}
 
 	public static function is_relevant_screen( $screen ) {
@@ -54,7 +54,7 @@ class Riskybuyer_Plugin {
 		if ( in_array( $screen->id, $ids, true ) ) {
 			return true;
 		}
-		return false !== strpos( (string) $screen->id, 'risky-buyer' );
+		return false !== strpos( (string) $screen->id, 'riskybuyer' );
 	}
 
 	public function enqueue_assets( $hook ) {
@@ -77,13 +77,13 @@ class Riskybuyer_Plugin {
 				'can_add'    => $bl->can_add(),
 				'can_manage' => $bl->can_manage(),
 				'i18n'       => array(
-					'confirm_remove' => __( 'Remove this client from the list?', 'risky-buyer' ),
-					'error'          => __( 'An error occurred.', 'risky-buyer' ),
-					'saving'         => __( 'Saving…', 'risky-buyer' ),
-					'saved'          => __( 'Saved', 'risky-buyer' ),
-					'checking'       => __( 'Checking…', 'risky-buyer' ),
-					'key_invalid'    => __( 'Invalid key', 'risky-buyer' ),
-					'server_unreachable' => __( 'Server unreachable — the key was not checked.', 'risky-buyer' ),
+					'confirm_remove' => __( 'Remove this client from the list?', 'riskybuyer' ),
+					'error'          => __( 'An error occurred.', 'riskybuyer' ),
+					'saving'         => __( 'Saving…', 'riskybuyer' ),
+					'saved'          => __( 'Saved', 'riskybuyer' ),
+					'checking'       => __( 'Checking…', 'riskybuyer' ),
+					'key_invalid'    => __( 'Invalid key', 'riskybuyer' ),
+					'server_unreachable' => __( 'Server unreachable — the key was not checked.', 'riskybuyer' ),
 				),
 			)
 		);

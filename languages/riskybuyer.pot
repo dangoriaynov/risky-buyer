@@ -2,8 +2,8 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: RiskyBuyer 0.6.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/risky-buyer\n"
+"Project-Id-Version: RiskyBuyer 1.0.2\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/riskybuyer\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -12,30 +12,30 @@ msgstr ""
 "POT-Creation-Date: 2026-06-14T20:48:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: risky-buyer\n"
+"X-Domain: riskybuyer\n"
 
 #. Plugin Name of the plugin
-#: risky-buyer.php
-msgid "RiskyBuyer"
+#: riskybuyer.php
+msgid "RiskyBuyer – Customer Flags for WooCommerce"
 msgstr ""
 
 #. Plugin URI of the plugin
-#: risky-buyer.php
+#: riskybuyer.php
 msgid "https://github.com/dangoriaynov/risky-buyer"
 msgstr ""
 
 #. Description of the plugin
-#: risky-buyer.php
+#: riskybuyer.php
 msgid "Flag problematic WooCommerce customers by phone or name (with a reason and note) and automatically mark their orders in the admin. Optional sync with a shared central list (riskybuyer.com)."
 msgstr ""
 
 #. Author of the plugin
-#: risky-buyer.php
+#: riskybuyer.php
 msgid "dangoriaynov"
 msgstr ""
 
 #. Author URI of the plugin
-#: risky-buyer.php
+#: riskybuyer.php
 msgid "https://github.com/dangoriaynov"
 msgstr ""
 

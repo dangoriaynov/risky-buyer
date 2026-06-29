@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Risky Buyer
+ * Plugin Name: RiskyBuyer – Customer Flags for WooCommerce
  * Description: Flag problematic WooCommerce customers by phone or name (with a reason and note) and automatically mark their orders in the admin. Optional sync with a shared central list (riskybuyer.com).
- * Version: 1.0.1
+ * Version: 1.0.3
  * Author: dangoriaynov
  * Author URI: https://github.com/dangoriaynov
  * Plugin URI: https://github.com/dangoriaynov/risky-buyer
@@ -10,7 +10,7 @@
  * Requires at least: 6.0
  * Tested up to: 7.0
  * Requires Plugins: woocommerce
- * Text Domain: risky-buyer
+ * Text Domain: riskybuyer
  * Domain Path: /languages
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'RISKYBUYER_VERSION', '1.0.1' );
+define( 'RISKYBUYER_VERSION', '1.0.3' );
 define( 'RISKYBUYER_DB_VERSION', '2' );
 define( 'RISKYBUYER_FILE', __FILE__ );
 define( 'RISKYBUYER_DIR', plugin_dir_path( __FILE__ ) );
