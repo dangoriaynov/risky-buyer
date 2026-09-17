@@ -26,8 +26,8 @@ requirements.txt
 # 1) container
 lxc launch images:ubuntu/24.04 riskybuyer
 # 2) inside: python + venv
-lxc exec riskybuyer -- bash -lc 'apt-get update && apt-get install -y python3-venv'
-lxc exec riskybuyer -- useradd --system --create-home --home-dir /opt/riskybuyer riskybuyer
+lxc exec risky-buyer -- bash -lc 'apt-get update && apt-get install -y python3-venv'
+lxc exec risky-buyer -- useradd --system --create-home --home-dir /opt/riskybuyer riskybuyer
 # 3) copy app to /opt/riskybuyer/server, create venv, pip install -r requirements.txt
 # 4) install deploy/riskybuyer.service, enable + start
 # 5) on nginx-proxy: add deploy/nginx-riskybuyer.conf (set __APP_IP__), certbot --nginx
