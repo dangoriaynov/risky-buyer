@@ -31,7 +31,7 @@ lxc launch images:ubuntu/24.04 riskybuyer
 # 2) inside: python + venv
 lxc exec risky-buyer -- bash -lc 'apt-get update && apt-get install -y python3-venv'
 lxc exec risky-buyer -- useradd --system --create-home --home-dir /opt/riskybuyer riskybuyer
-# 3) copy app to /opt/riskybuyer/server, create venv, pip install -r requirements.txt
+# 3) copy app to /opt/riskybuyer/server, create venv, pip install -r requirements.txt -c constraints.txt
 # 4) install deploy/riskybuyer.service, enable + start
 # 5) on nginx-proxy: add deploy/nginx-riskybuyer.conf (set __APP_IP__), certbot --nginx
 ```
@@ -44,5 +44,5 @@ cd /opt/riskybuyer/server
 ```
 
 ## DNS
-`riskybuyer.com` + `www` → A `79.100.220.106` (homelab public IP) on Cloudflare.
+`riskybuyer.com` + `www` → A record to the server's public address, on Cloudflare.
 Use DNS-only (grey cloud) during first certbot issuance, then proxied is fine.
