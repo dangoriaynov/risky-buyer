@@ -12,3 +12,7 @@ vendor/
 # build artifact
 risky-buyer.zip
 *.zip
+
+.venv/
+__pycache__/
+*.pyc

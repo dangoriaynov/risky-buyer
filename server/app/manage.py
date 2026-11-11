@@ -42,7 +42,9 @@ def list_appeals() -> None:
     init_db()
     conn = db()
     for r in conn.execute( "SELECT id, created_at, status, name, phone, message FROM appeals ORDER BY created_at DESC LIMIT 200" ):
-        print( "#%d [%s] %s | %s | %s | %s" % ( r["id"], r["status"], r["created_at"], r["name"], r["phone"], ( r["message"] or "" )[:120] ) )
+        # Strangers wrote these: control characters would be obeyed by the terminal that prints them.
+        clean = lambda v: "".join( c if c.isprintable() else "?" for c in ( v or "" ) )
+        print( "#%d [%s] %s | %s | %s | %s" % ( r["id"], r["status"], r["created_at"], clean( r["name"] ), clean( r["phone"] ), clean( r["message"] )[:120] ) )
     conn.close()
 
 

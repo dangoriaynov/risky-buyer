@@ -14,16 +14,81 @@ import sqlite3
 import hashlib
 import secrets
 import datetime
+import threading
+import time
+from collections import deque
 from typing import List, Optional
 
-from fastapi import FastAPI, Header, HTTPException
-from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from fastapi import FastAPI, Header, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel, Field
 
 DB_PATH = os.environ.get("RB_DB", "/var/lib/riskybuyer/riskybuyer.db")
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
+# The list holds names and phone numbers. "1" makes GET /v1/entries ask for a valid key (any scope);
+# the plugin already sends its key on reads when it has one.
+READ_NEEDS_KEY = os.environ.get("RB_READ_NEEDS_KEY", "") == "1"
+
+# Largest honest request: one push of MAX_ENTRIES entries with every field full.
+MAX_ENTRIES = 500
+MAX_BODY_BYTES = 1024 * 1024
+
+# The appeal form is open to anyone: a few per visitor, and a ceiling for everyone together.
+APPEALS_PER_IP = (5, 3600)
+APPEALS_TOTAL = (200, 86400)
+
+SECURITY_HEADERS = {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Content-Security-Policy": "frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'",
+    "Strict-Transport-Security": "max-age=31536000",
+}
+
 app = FastAPI(title="riskybuyer", docs_url=None, redoc_url=None, openapi_url=None)
+
+
+@app.middleware("http")
+async def limits_and_headers(request: Request, call_next):
+    declared = request.headers.get("content-length", "")
+    if request.method in ("POST", "PUT", "PATCH", "DELETE"):
+        # A body of unknown length would be read whole before any check could refuse it.
+        if not declared.isdigit() and request.method != "DELETE":
+            response = JSONResponse({"detail": "Length required"}, status_code=411)
+        elif declared.isdigit() and int(declared) > MAX_BODY_BYTES:
+            response = JSONResponse({"detail": "Request too large"}, status_code=413)
+        else:
+            response = await call_next(request)
+    else:
+        response = await call_next(request)
+    for name, value in SECURITY_HEADERS.items():
+        response.headers.setdefault(name, value)
+    if request.url.path.startswith("/v1/"):
+        response.headers.setdefault("Cache-Control", "no-store")
+    return response
+
+
+_hits_lock = threading.Lock()
+_hits: dict = {}
+
+
+def allow(key: str, limit: int, window: float, now: Optional[float] = None) -> bool:
+    """Sliding window: at most `limit` accepted calls per `window` seconds for this key."""
+    now = time.monotonic() if now is None else now
+    with _hits_lock:
+        if len(_hits) > 10000:
+            for k in [k for k, q in _hits.items() if not q or q[-1] <= now - window]:
+                del _hits[k]
+            if len(_hits) > 10000:
+                return False
+        q = _hits.setdefault(key, deque())
+        while q and q[0] <= now - window:
+            q.popleft()
+        if len(q) >= limit:
+            return False
+        q.append(now)
+        return True
 
 
 # --------------------------------------------------------------------------- #
@@ -84,6 +149,7 @@ init_db()
 
 _NAME_RE = re.compile(r"[\W_]+", re.UNICODE)
 _VALID_REASONS = {"uncollected", "fake", "abusive", "other"}
+_UUID_RE = re.compile(r"[A-Za-z0-9-]{8,64}\Z")
 
 
 def norm_phone(s: Optional[str]) -> str:
@@ -106,7 +172,7 @@ def now_iso() -> str:
     return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
 
 
-def require_write(authorization: Optional[str]) -> sqlite3.Row:
+def require_key(authorization: Optional[str]) -> sqlite3.Row:
     if not authorization or not authorization.lower().startswith("bearer "):
         raise HTTPException(status_code=401, detail="Missing API key")
     key = authorization.split(" ", 1)[1].strip()
@@ -116,6 +182,11 @@ def require_write(authorization: Optional[str]) -> sqlite3.Row:
     conn.close()
     if not row:
         raise HTTPException(status_code=403, detail="Invalid API key")
+    return row
+
+
+def require_write(authorization: Optional[str]) -> sqlite3.Row:
+    row = require_key(authorization)
     if row["scope"] != "write":
         raise HTTPException(status_code=403, detail="Key is not authorized to write")
     return row
@@ -135,7 +206,7 @@ class EntryIn(BaseModel):
 
 
 class EntriesIn(BaseModel):
-    entries: List[EntryIn]
+    entries: List[EntryIn] = Field(max_length=MAX_ENTRIES)
 
 
 class AppealIn(BaseModel):
@@ -157,22 +228,16 @@ def healthz():
 @app.get("/v1/whoami")
 def whoami(authorization: Optional[str] = Header(default=None)):
     """Validate an API key: returns its site_domain and scope, or 401/403."""
-    if not authorization or not authorization.lower().startswith("bearer "):
-        raise HTTPException(status_code=401, detail="Missing API key")
-    key = authorization.split(" ", 1)[1].strip()
-    key_hash = hashlib.sha256(key.encode("utf-8")).hexdigest()
-    conn = db()
-    row = conn.execute(
-        "SELECT site_domain, scope FROM api_keys WHERE key_hash = ?", (key_hash,)
-    ).fetchone()
-    conn.close()
-    if not row:
-        raise HTTPException(status_code=403, detail="Invalid API key")
+    row = require_key(authorization)
     return {"site_domain": row["site_domain"], "scope": row["scope"]}
 
 
 @app.get("/v1/entries")
-def list_entries(since: Optional[str] = None):
+def list_entries(since: Optional[str] = None, authorization: Optional[str] = Header(default=None)):
+    if READ_NEEDS_KEY:
+        require_key(authorization)
+    if since is not None and len(since) > 32:
+        raise HTTPException(status_code=400, detail="Bad since")
     conn = db()
     if since:
         rows = conn.execute(
@@ -199,6 +264,8 @@ def upsert_entries(payload: EntriesIn, authorization: Optional[str] = Header(def
     upserted = 0
     for e in payload.entries:
         uuid = (e.uuid or "").strip() or secrets.token_hex(16)
+        if not _UUID_RE.match(uuid):
+            continue
         row = {
             "uuid": uuid,
             "phone_norm": norm_phone(e.phone),
@@ -236,10 +303,13 @@ def upsert_entries(payload: EntriesIn, authorization: Optional[str] = Header(def
 
 
 @app.post("/v1/appeal")
-def submit_appeal(payload: AppealIn):
+def submit_appeal(payload: AppealIn, request: Request):
     """Removal / wrongly-listed request. Honeypot-protected, open (no key)."""
     if ( payload.website or "" ).strip():
         return {"ok": True}  # bot filled the honeypot — silently drop
+    ip = request.client.host if request.client else "unknown"
+    if not (allow("appeal:" + ip, *APPEALS_PER_IP) and allow("appeal:*", *APPEALS_TOTAL)):
+        raise HTTPException(status_code=429, detail="Too many requests, please try again later")
     name    = ( payload.name or "" ).strip()[:191]
     phone   = ( payload.phone or "" ).strip()[:64]
     message = ( payload.message or "" ).strip()[:2000]
