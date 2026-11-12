@@ -106,8 +106,15 @@ def test_no_api_docs(api, path):
 
 
 def test_the_unit_trusts_forwarded_headers_from_the_proxy_only():
-    unit = (Path(__file__).resolve().parent.parent / "deploy" / "riskybuyer.service").read_text()
+    unit = (Path(__file__).resolve().parent.parent / "deploy" / "risky-buyer.service").read_text()
     assert "--forwarded-allow-ips=*" not in unit
+
+
+def test_the_unit_matches_the_layout_of_the_host():
+    unit = (Path(__file__).resolve().parent.parent / "deploy" / "risky-buyer.service").read_text()
+    for line in ("User=risky-buyer", "WorkingDirectory=/opt/risky-buyer/server",
+                 "EnvironmentFile=-/etc/risky-buyer/risky-buyer.env", "ReadWritePaths=/var/lib/riskybuyer"):
+        assert line in unit.splitlines()
 
 
 def test_appeals_are_printed_without_control_characters(api, capsys):

@@ -3,15 +3,17 @@ Description=RiskyBuyer API (FastAPI/uvicorn)
 After=network.target
 
 [Service]
-User=riskybuyer
-Group=riskybuyer
-WorkingDirectory=/opt/riskybuyer/server
+User=risky-buyer
+Group=risky-buyer
+WorkingDirectory=/opt/risky-buyer/server
 Environment=RB_DB=/var/lib/riskybuyer/riskybuyer.db
 # Set to "1" to make GET /v1/entries require an API key (the list holds names and phone numbers).
 Environment=RB_READ_NEEDS_KEY=
 # The reverse proxy's address. Never "*": the port is reachable directly, and anyone could then name their own address.
 Environment=RB_PROXY=127.0.0.1
-ExecStart=/opt/riskybuyer/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8080 --proxy-headers --forwarded-allow-ips=${RB_PROXY}
+# The host's own values (RB_PROXY above all) live here and win over the defaults.
+EnvironmentFile=-/etc/risky-buyer/risky-buyer.env
+ExecStart=/opt/risky-buyer/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8080 --proxy-headers --forwarded-allow-ips=${RB_PROXY}
 Restart=always
 RestartSec=3
 NoNewPrivileges=true
