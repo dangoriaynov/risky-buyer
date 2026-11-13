@@ -18,7 +18,7 @@ Lightweight **FastAPI** app with **SQLite**, served behind the homelab
 app/main.py        FastAPI app, DB, auth, endpoints, static
 app/manage.py      CLI: create-key / list-keys
 app/static/        index.html, terms.html, privacy.html
-deploy/riskybuyer.service   systemd unit (uvicorn on :8080)
+deploy/risky-buyer.service  systemd unit (uvicorn on :8080)
 deploy/nginx-riskybuyer.conf nginx-proxy vhost template
 requirements.txt
 tests/             pytest (`make check` in server/)
@@ -27,20 +27,21 @@ tests/             pytest (`make check` in server/)
 ## Deploy (LXC container on the homelab)
 ```bash
 # 1) container
-lxc launch images:ubuntu/24.04 riskybuyer
+lxc launch images:ubuntu/24.04 risky-buyer
 # 2) inside: python + venv
 lxc exec risky-buyer -- bash -lc 'apt-get update && apt-get install -y python3-venv'
-lxc exec risky-buyer -- useradd --system --create-home --home-dir /opt/riskybuyer riskybuyer
-# 3) copy app to /opt/riskybuyer/server, create venv, pip install -r requirements.txt -c constraints.txt
-# 4) install deploy/riskybuyer.service, enable + start
+lxc exec risky-buyer -- useradd --system --create-home --home-dir /opt/risky-buyer risky-buyer
+# 3) copy app to /opt/risky-buyer/server, create venv, pip install -r requirements.txt -c constraints.txt
+# 4) put RB_PROXY=<reverse proxy address> into /etc/risky-buyer/risky-buyer.env (0600),
+#    install deploy/risky-buyer.service, enable + start
 # 5) on nginx-proxy: add deploy/nginx-riskybuyer.conf (set __APP_IP__), certbot --nginx
 ```
 
 ## Create an API key
 ```bash
-cd /opt/riskybuyer/server
-/opt/riskybuyer/venv/bin/python -m app.manage create-key dobavki.club write
-/opt/riskybuyer/venv/bin/python -m app.manage create-key example.com read   # (read is open anyway)
+cd /opt/risky-buyer/server
+/opt/risky-buyer/venv/bin/python -m app.manage create-key dobavki.club write
+/opt/risky-buyer/venv/bin/python -m app.manage create-key example.com read   # (read is open anyway)
 ```
 
 ## DNS
