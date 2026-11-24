@@ -5,7 +5,7 @@ Open read (GET), authenticated write (POST/DELETE) gated by an API key whose
 scope is 'write'. The server stamps each entry with the key's site_domain, so a
 client cannot forge ownership; updates/deletes only affect the owner's entries.
 
-Static site (landing, Terms, Privacy) is served from app/static.
+Static site (landing, Terms, Privacy, tab icons) is served from app/static.
 """
 
 import os
@@ -356,3 +356,14 @@ def terms():
 @app.get("/privacy")
 def privacy():
     return FileResponse(os.path.join(STATIC_DIR, "privacy.html"))
+
+
+@app.get("/favicon.svg")
+def favicon_svg():
+    return FileResponse(os.path.join(STATIC_DIR, "favicon.svg"), media_type="image/svg+xml")
+
+
+@app.get("/apple-touch-icon.png")
+@app.get("/favicon.ico")
+def touch_icon():
+    return FileResponse(os.path.join(STATIC_DIR, "apple-touch-icon.png"), media_type="image/png")

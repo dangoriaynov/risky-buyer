@@ -122,3 +122,17 @@ def test_appeals_are_printed_without_control_characters(api, capsys):
     importlib.import_module("app.manage").list_appeals()
     out = capsys.readouterr().out
     assert "\x1b" not in out and "\r" not in out and "A?[2JB" in out
+
+
+@pytest.mark.parametrize("path, kind", [("/favicon.ico", "image/png"), ("/apple-touch-icon.png", "image/png"),
+                                        ("/favicon.svg", "image/svg+xml")])
+def test_tab_icons_are_served(api, path, kind):
+    r = api.get(path)
+    assert r.status_code == 200 and r.headers["content-type"].startswith(kind)
+
+
+@pytest.mark.parametrize("page", ["/", "/terms", "/privacy"])
+def test_every_page_links_the_tab_icons(api, page):
+    html = api.get(page).text
+    assert '<link rel="icon" href="/favicon.svg" type="image/svg+xml">' in html
+    assert '<link rel="apple-touch-icon" href="/apple-touch-icon.png">' in html
